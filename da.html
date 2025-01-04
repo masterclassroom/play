@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xisaabi Sannadka Dhalashada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+        }
+
+        button {
+            background-color: #2109d6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2109d1;
+        }
+
+        p {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Xisaabi Sannadka Dhalashada</h1>
+        <label for="age">Geli da'daada (sano):</label>
+        <input type="number" id="age" placeholder="Tusaale: 25">
+        <button onclick="calculateBirthYear()">Xisaabi</button>
+        <p id="result"></p>
+        <audio id="successSound" src="play.sound.mp3"></audio>
+        <audio id="errorSound" src="play.sound1.mp3"></audio>
+    </div>
+    <script>
+        function calculateBirthYear() {
+            const age = parseInt(document.getElementById("age").value);
+            const currentYear = new Date().getFullYear();
+
+            if (isNaN(age) || age <= 0) {
+                document.getElementById("result").innerText = "Fadlan geli da' sax ah.";
+                document.getElementById("errorSound").play();
+                return;
+            }
+
+            const birthYear = currentYear - age;
+
+            document.getElementById("result").innerText = 
+                `Waxaad dhalatay sannadkii: ${birthYear}`;
+            document.getElementById("successSound").play();
+        }
+    </script>
+</body>
+</html>
