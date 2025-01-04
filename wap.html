@@ -108,6 +108,8 @@
             // Hubinta saxnimada taariikhda la geliyay
             const userDate = new Date(year, month - 1, day);
             if (userDate.getDate() !== day || userDate.getMonth() !== month - 1 || userDate.getFullYear() !== year) {
+                var sound = document.getElementById("loginpound");
+            sound.play();
                 document.getElementById("result").innerText = "Fadlan geli taariikh sax ah (D/M/YYYY).";
                 return;
             }
