@@ -44,6 +44,7 @@
             cursor: pointer;
             font-size: 16px;
             width: 100%;
+            margin-top: 10px;
         }
 
         button:hover {
@@ -108,9 +109,11 @@
                     }
 
                     resultText = `Waxaad dhalatay: ${birthYear}, bishii ${birthMonth}.`;
+                    var sound = document.getElementById("loginSound");
+            sound.play();
                 }
             } else {
-                resultText = "Fadlan geli xog sax ah (tusaale: Y, Y.M).";
+                resultText = "Fadlan geli da'dada (tusaale: Y, Y.M).";
                 var sound = document.getElementById("loginpound");
             sound.play();
             }
