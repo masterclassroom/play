@@ -57,7 +57,7 @@
        input:hover {
         }
         input:disabled {
-            background: #000000;
+            background: #16deac;
             
         }
 
@@ -93,7 +93,7 @@
     </style>
     <script>
         let captchaCode;
-        let currentLang = "so";
+        let currentLang = "So";
         let failedAttempts = 0;
         const blockDuration = 10; // seconds
         const translations = {
@@ -145,7 +145,7 @@
                 startLoading();
             } else {
                 failedAttempts++;
-                if (failedAttempts >= 5) {
+                if (failedAttempts >= 7) {
                     blockUser();
                 } else {
                     var sound = document.getElementById("loginpound");
