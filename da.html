@@ -84,7 +84,9 @@
                 // Haddii qofku geliyo sannad keliya
                 const years = parseInt(parts[0]);
                 if (isNaN(years)) {
-                    resultText = "Fadlan geli xog sax ah.";
+                    resultText = "Fadlan geli da'dada.";
+                    var sound = document.getElementById("loginpound");
+            sound.play();
                 } else {
                     resultText = `Waxaad dhalatay sannadkii ${currentYear - years}.`;
                     var sound = document.getElementById("loginSound");
@@ -113,7 +115,7 @@
             sound.play();
                 }
             } else {
-                resultText = "Fadlan geli da'dada (tusaale: Y, Y.M).";
+                resultText = "Fadlan geli xog sax ah (tusaale: Y, Y.M).";
                 var sound = document.getElementById("loginpound");
             sound.play();
             }
