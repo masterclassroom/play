@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xisaabi Sannadka Dhalashada</title>
+    <title>Xisaabi Sannadka, Bilaha, iyo Maalmaha</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,34 +17,22 @@
             height: 100vh;
         }
 
-        h1 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
         .container {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
             text-align: center;
+            width: 300px;
         }
 
-        input[type="number"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border-radius: 5px;
             border: 1px solid #ccc;
+            border-radius: 5px;
             font-size: 16px;
-            outline: none;
-        }
-
-        input[type="number"]:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
         }
 
         button {
@@ -56,7 +44,6 @@
             cursor: pointer;
             font-size: 16px;
             width: 100%;
-            margin-top: 10px;
         }
 
         button:hover {
@@ -66,43 +53,74 @@
         p {
             font-size: 18px;
             font-weight: bold;
-            margin-top: 20px;
             color: #333;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Xisaabi Sannadka Dhalashada</h1>
-        <label for="age">Geli da'daada:</label>
-        <input type="number" id="age" placeholder="Fadlan gali da,dada">
-        <button onclick="calculateBirthYear()">Xisaabi</button>
+        <h1>Xisaabi Taariikhda Dhalashada</h1>
+        <label for="inputDate">Geli da'daada (tusaale: Y, Y.M):</label>
+        <input type="text" id="inputDate" placeholder="Tusaale: 25, 25.6">
+        <button onclick="calculateBirth()">Xisaabi</button>
         <button onclick="back()">Noqo</button>
+        <audio id="loginSound" src="play.sound.mp3"></audio>
+        <audio id="loginpound" src="play.sound1.mp3"></audio>
         <p id="result"></p>
-        <audio id="successSound" src="play.sound.mp3"></audio>
-        <audio id="errorSound" src="play.sound1.mp3"></audio>
     </div>
     <script>
-        function calculateBirthYear() {
-            const age = parseInt(document.getElementById("age").value);
-            const currentYear = new Date().getFullYear();
+        function calculateBirth() {
+            const input = document.getElementById("inputDate").value;
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // Bisha hadda
 
-            if (isNaN(age) || age <= 0) {
-                document.getElementById("result").innerText = "Fadlan geli da,dada.";
-                document.getElementById("errorSound").play();
-                return;
+            const parts = input.split(".");
+            let resultText = "";
+
+            if (parts.length === 1) {
+                // Haddii qofku geliyo sannad keliya
+                const years = parseInt(parts[0]);
+                if (isNaN(years)) {
+                    resultText = "Fadlan geli xog sax ah.";
+                } else {
+                    resultText = `Waxaad dhalatay sannadkii ${currentYear - years}.`;
+                    var sound = document.getElementById("loginSound");
+            sound.play();
+                }
+            } else if (parts.length === 2) {
+                // Haddii qofku geliyo sannad iyo bilo
+                const years = parseInt(parts[0]);
+                const months = parseInt(parts[1]);
+                if (isNaN(years) || isNaN(months) || months < 1 || months > 12) {
+                    resultText = "Fadlan geli xog sax ah.";
+                    var sound = document.getElementById("loginpound");
+            sound.play();
+                } else {
+                    let birthYear = currentYear - years;
+                    let birthMonth = currentMonth - months;
+
+                    // Haddii bisha cusub ay ka yar tahay 1, waxaan ka dhigeynaa bisha 12
+                    if (birthMonth <= 0) {
+                        birthMonth += 12;
+                        birthYear--;
+                    }
+
+                    resultText = `Waxaad dhalatay: ${birthYear}, bishii ${birthMonth}.`;
+                }
+            } else {
+                resultText = "Fadlan geli xog sax ah (tusaale: Y, Y.M).";
+                var sound = document.getElementById("loginpound");
+            sound.play();
             }
 
-            const birthYear = currentYear - age;
-
-            document.getElementById("result").innerText = 
-                `Waxaad dhalatay sannadkii: ${birthYear}`;
-            document.getElementById("successSound").play();
+            document.getElementById("result").innerText = resultText;
         }
 
-        function back() {
-            window.location.href = 'wap.html';
-        }
+         function back() {
+             window.location.href = 'wap.html';
+         }
     </script>
 </body>
 </html>
