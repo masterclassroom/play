@@ -93,9 +93,9 @@
     </style>
     <script>
         let captchaCode;
-        let currentLang = "en";
+        let currentLang = "so";
         let failedAttempts = 0;
-        const blockDuration = 15; // seconds
+        const blockDuration = 10; // seconds
         const translations = {
             en: {
                 title: "Verify CAPTCHA",
@@ -119,7 +119,7 @@
 
         function generateCaptcha() {
             const chars = "0123456789"; // Qoraalka iyo lambarada
-            const captchaLength = 4; // Dhererka CAPTCHA
+            const captchaLength = 3; // Dhererka CAPTCHA
             captchaCode = "";
             for (let i = 0; i < captchaLength; i++) {
                 const randomIndex = Math.floor(Math.random() * chars.length);
@@ -145,7 +145,7 @@
                 startLoading();
             } else {
                 failedAttempts++;
-                if (failedAttempts >= 3) {
+                if (failedAttempts >= 5) {
                     blockUser();
                 } else {
                     var sound = document.getElementById("loginpound");
@@ -216,7 +216,7 @@
                     window.location.href = "dashboard.html";
                     generateCaptcha();
                 }
-            }, 30); // 3 seconds total (30ms * 100)
+            }, 50); // 3 seconds total (30ms * 100)
         }
 
         window.onload = function () {
