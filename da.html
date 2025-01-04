@@ -74,8 +74,8 @@
 <body>
     <div class="container">
         <h1>Xisaabi Sannadka Dhalashada</h1>
-        <label for="age">Geli da'daada (sano):</label>
-        <input type="number" id="age" placeholder="Tusaale: 25">
+        <label for="age">Geli da'daada:</label>
+        <input type="number" id="age" placeholder="Fadlan gali da,dada">
         <button onclick="calculateBirthYear()">Xisaabi</button>
         <button onclick="back()">Noqo</button>
         <p id="result"></p>
@@ -88,7 +88,7 @@
             const currentYear = new Date().getFullYear();
 
             if (isNaN(age) || age <= 0) {
-                document.getElementById("result").innerText = "Fadlan geli da' sax ah.";
+                document.getElementById("result").innerText = "Fadlan geli da,dada.";
                 document.getElementById("errorSound").play();
                 return;
             }
