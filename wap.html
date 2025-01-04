@@ -48,7 +48,7 @@
         }
 
         button {
-            background-color: #2ccf13;
+            background-color: #2109d1;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -60,7 +60,13 @@
         }
 
         button:hover {
-            background-color: #2109d1;
+            background-color: #2109d5;
+        }
+        .i {
+            background-color: #cf1313;
+        }
+        .i:hover {
+            background-color: #cf1313;
         }
 
         p {
@@ -76,7 +82,7 @@
         <h1>Xisaabi Sannado, Bilaha, iyo Maalmaha</h1>
         <label for="userDate">Soo geli taariikh sax ah (D/M/YYYY):</label>
         <input type="text" id="userDate" placeholder="Tusaale: D/M/YYYY">
-        <button onclick="calculateTime()">Xisaabi</button>
+        <button onclick="calculateTime()" class="i">Xisaabi</button>
         <button onclick="jiya()">Ma garanayo</button>
         <p id="result"></p>
          <audio id="loginpound" src="play.sound1.mp3"></audio>
