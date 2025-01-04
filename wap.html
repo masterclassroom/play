@@ -80,11 +80,10 @@
         <button onclick="jiya()">Noqo</button>
         <p id="result"></p>
          <audio id="loginpound" src="play.sound1.mp3"></audio>
+         <audio id="loginSound" src="play.sound.mp3"></audio>
     </div>
     <script>
         function calculateTime() {
-          var sound = document.getElementById("loginpound");
-            sound.play();
             const input = document.getElementById("userDate").value;
 
             // Hubinta qaabka xogta
@@ -92,6 +91,8 @@
             const match = input.match(regex);
 
             if (!match) {
+                var sound = document.getElementById("loginpound");
+            sound.play();
                 document.getElementById("result").innerText = "Fadlan geli dhalasho sax ah (D/M/YYYY).";
                 return;
             }
@@ -119,6 +120,8 @@
 
             document.getElementById("result").innerText =
                 `Waxaa aad jirta: ${yearsDifference} sano, ${monthsDifference} bilood, iyo ${remainingDays} maalmood.`;
+            var sound = document.getElementById("loginSound");
+            sound.play();
         }
 
         function jiya() {
