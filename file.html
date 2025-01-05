@@ -146,7 +146,7 @@
                 if (failedAttempts >= 7) {
                     blockUser();
                 } else {
-                    const sound = document.getElementById("loginpound");
+                    const sound = document.getElementById("loginSound");
                     sound.play();
                     alert(translations[currentLang].error);
                 }
@@ -208,7 +208,7 @@
                 progress++;
                 progressBar.textContent = `Loading ${progress}%`;
                 if (progress === 100) {
-                    const sound = document.getElementById("loginSound");
+                    const sound = document.getElementById("loginpound");
                     sound.play();
                     clearInterval(interval);
                     window.location.href = "dashboard.html";
@@ -243,8 +243,8 @@
         <br>
         <button id="btnVerify" onclick="verifyCaptcha()">Verify</button>
         <button id="btnRefresh" onclick="refreshCaptcha()">Refresh</button>
-        <audio id="loginSound" src="success.mp3"></audio>
-        <audio id="loginpound" src="error.mp3"></audio>
+        <audio id="loginpound" src="play.sound.mp3"></audio>
+        <audio id="loginpound" src="play.sound1.mp3"></audio>
 
         <div id="loadingText"></div>
         <div id="progressBar"></div>
