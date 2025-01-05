@@ -95,7 +95,7 @@
         let captchaCode;
         let currentLang = "en";
         let failedAttempts = 0;
-        const blockDuration = 5; // seconds
+        const blockDuration = 15; // seconds
         const translations = {
             en: {
                 title: "Verify CAPTCHA",
@@ -119,7 +119,7 @@
 
         function generateCaptcha() {
             const chars = "0123456789"; // Qoraalka iyo lambarada
-            const captchaLength = 10; // Dhererka CAPTCHA
+            const captchaLength = 4; // Dhererka CAPTCHA
             captchaCode = "";
             for (let i = 0; i < captchaLength; i++) {
                 const randomIndex = Math.floor(Math.random() * chars.length);
