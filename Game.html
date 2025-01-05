@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Coins</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .coin-count {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .claim-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .claim-btn:hover {
+            background-color: #218838;
+        }
+
+        .remaining-coins {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .congratulations {
+            font-size: 20px;
+            color: #FFD700;
+            font-weight: bold;
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Claim Your Coins!</h2>
+        <div class="coin-count" id="coinCount">Coins: 0</div>
+        <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
+        <div class="remaining-coins" id="remainingCoins">Remaining Coins: 100</div>
+        <div class="congratulations" id="congratulationsMessage">Congratulations! You've earned 1 million coins! 🎉</div>
+    </div>
+
+    <script>
+        // Function to load coins from localStorage
+        function loadCoins() {
+            const storedCoins = localStorage.getItem("coins");
+            const storedRemainingCoins = localStorage.getItem("remainingCoins");
+
+            if (storedCoins) {
+                document.getElementById("coinCount").textContent = "Coins: " + storedCoins;
+            } else {
+                localStorage.setItem("coins", 0);  // Initialize to 0 if not found
+            }
+
+            if (storedRemainingCoins) {
+                document.getElementById("remainingCoins").textContent = "Remaining Coins: " + storedRemainingCoins;
+            } else {
+                localStorage.setItem("remainingCoins", 100);  // Initialize to 100 if not found
+            }
+        }
+
+        // Function to claim coins
+        function claimCoins() {
+            let coins = parseInt(localStorage.getItem("coins")) || 0;
+            let remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
+
+            if (remainingCoins > 0) {
+                coins += 10;  // Add 10 coins
+                remainingCoins -= 10;  // Subtract 10 coins from remaining coins
+
+                // Update localStorage with new values
+                localStorage.setItem("coins", coins);
+                localStorage.setItem("remainingCoins", remainingCoins);
+
+                // Update the display
+                document.getElementById("coinCount").textContent = "Coins: " + coins;
+                document.getElementById("remainingCoins").textContent = "Remaining Coins: " + remainingCoins;
+
+                // Check if remaining coins reach 1 million
+                if (coins >= 1000000) {
+                    document.getElementById("congratulationsMessage").style.display = "block";  // Show congratulations
+                    document.getElementById("claimButton").disabled = true;  // Disable claim button
+                    localStorage.setItem("coins", 1000000);  // Set coins to 1 million in localStorage
+                    localStorage.setItem("gameStatus", "Game Over: You have reached 1 million coins!");  // Save the game status
+
+                    // Close the game after a few seconds or immediately
+                    setTimeout(() => {
+                        alert("You have reached 1 million coins! Closing the game now...");
+                        window.close();  // Close the browser window (if allowed)
+                    }, 5000);  // 5 seconds before closing the game
+                }
+            }
+        }
+
+        // Load coins from localStorage when the page loads
+        window.onload = loadCoins;
+
+        // Add event listener to claim button
+        document.getElementById("claimButton").addEventListener("click", claimCoins);
+    </script>
+
+</body>
+</html>
