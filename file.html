@@ -54,18 +54,16 @@
             text-align: center;
             border-color: #16deac;
         }
-       input:hover {
-        }
+
         input:disabled {
             background: #16deac;
-            
         }
 
         button {
             padding: 12px 20px;
             font-size: 1rem;
             color: #fff;
-            background: #fc0303;
+            background: #42f7ef;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -118,8 +116,8 @@
         };
 
         function generateCaptcha() {
-            const chars = "0123456789"; // Qoraalka iyo lambarada
-            const captchaLength = 4; // Dhererka CAPTCHA
+            const chars = "0123456789";
+            const captchaLength = 4;
             captchaCode = "";
             for (let i = 0; i < captchaLength; i++) {
                 const randomIndex = Math.floor(Math.random() * chars.length);
@@ -148,8 +146,8 @@
                 if (failedAttempts >= 7) {
                     blockUser();
                 } else {
-                    var sound = document.getElementById("loginpound");
-            sound.play();
+                    const sound = document.getElementById("loginpound");
+                    sound.play();
                     alert(translations[currentLang].error);
                 }
                 generateCaptcha();
@@ -169,7 +167,7 @@
                     localStorage.removeItem("blockEndTime");
                     resetUI();
                 } else {
-                    document.getElementById("loadingText").textContent = 
+                    document.getElementById("loadingText").textContent =
                         translations[currentLang].blocked + remainingTime + " seconds.";
                 }
             }, 1000);
@@ -191,7 +189,7 @@
         function updateBlockUI() {
             document.getElementById("btnVerify").disabled = true;
             document.getElementById("btnRefresh").disabled = true;
-            document.getElementById ("captchaInput").disabled = true;
+            document.getElementById("captchaInput").disabled = true;
         }
 
         function resetUI() {
@@ -210,13 +208,12 @@
                 progress++;
                 progressBar.textContent = `Loading ${progress}%`;
                 if (progress === 100) {
-                    var sound = document.getElementById("loginSound");
-            sound.play();
+                    const sound = document.getElementById("loginSound");
+                    sound.play();
                     clearInterval(interval);
                     window.location.href = "dashboard.html";
-                    generateCaptcha();
                 }
-            }, 50); // 3 seconds total (30ms * 100)
+            }, 50);
         }
 
         window.onload = function () {
@@ -229,9 +226,8 @@
                     blockUser();
                 }
             }
-        },
-                    
-</script>
+        };
+    </script>
 </head>
 <body>
     <div class="container">
@@ -247,9 +243,8 @@
         <br>
         <button id="btnVerify" onclick="verifyCaptcha()">Verify</button>
         <button id="btnRefresh" onclick="refreshCaptcha()">Refresh</button>
-         <audio id="loginSound" src="play.sound.mp3"></audio>
+        <audio id="loginSound" src="play.sound.mp3"></audio>
         <audio id="loginpound" src="play.sound1.mp3"></audio>
-        
 
         <div id="loadingText"></div>
         <div id="progressBar"></div>
