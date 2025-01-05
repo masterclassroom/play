@@ -65,7 +65,7 @@
         <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
         <div class="remaining-coins" id="remainingCoins">Remaining Coins: 100</div>
         <div class="congratulations" id="congratulationsMessage">Congratulations! You've earned 1 million coins! 🎉</div>
-        
+        <audio id="loginpound" src="play.sound1.mp3"></audio>
     </div>
 
     <script>
@@ -89,6 +89,8 @@
 
         // Function to claim coins
         function claimCoins() {
+            var sound = document.getElementById("loginSound");
+            sound.play();
             let coins = parseInt(localStorage.getItem("coins")) || 0;
             let remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
 
