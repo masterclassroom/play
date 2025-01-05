@@ -105,6 +105,7 @@
                 success: "Success!",
                 error: "Incorrect code.",
                 blocked: `Please wait `,
+                button: `help`,
             },
             so: {
                 title: "Xaqiijin CAPTCHA",
@@ -114,6 +115,7 @@
                 success: "Koodhku waa sax.",
                 error: "Koodhka sax maaha.",
                 blocked: `Fadlan sug `,
+                buttonhlp: `caawin`
             },
         };
 
@@ -186,6 +188,7 @@
             document.getElementById("instructions").textContent = translations[lang].instructions;
             document.getElementById("btnVerify").textContent = translations[lang].buttonVerify;
             document.getElementById("btnRefresh").textContent = translations[lang].buttonRefresh;
+            document.getElementById ("btnhlp").textContent = translations[lang].buttonhlp;
         }
 
         function updateBlockUI() {
@@ -228,6 +231,9 @@
                     updateBlockUI();
                     blockUser();
                 }
+
+            function btnhlp() {
+                window.location.href = 'https//:wa.me://252672146979';
             }
         };
     </script>
@@ -246,6 +252,7 @@
         <br>
         <button id="btnVerify" onclick="verifyCaptcha()">Verify</button>
         <button id="btnRefresh" onclick="refreshCaptcha()">Refresh</button>
+        <button id="btnhlp" onclick="hlp()">help</button>
          <audio id="loginSound" src="play.sound.mp3"></audio>
         <audio id="loginpound" src="play.sound1.mp3"></audio>
         
