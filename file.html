@@ -105,7 +105,6 @@
                 success: "Success!",
                 error: "Incorrect code.",
                 blocked: "Please wait ",
-                buttonhlp: `help`
             },
             so: {
                 title: "Xaqiijin CAPTCHA",
@@ -115,7 +114,6 @@
                 success: "Koodhku waa sax.",
                 error: "Koodhka sax maaha.",
                 blocked: "Fadlan sug ",
-                buttonhlp: `caawin`,
             },
         };
 
@@ -188,7 +186,6 @@
             document.getElementById("instructions").textContent = translations[lang].instructions;
             document.getElementById("btnVerify").textContent = translations[lang].buttonVerify;
             document.getElementById("btnRefresh").textContent = translations[lang].buttonRefresh;
-            document.getElementById ("btnhlp").textContent = translations[lang].buttonhlp;
         }
 
         function updateBlockUI() {
@@ -231,11 +228,6 @@
                     updateBlockUI();
                     blockUser();
                 }
-            },
-
-            function hlp() {
-                window.location.href = 'https//:wa.me://252672146979';
-            }
             },
         
     </script>
