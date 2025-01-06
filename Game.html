@@ -30,7 +30,7 @@
         }
 
         .claim-btn, .withdraw-btn {
-            background-color: #000000;
+            background-color: #3209d6;
             color: white;
             padding: 10px 20px;
             font-size: 18px;
@@ -145,7 +145,7 @@
             const now = new Date();
             const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
             localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer(24 * 60 * 60);
+            startTimer(1 * 60 * 60);
             disableClaimButton();
         }
 
@@ -193,12 +193,12 @@
             let coins = parseInt(localStorage.getItem("coins")) || 0;
 
             if (coins < 10) {
-                alert("Waxaad u baahan tahay ugu yaraan 10 coins si aad u la baxdo.");
+                alert("No enough Coins.");
                 return;
             }
 
             if (userId.trim() === "") {
-                alert("Fadlan gali ID-gaaga si aad lacagta u la baxdo.");
+                alert("Enter Your Konami Id.");
                 return;
             }
 
