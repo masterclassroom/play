@@ -143,9 +143,9 @@
         // Function to set daily limit timer
         function setDailyLimitTimer() {
             const now = new Date();
-            const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+            const endTime = new Date(now.getTime() + 00 * 01 * 60 * 1000); // 24 hours from now
             localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer(24 * 60 * 60);
+            startTimer(00 * 01 * 60);
             disableClaimButton();
         }
 
