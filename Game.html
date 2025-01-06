@@ -107,16 +107,17 @@
                 document.getElementById("remainingCoins").textContent = "Remaining Coins: " + remainingCoins;
 
                 // Check if remaining coins reach 1 million
-                if (coins >= 1500) {
+                if (coins >= 1700) {
                     document.getElementById("congratulationsMessage").style.display = "block";  // Show congratulations
                     document.getElementById("claimButton").disabled = true;  // Disable claim button
-                    localStorage.setItem("coins", 1500);  // Set coins to 1 million in localStorage
+                    localStorage.setItem("coins", 1700);  // Set coins to 1 million in localStorage
                     localStorage.setItem("gameStatus", "Game Over: You have reached 1 million coins!");  // Save the game status
 
                     // Close the game after a few seconds or immediately
                     setTimeout(() => {
                         alert("You have reached 1 million coins! Closing the game now...");
-                        window.close();  // Close the browser window (if allowed)
+                        localStorage.clear();
+                        location.reload(); // Close the browser window (if allowed)
                     }, 5000);  // 5 seconds before closing the game
                 }
             }
