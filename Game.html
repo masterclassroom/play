@@ -121,8 +121,6 @@
             const claimedToday = parseInt(localStorage.getItem("claimedToday")) || 0;
 
             if (remainingCoins > 0) {
-                const newClaimedToday = claimedToday + 10;
-                if (newClaimedToday > 1000000) {
                     alert("You Reched The Limit.");
                     return;
                 }
@@ -137,7 +135,7 @@
                 document.getElementById("coinCount").textContent = "Coins: " + newCoins;
                 document.getElementById("remainingCoins").textContent = "Remaining Coins: " + newRemainingCoins;
 
-                if (newClaimedToday === 100) {
+                if (remainingCoins === 0) {
                     setDailyLimitTimer();
                 }
             }
