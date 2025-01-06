@@ -72,7 +72,7 @@
     <div class="container">
         <h2>Claim Your Coins!</h2>
         <div class="coin-count" id="coinCount">Balance Coins: 0</div>
-        <div class="remaining-coins" id="remainingCoins">remainigCoins:100</div>
+        <div class="remaining-coins" id="remainingCoins">Remaining Coins: 100</div>
         <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
         <button class="withdraw-btn" id="withdrawButton">Withdraw</button>
         <div class="daily-limit" id="dailyLimit"></div>
@@ -120,24 +120,24 @@
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
             const claimedToday = parseInt(localStorage.getItem("claimedToday")) || 0;
 
-            if (remainingCoins > 0) {
-                    alert("You Reched The Limit.");
-                    return;
-                }
+            if (remainingCoins <= 0) {
+                alert("You Reached The Limit.");
+                return;
+            }
 
-                const newCoins = coins + 10;
-                const newRemainingCoins = remainingCoins - 10;
+            const newCoins = coins + 10;
+            const newRemainingCoins = remainingCoins - 10;
+            const newClaimedToday = claimedToday + 1;
 
-                localStorage.setItem("coins", newCoins);
-                localStorage.setItem("remainingCoins", newRemainingCoins);
-                localStorage.setItem("claimedToday", newClaimedToday);
+            localStorage.setItem("coins", newCoins);
+            localStorage.setItem("remainingCoins", newRemainingCoins);
+            localStorage.setItem("claimedToday", newClaimedToday);
 
-                document.getElementById("coinCount").textContent = "Coins: " + newCoins;
-                document.getElementById("remainingCoins").textContent = "Remaining Coins: " + newRemainingCoins;
+            document.getElementById("coinCount").textContent = "Coins: " + newCoins;
+            document.getElementById("remainingCoins").textContent = "Remaining Coins: " + newRemainingCoins;
 
-                if (remainingCoins === 0) {
-                    setDailyLimitTimer();
-                }
+            if (remainingCoins === 10) {
+                setDailyLimitTimer();
             }
         }
 
@@ -190,27 +190,26 @@
             let coins = parseInt(localStorage.getItem("coins")) || 0;
 
             if (userId.trim() === "") {
-                alert("Enter Your Konami Id.");
+                alert("Enter Your ID.");
                 return;
             }
 
             if (withdrawAmount > coins) {
-                alert("No Enough Coins.");
-                 location.reload()
+                alert("Not Enough Coins.");
                 return;
             }
-          
-           if (withdrawAmount <= 0){
-            alert("Enter amount");
-            return;
-          }
+
+            if (withdrawAmount <= 0) {
+                alert("Enter amount");
+                return;
+            }
 
             coins -= withdrawAmount;
             localStorage.setItem("coins", coins);
 
             document.getElementById("coinCount").textContent = "Coins: " + coins;
 
-            alert("Your Coins withdrawed Is [" + withdrawAmount + "] Coins You see To the Your Account After 24 Houres.");
+            alert("Your Coins Withdrawn: [" + withdrawAmount + "] Coins. You will see them in your account after 24 hours.");
             location.reload();
         }
 
