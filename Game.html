@@ -24,12 +24,12 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        .coin-count {
-            font-size: 24px;
-            margin-bottom: 20px;
+        .coin-count, .remaining-coins, .daily-limit {
+            font-size: 18px;
+            margin: 10px 0;
         }
 
-        .claim-btn {
+        .claim-btn, .withdraw-btn {
             background-color: #000000;
             color: white;
             padding: 10px 20px;
@@ -37,22 +37,24 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            margin: 10px;
         }
 
-        .claim-btn:hover {
-            background-color: #000009;
+        .claim-btn:hover, .withdraw-btn:hover {
+            background-color: #333333;
         }
 
-        .remaining-coins {
-            font-size: 18px;
-            margin-top: 20px;
-        }
-
-        .congratulations {
-            font-size: 20px;
-            color: #FFD700;
-            font-weight: bold;
+        .hidden-page {
             display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer {
+            font-size: 16px;
+            color: red;
             margin-top: 20px;
         }
     </style>
@@ -61,73 +63,163 @@
 
     <div class="container">
         <h2>Claim Your Coins!</h2>
-        <div class="coin-count" id="coinCount"> Balance Coins: 0</div>
-        <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
+        <div class="coin-count" id="coinCount">Balance Coins: 0</div>
         <div class="remaining-coins" id="remainingCoins">Remaining Coins: 100</div>
-        <div class="congratulations" id="congratulationsMessage">Congratulations! You've earned 10 thousend hundred coins! 🎉</div>
-        <audio id="loginpound" src="play.sound1.mp3"></audio>
+        <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
+        <button class="withdraw-btn" id="withdrawButton">La Bax Coinskaaga</button>
+        <div class="daily-limit" id="dailyLimit"></div>
+        <div class="timer" id="timer"></div>
+    </div>
+
+    <div class="hidden-page" id="hiddenPage">
+        <h2>La Bax Coinskaaga</h2>
+        <label for="userId">Enter Your ID:</label>
+        <input type="number" id="userId" placeholder="Enter your ID">
+        <button class="withdraw-btn" id="confirmWithdrawButton">La Bax</button>
     </div>
 
     <script>
-        // Function to load coins from localStorage
+        // Helper function to format time (HH:MM:SS)
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Function to load coins and limit status from localStorage
         function loadCoins() {
-            const storedCoins = localStorage.getItem("coins");
-            const storedRemainingCoins = localStorage.getItem("remainingCoins");
+            const coins = parseInt(localStorage.getItem("coins")) || 0;
+            const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
+            const dailyLimitEndTime = localStorage.getItem("dailyLimitEndTime");
 
-            if (storedCoins) {
-                document.getElementById("coinCount").textContent = "Coins: " + storedCoins;
-            } else {
-                localStorage.setItem("coins", 0);  // Initialize to 0 if not found
-            }
+            document.getElementById("coinCount").textContent = "Coins: " + coins;
+            document.getElementById("remainingCoins").textContent = "Remaining Coins: " + remainingCoins;
 
-            if (storedRemainingCoins) {
-                document.getElementById("remainingCoins").textContent = "Remaining Coins: " + storedRemainingCoins;
-            } else {
-                localStorage.setItem("remainingCoins", 100);  // Initialize to 100 if not found
+            // Check if daily limit timer is active
+            if (dailyLimitEndTime) {
+                const timeLeft = Math.max(0, Math.floor((new Date(dailyLimitEndTime) - new Date()) / 1000));
+                if (timeLeft > 0) {
+                    startTimer(timeLeft);
+                    disableClaimButton();
+                }
             }
         }
 
         // Function to claim coins
         function claimCoins() {
-            var sound = document.getElementById("loginpound");
-            sound.play();
-            let coins = parseInt(localStorage.getItem("coins")) || 0;
-            let remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
+            const coins = parseInt(localStorage.getItem("coins")) || 0;
+            const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
+            const claimedToday = parseInt(localStorage.getItem("claimedToday")) || 0;
+
+            if (claimedToday >= 100) {
+                alert("Waxaad dhamaysay xadkaaga maalinlaha ah. Fadlan sug 24 saacadood.");
+                return;
+            }
 
             if (remainingCoins > 0) {
-                coins += 10;  // Add 10 coins
-                remainingCoins -= 10;  // Subtract 10 coins from remaining coins
+                const newClaimedToday = claimedToday + 10;
+                if (newClaimedToday > 100) {
+                    alert("Waxaad dhamaysay xadkaaga maalinlaha ah. Fadlan sug 24 saacadood.");
+                    return;
+                }
 
-                // Update localStorage with new values
-                localStorage.setItem("coins", coins);
-                localStorage.setItem("remainingCoins", remainingCoins);
+                const newCoins = coins + 10;
+                const newRemainingCoins = remainingCoins - 10;
 
-                // Update the display
-                document.getElementById("coinCount").textContent = "Coins: " + coins;
-                document.getElementById("remainingCoins").textContent = "Remaining Coins: " + remainingCoins;
+                localStorage.setItem("coins", newCoins);
+                localStorage.setItem("remainingCoins", newRemainingCoins);
+                localStorage.setItem("claimedToday", newClaimedToday);
 
-                // Check if remaining coins reach 1 million
-                if (coins >= 1700) {
-                    document.getElementById("congratulationsMessage").style.display = "block";  // Show congratulations
-                    document.getElementById("claimButton").disabled = true;  // Disable claim button
-                    localStorage.setItem("coins", 1700);  // Set coins to 1 million in localStorage
-                    localStorage.setItem("gameStatus", "Game Over: You have reached 1 million coins!");  // Save the game status
+                document.getElementById("coinCount").textContent = "Coins: " + newCoins;
+                document.getElementById("remainingCoins").textContent = "Remaining Coins: " + newRemainingCoins;
 
-                    // Close the game after a few seconds or immediately
-                    setTimeout(() => {
-                        alert("You have reached 1 million coins! Closing the game now...");
-                        localStorage.clear();
-                        location.reload(); // Close the browser window (if allowed)
-                    }, 5000);  // 5 seconds before closing the game
+                if (newClaimedToday === 100) {
+                    setDailyLimitTimer();
                 }
             }
+        }
+
+        // Function to set daily limit timer
+        function setDailyLimitTimer() {
+            const now = new Date();
+            const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+            localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
+            startTimer(24 * 60 * 60);
+            disableClaimButton();
+        }
+
+        // Function to start timer
+        function startTimer(seconds) {
+            const timerElement = document.getElementById("timer");
+            const interval = setInterval(() => {
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    enableClaimButton();
+                    localStorage.removeItem("dailyLimitEndTime");
+                    timerElement.textContent = "";
+                } else {
+                    timerElement.textContent = "Wakhti u hadhay: " + formatTime(seconds);
+                    seconds--;
+                }
+            }, 1000);
+        }
+
+        // Disable claim button
+        function disableClaimButton() {
+            const claimButton = document.getElementById("claimButton");
+            claimButton.disabled = true;
+            claimButton.style.backgroundColor = "#ccc";
+            document.getElementById("dailyLimit").textContent = "Waxaad dhamaysay xadkaaga maalinlaha ah.";
+        }
+
+        // Enable claim button
+        function enableClaimButton() {
+            const claimButton = document.getElementById("claimButton");
+            claimButton.disabled = false;
+            claimButton.style.backgroundColor = "#000";
+            document.getElementById("dailyLimit").textContent = "";
+        }
+
+        // Function to show withdrawal page
+        function showWithdrawPage() {
+            document.querySelector(".container").style.display = "none";
+            document.getElementById("hiddenPage").style.display = "block";
+        }
+
+        // Function to handle withdrawal
+        function withdrawCoins() {
+            const userId = document.getElementById("userId").value;
+            let coins = parseInt(localStorage.getItem("coins")) || 0;
+
+            if (coins < 10) {
+                alert("Waxaad u baahan tahay ugu yaraan 10 coins si aad u la baxdo.");
+                return;
+            }
+
+            if (userId.trim() === "") {
+                alert("Fadlan gali ID-gaaga si aad lacagta u la baxdo.");
+                return;
+            }
+
+            // Update coins to 0
+            localStorage.setItem("coins", 0);
+            localStorage.setItem("remainingCoins", 0);
+
+            document.getElementById("coinCount").textContent = "Coins: 0";
+            document.getElementById("remainingCoins").textContent = "Remaining Coins: 0";
+
+            alert("Lacagtaadii waa laguu diray. Fadlan dib u eeg 24 saacadood ka dib.");
+            location.reload();
         }
 
         // Load coins from localStorage when the page loads
         window.onload = loadCoins;
 
-        // Add event listener to claim button
+        // Add event listeners to buttons
         document.getElementById("claimButton").addEventListener("click", claimCoins);
+        document.getElementById("withdrawButton").addEventListener("click", showWithdrawPage);
+        document.getElementById("confirmWithdrawButton").addEventListener("click", withdrawCoins);
     </script>
 
 </body>
