@@ -145,7 +145,7 @@
             const now = new Date();
             const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
             localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer(1 * 60 * 60);
+            startTimer(24 * 60 * 60);
             disableClaimButton();
         }
 
@@ -159,7 +159,7 @@
                     localStorage.removeItem("dailyLimitEndTime");
                     timerElement.textContent = "";
                 } else {
-                    timerElement.textContent = "Wakhti u hadhay: " + formatTime(seconds);
+                    timerElement.textContent = "Wakhtiga Ka hadhay: " + formatTime(seconds);
                     seconds--;
                 }
             }, 1000);
