@@ -190,7 +190,7 @@
             let coins = parseInt(localStorage.getItem("coins")) || 0;
 
             if (userId.trim() === "") {
-                alert("Enter Your ID.");
+                alert("Enter Your Konami Id.");
                 document.getElementById("userId").focus();
                 return;
             }
@@ -202,7 +202,6 @@
 
             if (withdrawAmount <= 0) {
                 alert("Enter amount");
-                document.getElementById("withdrawAmount").focus();
                 return;
             }
 
