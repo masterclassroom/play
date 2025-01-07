@@ -191,8 +191,7 @@
 
             if (userId.trim() === "") {
                 alert("Enter Your ID.");
-                document.getElementById("userId");
-                userId.focus();
+                document.getElementById("userId").focus();
                 return;
             }
 
@@ -203,6 +202,7 @@
 
             if (withdrawAmount <= 0) {
                 alert("Enter amount");
+                document.getElementById("withdrawAmount").focus();
                 return;
             }
 
