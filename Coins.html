@@ -77,7 +77,6 @@
         <div class="coin-count" id="coinCount">Balance Coins: 0</div>
         <div class="remaining-coins" id="remainingCoins">Chance Coins: 100</div>
         <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
-        <button class="claim-btn" onclick="delet">reset</button>
         <button class="withdraw-btn" id="withdrawButton">Withdraw</button>
         <div class="daily-limit" id="dailyLimit"></div>
         <div class="timer" id="timer"></div>
@@ -169,12 +168,6 @@
                 setDailyLimitTimer();
             }
         }
-          function delet() {
-              alert("you deleted");
-              localStorage.clear();
-              location.reload();
-              return;
-          }
 
         function setDailyLimitTimer() {
             const now = new Date();
