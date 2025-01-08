@@ -94,11 +94,6 @@
     </div>
 
     <script>
-           if (!localStorage.getItem("acepty")) {
-               Swal.fire('confirm new update', 'Claim a New coins', 'question');
-               localStorage.clear();
-                 localStorage.setItem("acepty", "true");
-           }
         if (!localStorage.getItem("confirmed")) {
             Swal.fire({
                 title: 'Confirm',
