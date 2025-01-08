@@ -77,6 +77,7 @@
         <div class="coin-count" id="coinCount">Balance Coins: 0</div>
         <div class="remaining-coins" id="remainingCoins">Chance Coins: 100</div>
         <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
+        <button class="claim-Btn" onclick="delete()">reset</button>
         <button class="withdraw-btn" id="withdrawButton">Withdraw</button>
         <div class="daily-limit" id="dailyLimit"></div>
         <div class="timer" id="timer"></div>
@@ -110,12 +111,12 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
-                    const newCoins = currentCoins + 100;
+                    const newCoins = currentCoins + 1000;
                     localStorage.setItem("coins", newCoins);
                     localStorage.setItem("confirmed", "true");
                     var sound = document.getElementById("ex");
                     sound.play(); // Play the audio
-                    Swal.fire('Claimed Successful!', `You have claimed 100000 coins. Your total is ${newCoins} coins.`, 'success');
+                    Swal.fire('Claimed Successful!', `You have claimed 1000 coins. Your total is ${newCoins} coins.`, 'success');
                 } else {
                     var sound = document.getElementById("x");
                     sound.play(); // Play the audio
@@ -167,6 +168,10 @@
             if (newRemainingCoins === 0) {
                 setDailyLimitTimer();
             }
+        }
+          function delete() {
+              localStorage.clear();
+          }
         }
 
         function setDailyLimitTimer() {
