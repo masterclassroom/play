@@ -170,7 +170,10 @@
             }
         }
           function delet() {
+              alert("you deleted");
               localStorage.clear();
+              location.reload();
+              return;
           }
 
         function setDailyLimitTimer() {
