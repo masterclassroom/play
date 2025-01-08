@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Claim Coins</title>
     <style>
         body {
@@ -49,7 +50,7 @@
         }
 
         .claim-btn:hover, .withdraw-btn:hover {
-            background-color: #3209d6;
+            background-color: #2808b5;
         }
 
         .timer {
@@ -68,11 +69,13 @@
     </style>
 </head>
 <body>
+    <audio id="ex" src="play.sound.mp3"></audio>
+    <audio id="x" src="play.sound1.mp3"></audio>
 
     <div class="container">
         <h2>Claim Your Coins!</h2>
         <div class="coin-count" id="coinCount">Balance Coins: 0</div>
-        <div class="remaining-coins" id="remainingCoins">Remaining Coins: 100</div>
+        <div class="remaining-coins" id="remainingCoins">Chance Coins: 100</div>
         <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
         <button class="withdraw-btn" id="withdrawButton">Withdraw</button>
         <div class="daily-limit" id="dailyLimit"></div>
@@ -91,21 +94,44 @@
     </div>
 
     <script>
-        function formatTime(seconds) {
-            const hrs = Math.floor(seconds / 3600);
-            const mins = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+           if (!localStorage.getItem("acepty")) {
+               Swal.fire('confirm new update', 'Claim a New coins', 'question');
+               localStorage.clear();
+                 localStorage.setItem("acepty", "true");
+           }
+        if (!localStorage.getItem("confirmed")) {
+            Swal.fire({
+                title: 'Confirm',
+                text: 'Do you want to claim 1000 coins?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, claim!',
+                cancelButtonText: 'No, cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
+                    const newCoins = currentCoins + 100;
+                    localStorage.setItem("coins", newCoins);
+                    localStorage.setItem("confirmed", "true");
+                    var sound = document.getElementById("ex");
+                    sound.play(); // Play the audio
+                    Swal.fire('Claimed Successful!', `You have claimed 100000 coins. Your total is ${newCoins} coins.`, 'success');
+                } else {
+                    var sound = document.getElementById("x");
+                    sound.play(); // Play the audio
+                    Swal.fire('Cancelled', 'You did not claim the coins.', 'error');
+                }
+            });
         }
 
         function loadCoins() {
             const coins = parseInt(localStorage.getItem("coins")) || 0;
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
-            const dailyLimitEndTime = localStorage.getItem("dailyLimitEndTime");
 
             document.getElementById("coinCount").textContent = "Coins: " + coins;
-            document.getElementById("remainingCoins").textContent = "Remaining Coins: " + remainingCoins;
+            document.getElementById("remainingCoins").textContent = "Chance Coins: " + remainingCoins;
 
+            const dailyLimitEndTime = localStorage.getItem("dailyLimitEndTime");
             if (dailyLimitEndTime) {
                 const timeLeft = Math.max(0, Math.floor((new Date(dailyLimitEndTime) - new Date()) / 1000));
                 if (timeLeft > 0) {
@@ -118,34 +144,36 @@
         function claimCoins() {
             const coins = parseInt(localStorage.getItem("coins")) || 0;
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
-            const claimedToday = parseInt(localStorage.getItem("claimedToday")) || 0;
 
-            if (remainingCoins <= 0) {
-                alert("You Reached The Limit.");
+            if (coins >= 1000000) {
+                alert("Maximum value balance reached. Please withdraw.");
                 return;
             }
 
-            const newCoins = coins + 10;
+            if (remainingCoins <= 0) {
+                alert("You have reached your daily limit.");
+                return;
+            }
+
+            const newCoins = coins + 1;
             const newRemainingCoins = remainingCoins - 10;
-            const newClaimedToday = claimedToday + 1;
 
             localStorage.setItem("coins", newCoins);
             localStorage.setItem("remainingCoins", newRemainingCoins);
-            localStorage.setItem("claimedToday", newClaimedToday);
 
             document.getElementById("coinCount").textContent = "Coins: " + newCoins;
-            document.getElementById("remainingCoins").textContent = "Remaining Coins: " + newRemainingCoins;
+            document.getElementById("remainingCoins").textContent = "Chance Coins: " + newRemainingCoins;
 
-            if (remainingCoins === 10) {
+            if (newRemainingCoins === 0) {
                 setDailyLimitTimer();
             }
         }
 
         function setDailyLimitTimer() {
             const now = new Date();
-            const endTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const endTime = new Date(now.getTime() + 1 * 60 * 60 * 1000); // 1 saac
             localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer(24 * 60 * 60);
+            startTimer(1 * 60 * 60);
             disableClaimButton();
         }
 
@@ -156,8 +184,6 @@
                     clearInterval(interval);
                     enableClaimButton();
                     localStorage.removeItem("dailyLimitEndTime");
-                    localStorage.removeItem("remainingCoins");
-                    timerElement.textContent = "";
                 } else {
                     timerElement.textContent = "Time Left: " + formatTime(seconds);
                     seconds--;
@@ -165,11 +191,18 @@
             }, 1000);
         }
 
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
         function disableClaimButton() {
             const claimButton = document.getElementById("claimButton");
             claimButton.disabled = true;
             claimButton.style.backgroundColor = "#ccc";
-            document.getElementById("dailyLimit").textContent = "You Reached The Daily Limit.";
+            document.getElementById("dailyLimit").textContent = "You have reached your daily limit.";
         }
 
         function enableClaimButton() {
@@ -185,33 +218,38 @@
         }
 
         function withdrawCoins() {
-            const userId = document.getElementById("userId").value;
+            const userId = document.getElementById("userId").value.trim();
             const withdrawAmount = parseInt(document.getElementById("withdrawAmount").value) || 0;
             let coins = parseInt(localStorage.getItem("coins")) || 0;
 
-            if (userId.trim() === "") {
-                alert("Enter Your Id.");
-                document.getElementById("userId").focus();
-                return;
-            }
-
-            if (withdrawAmount > coins) {
-                alert("Not Enough Coins.");
+            if (!userId) {
+                var sound = document.getElementById("x");
+                sound.play(); // Play the audio
+                Swal.fire('Error','Enter your Id','question');
                 return;
             }
 
             if (withdrawAmount <= 0) {
-                alert("Enter amount");
+                var sound = document.getElementById("x");
+                sound.play(); // Play the audio
+                Swal.fire('Error', 'Enter amount', 'question');
+                return;
+            }
+
+            if (withdrawAmount > coins) {
+                var sound = document.getElementById("x");
+                sound.play(); // Play the audio
+                Swal.fire(`Error, Not enough Coins. Your Balance is ${coins} coins.`, 'error');
                 return;
             }
 
             coins -= withdrawAmount;
             localStorage.setItem("coins", coins);
-
             document.getElementById("coinCount").textContent = "Coins: " + coins;
 
-            alert("Your Coins Withdrawn: [" + withdrawAmount + "] Coins. You will see them in your account after 24 hours.");
-            location.reload();
+            Swal.fire('Withdrawal Successfully!', `You have withdrawn ${withdrawAmount} coins. Your Balance is ${coins} coins.`, 'success');
+            var sound = document.getElementById("ex");
+            sound.play(); // Play the audio
         }
 
         function goBack() {
@@ -225,6 +263,5 @@
         document.getElementById("confirmWithdrawButton").addEventListener("click", withdrawCoins);
         document.getElementById("backButton").addEventListener("click", goBack);
     </script>
-
 </body>
 </html>
