@@ -166,9 +166,9 @@
 
         function setDailyLimitTimer() {
             const now = new Date();
-            const endTime = new Date(now.getTime() + 1 * 60 * 60 * 1000); // 1 saac
+            const endTime = new Date(now.getTime() + * 60 * 1000); // 1 saac
             localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer(1 * 60 * 60);
+            startTimer( 60 );
             disableClaimButton();
         }
 
