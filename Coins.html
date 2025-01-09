@@ -97,7 +97,7 @@
         if (!localStorage.getItem("confirmed")) {
             Swal.fire({
                 title: 'Confirm',
-                text: 'Do you want to claim 100 coins?',
+                text: 'Do you want to claim 100 coins a new update?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Yes, claim!',
@@ -116,7 +116,35 @@
                 }
             });
         }
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            const alertKey = "seenSweetAlert";
+            const alertTimeout = 86400000; // 24 hours in milliseconds
 
+            // Check if alert has been seen and time has passed
+            const lastSeen = localStorage.getItem(alertKey);
+            const now = Date.now();
+
+            if (!lastSeen || now - lastSeen > alertTimeout) {
+                // Show SweetAlert as a simple alert (only one button)
+                Swal.fire({
+                    title: "daily login Rewards",
+                    text: "Do You want to claim 10 coins.",
+                    icon: "info",  // Choose an icon
+                    confirmButtonText: "Ok"
+                }).then(() => {
+                    var sound = document.getElementById("ex").play();
+                    Swal.fire('Succesfully', 'You claimed a 10 coins daily login Rewards', 'success');
+                    const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
+                    const newCoins = currentCoins + 10;
+                    localStorage.setItem("coins", newCoins);
+                    // Save the current timestamp when user acknowledges the alert
+                    localStorage.setItem(alertKey, now);
+                    return;
+                });
+            }
+        });
+    
         function loadCoins() {
             const coins = parseInt(localStorage.getItem("coins")) || 0;
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
@@ -148,7 +176,7 @@
                 return;
             }
 
-            const newCoins = coins + 1;
+            const newCoins = coins + 10; // Ku dar 10 coins halkii 1
             const newRemainingCoins = remainingCoins - 10;
 
             localStorage.setItem("coins", newCoins);
@@ -223,7 +251,7 @@
 
             if (withdrawAmount <= 0) {
                 document.getElementById("x").play(); // Play the audio
-                Swal.fire('error', 'Enter a amount.', 'question');
+                Swal.fire('Error', 'Enter a amount.', 'question');
                 return;
             }
 
@@ -237,7 +265,7 @@
             localStorage.setItem("coins", coins);
             document.getElementById("coinCount").textContent = "Coins: " + coins;
 
-            Swal.fire('Success!', `You have withdrawn succesfully! ${withdrawAmount} coins. Your balance is ${coins} coins.`, 'success');
+            Swal.fire('Successfully!', `You have withdrawn succesfully! ${withdrawAmount} coins. Your balance is ${coins} coins.`, 'success');
             document.getElementById("ex").play(); // Play the audio
         }
 
