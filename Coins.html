@@ -105,16 +105,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
-                    const newCoins = currentCoins + 1000;
+                    const newCoins = currentCoins + 100;
                     localStorage.setItem("coins", newCoins);
                     localStorage.setItem("confirmed", "true");
-                    var sound = document.getElementById("ex");
-                    sound.play(); // Play the audio
-                    Swal.fire('Claimed Successful!', `You have claimed 1000 coins. Your total is ${newCoins} coins.`, 'success');
+                    document.getElementById("ex").play(); // Play the audio
+                    Swal.fire('Claimed Successfully!', `You have claimed 1000 coins. Your total is ${newCoins} coins.`, 'success');
                 } else {
-                    var sound = document.getElementById("x");
-                    sound.play(); // Play the audio
-                    Swal.fire('Cancelled', 'You did not claim the coins.', 'error');
+                    document.getElementById("x").play(); // Play the audio
+                    Swal.fire('Cancelled', 'You did not claim the coins.', 'warning');
                 }
             });
         }
@@ -166,9 +164,9 @@
 
         function setDailyLimitTimer() {
             const now = new Date();
-            const endTime = new Date(now.getTime() + * 60 * 1000); // 1 saac
+            const endTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour
             localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer( 60 );
+            startTimer(3600);
             disableClaimButton();
         }
 
@@ -218,23 +216,20 @@
             let coins = parseInt(localStorage.getItem("coins")) || 0;
 
             if (!userId) {
-                var sound = document.getElementById("x");
-                sound.play(); // Play the audio
-                Swal.fire('Error','Enter your Id','question');
+                document.getElementById("x").play(); // Play the audio
+                Swal.fire('Error', 'Enter your ID.', 'question');
                 return;
             }
 
             if (withdrawAmount <= 0) {
-                var sound = document.getElementById("x");
-                sound.play(); // Play the audio
-                Swal.fire('Error', 'Enter amount', 'question');
+                document.getElementById("x").play(); // Play the audio
+                Swal.fire('error', 'Enter a amount.', 'question');
                 return;
             }
 
             if (withdrawAmount > coins) {
-                var sound = document.getElementById("x");
-                sound.play(); // Play the audio
-                Swal.fire(`Error, Not enough Coins. Your Balance is ${coins} coins.`, 'error');
+                document.getElementById("x").play(); // Play the audio
+                Swal.fire('Error', `Not enough coins. Your balance is ${coins} coins.`, 'error');
                 return;
             }
 
@@ -242,9 +237,8 @@
             localStorage.setItem("coins", coins);
             document.getElementById("coinCount").textContent = "Coins: " + coins;
 
-            Swal.fire('Withdrawal Successfully!', `You have withdrawn ${withdrawAmount} coins. Your Balance is ${coins} coins.`, 'success');
-            var sound = document.getElementById("ex");
-            sound.play(); // Play the audio
+            Swal.fire('Success!', `You have withdrawn succesfully! ${withdrawAmount} coins. Your balance is ${coins} coins.`, 'success');
+            document.getElementById("ex").play(); // Play the audio
         }
 
         function goBack() {
