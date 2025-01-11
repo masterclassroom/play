@@ -5,28 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qoraal iyo Tirada</title>
     <style>
-        html { background: #31d1d6; }
-        .mami { color: blue; background: #fff; }
-        input { background: #9FF4DF; height: 25px; color: blue; }
-        #output { white-space: pre-wrap; word-wrap: break-word; color: blue; }
-        label, h1, h2 { color: blue; }
-        input::placeholder { color: blue; }
-        button {
-            background-color: #4CAF50; color: white; padding: 10px 20px; 
-            border: none; border-radius: 5px; cursor: pointer; font-size: 16px;
+        html {
+            background: #31d1d6;
+            font-family: 'Arial', sans-serif;
         }
-        button:hover { background-color: #45a049; }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
         select {
-            padding: 10px;
+            padding: 12px;
             border-radius: 5px;
             font-size: 16px;
             margin-bottom: 20px;
+            border: 2px solid #3498db;
+            background-color: #fff;
         }
 
-        /* Circle loading spinner (pesta-like) */
+        h1, h2 {
+            color: #3498db;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 2px solid #3498db;
+            font-size: 16px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            color: #3498db;
+        }
+
+        input[type="text"]::placeholder {
+            color: #3498db;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #333;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            width: 80%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label, #timesLabel {
+            color: #3498db;
+            font-size: 16px;
+        }
+
+        #numberOfRepeats {
+            width: 100%;
+            margin: 10px 0;
+            height: 25px;
+            border-radius: 5px;
+            border: 2px solid #3498db;
+            background-color: #f0f0f0;
+        }
+
+        #rangeLabel {
+            margin-bottom: 10px;
+        }
+
+        .mami {
+            color: #e74c3c; /* Bedelay midabka, hadda waa casaan */
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .mami:hover {
+            color: #c0392b; /* Midabka hoos u dhigista */
+        }
+
         .circle-loader {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #3498db; /* Blue */
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -37,6 +119,20 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        #btnOtherPage {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #btnOtherPage:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
