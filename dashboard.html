@@ -69,7 +69,7 @@
     <script>
         setTimeout(() => {
             if (!localStorage.getItem("verifye")) {
-                const sound = document.getElementById("loginSound");
+                const sound = document.getElementById("loginpound");
                 if (sound) sound.play();
                 Swal.fire('Error', 'Please log in first.', 'warning');
                 setTimeout(() => {
