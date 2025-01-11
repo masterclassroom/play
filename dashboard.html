@@ -52,15 +52,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         setTimeout(() => {
-    if (!localStorage.getItem("verifye")) {
-        var sound = document.getElementById("loginSound");
-        if (sound) sound.play();
-        Swal.fire('Error', 'Please log in first.', 'warning');
-        setTimeout(() => {
-            window.location.href = "file.html";
+            if (!localStorage.getItem("verifye")) {
+                const sound = document.getElementById("loginSound");
+                if (sound) sound.play();
+                Swal.fire('Error', 'Please log in first.', 'warning');
+                setTimeout(() => {
+                    window.location.href = "file.html";
+                }, 3000);
+            }
         }, 3000);
-    }
-}, 3000);
 
         const translations = {
             en: {
@@ -123,7 +123,9 @@
             const text = document.getElementById("inputField").value;
             const repeatCount = document.getElementById("numberOfRepeats").value;
             const output = document.getElementById("output");
-            var sound = document.getElementById("loginSound").play();
+            const sound = document.getElementById("loginSound");
+            if (sound) sound.play();
+
             Swal.fire('Success', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
 
             output.innerHTML = "";
@@ -142,8 +144,11 @@
             selection.removeAllRanges();
             selection.addRange(range);
             document.execCommand("copy");
-            var sound = document.getElementById("loginSound").play();
-            Swal.fire('Copied!', translations[currentLang].alertCopied, 'success);
+
+            const sound = document.getElementById("loginSound");
+            if (sound) sound.play();
+
+            Swal.fire('Copied!', translations[currentLang].alertCopied, 'success');
         }
 
         function raf() {
@@ -153,13 +158,14 @@
         function logout() {
             localStorage.removeItem("loggedInUser");
             Swal.fire('Logged Out', translations[currentLang].logoutMessage, 'success');
-            var sound = document.getElementById("loginSound").play();
+
+            const sound = document.getElementById("loginSound");
+            if (sound) sound.play();
+
             localStorage.removeItem("verifye");
-          setTimeout(() => {
+            setTimeout(() => {
                 window.location.href = "file.html";
             }, 3000);
-          
- 
         }
     </script>
 </body>
