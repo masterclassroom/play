@@ -53,13 +53,12 @@
     <script>
         if (!localStorage.getItem("verifye")) {
             setTimeout(() => {
-                
-            var sound = document.getElementById("loginSound").play();
+             var sound = document.getElementById("loginSound").play();
             Swal.fire('Error', 'Please log in first.', 'warning');
             setTimeout(() => {
                 window.location.href = "file.html";
             }, 3000);
-                }, 3000);
+    }, 3000);
         }
 
         const translations = {
