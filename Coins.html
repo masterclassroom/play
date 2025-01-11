@@ -97,6 +97,8 @@
     </div>
 
     <script>
+        
+    
         document.addEventListener("DOMContentLoaded", function () {
             const alertKey = "seenSweetAlert";
             const alertTimeout = 86400000; // 24 hours in milliseconds
@@ -106,26 +108,25 @@
             const now = Date.now();
 
             if (!lastSeen || now - lastSeen > alertTimeout) {
+                // Show SweetAlert as a simple alert (only one button)
                 Swal.fire({
-                    title: "Daily Login Rewards",
-                    text: "Do you want to claim 10 coins?",
-                    icon: "info",
+                    title: "daily login Rewards",
+                    text: "Do You want to claim 10 coins.",
+                    icon: "info",  // Choose an icon
                     confirmButtonText: "Ok"
                 }).then(() => {
-                    const sound = document.getElementById("ex");
-                    if (sound) {
-                        sound.play(); // Codka bilaaw
-                    }
-                    Swal.fire('Successfully', 'You claimed 10 coins daily login rewards!', 'success');
-                    
+                    var sound = document.getElementById("ex").play();
+                    Swal.fire('Succesfully', 'You claimed a 10 coins daily login Rewards', 'success');
                     const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
                     const newCoins = currentCoins + 10;
                     localStorage.setItem("coins", newCoins);
+                    // Save the current timestamp when user acknowledges the alert
                     localStorage.setItem(alertKey, now);
+                    return;
                 });
             }
         });
-
+    
         function loadCoins() {
             const coins = parseInt(localStorage.getItem("coins")) || 0;
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
@@ -144,10 +145,7 @@
         }
 
         function claimCoins() {
-            const sound = document.getElementById("c");
-            if (sound) {
-                sound.play();
-            }
+            var sound = document.getElementById("c").play();
             const coins = parseInt(localStorage.getItem("coins")) || 0;
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
 
@@ -161,7 +159,7 @@
                 return;
             }
 
-            const newCoins = coins + 10; // Ku dar 10 coins
+            const newCoins = coins + 1; // Ku dar 10 coins halkii 1
             const newRemainingCoins = remainingCoins - 10;
 
             localStorage.setItem("coins", newCoins);
@@ -173,37 +171,6 @@
             if (newRemainingCoins === 0) {
                 setDailyLimitTimer();
             }
-        }
-
-        function withdrawCoins() {
-            const userId = document.getElementById("userId").value.trim();
-            const withdrawAmount = parseInt(document.getElementById("withdrawAmount").value) || 0;
-            let coins = parseInt(localStorage.getItem("coins")) || 0;
-
-            if (!userId) {
-                document.getElementById("x").play();
-                Swal.fire('Error', 'Enter your ID.', 'error');
-                return;
-            }
-
-            if (withdrawAmount <= 0) {
-                document.getElementById("x").play();
-                Swal.fire('Error', 'Enter a valid amount.', 'error');
-                return;
-            }
-
-            if (withdrawAmount > coins) {
-                document.getElementById("x").play();
-                Swal.fire('Error', `Not enough coins. Your balance is ${coins} coins.`, 'error');
-                return;
-            }
-
-            coins -= withdrawAmount;
-            localStorage.setItem("coins", coins);
-            document.getElementById("coinCount").textContent = "Coins: " + coins;
-
-            Swal.fire('Success!', `You successfully withdrew ${withdrawAmount} coins!`, 'success');
-            document.getElementById("succ").play();
         }
 
         function setDailyLimitTimer() {
@@ -228,6 +195,13 @@
             }, 1000);
         }
 
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
         function disableClaimButton() {
             const claimButton = document.getElementById("claimButton");
             claimButton.disabled = true;
@@ -242,14 +216,45 @@
             document.getElementById("dailyLimit").textContent = "";
         }
 
-        function goBack() {
-            document.querySelector(".container").style.display = "block";
-            document.getElementById("hiddenPage").style.display = "none";
-        }
-
         function showWithdrawPage() {
             document.querySelector(".container").style.display = "none";
             document.getElementById("hiddenPage").style.display = "block";
+        }
+
+        function withdrawCoins() {
+            const userId = document.getElementById("userId").value.trim();
+            const withdrawAmount = parseInt(document.getElementById("withdrawAmount").value) || 0;
+            let coins = parseInt(localStorage.getItem("coins")) || 0;
+
+            if (!userId) {
+                document.getElementById("x").play(); // Play the audio
+                Swal.fire('Error', 'Enter your ID.', 'question');
+                return;
+            }
+
+            if (withdrawAmount <= 0) {
+                document.getElementById("x").play(); // Play the audio
+                Swal.fire('Error', 'Enter a amount.', 'question');
+                return;
+            }
+
+            if (withdrawAmount > coins) {
+                document.getElementById("x").play(); // Play the audio
+                Swal.fire('Error', `Not enough coins. Your balance is ${coins} coins.`, 'error');
+                return;
+            }
+
+            coins -= withdrawAmount;
+            localStorage.setItem("coins", coins);
+            document.getElementById("coinCount").textContent = "Coins: " + coins;
+
+            Swal.fire('Successfully!', `You have withdrawn succesfully! ${withdrawAmount} coins. Your balance is ${coins} coins.`, 'success');
+            document.getElementById("succ").play(); // Play the audio
+        }
+
+        function goBack() {
+            document.querySelector(".container").style.display = "block";
+            document.getElementById("hiddenPage").style.display = "none";
         }
 
         window.onload = loadCoins;
