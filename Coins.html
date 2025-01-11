@@ -97,28 +97,7 @@
     </div>
 
     <script>
-        if (!localStorage.getItem("confirmed")) {
-            Swal.fire({
-                title: 'Confirm',
-                text: 'Do you want to claim 100 coins a new update?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, claim!',
-                cancelButtonText: 'No, cancel',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
-                    const newCoins = currentCoins + 100;
-                    localStorage.setItem("coins", newCoins);
-                    localStorage.setItem("confirmed", "true");
-                    document.getElementById("ex").play(); // Play the audio
-                    Swal.fire('Claimed Successfully!', `You have claimed 100 coins. Your total is ${newCoins} coins.`, 'success');
-                } else {
-                    document.getElementById("x").play(); // Play the audio
-                    Swal.fire('Cancelled', 'You did not claim the coins.', 'warning');
-                }
-            });
-        }
+        
     
         document.addEventListener("DOMContentLoaded", function () {
             const alertKey = "seenSweetAlert";
