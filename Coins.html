@@ -71,6 +71,7 @@
 <body>
     <audio id="ex" src="play.sound.mp3"></audio>
     <audio id="x" src="play.sound1.mp3"></audio>
+    <audio id="c" src="coin.mp3"></audio>
 
     <div class="container">
         <h2>Claim Your Coins!</h2>
@@ -163,6 +164,7 @@
         }
 
         function claimCoins() {
+            var sound = document.getElementById("c").play();
             const coins = parseInt(localStorage.getItem("coins")) || 0;
             const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
 
