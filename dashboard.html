@@ -73,7 +73,7 @@
                 if (sound) sound.play();
                 Swal.fire('Error', 'Please log in first.', 'warning');
                 setTimeout(() => {
-                    window.location.href = "file.html";
+                    window.location.replace("file.html");
                 }, 2000);
             }
         }, 3000);
