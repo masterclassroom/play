@@ -211,6 +211,7 @@
                     const sound = document.getElementById("loginSound");
                     sound.play();
                     clearInterval(interval);
+                    localStorage.setItem("verifye", "true");
                     window.location.href = "dashboard.html";
                 }
             }, 50);
