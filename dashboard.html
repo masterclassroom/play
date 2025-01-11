@@ -40,16 +40,22 @@
     <span id="repeatValue">1</span> <span id="timesLabel">times</span>
     <label id="rangeLabel">Select number of repetitions</label>
 
-    <a href="https://wa.me/252672146979?text=Help" target="_blank" class="mami" id="contactLink">
-        Contact Us
-    </a>
+    <a href="https://wa.me/252672146979?text=Help" target="_blank" class="mami" id="contactLink">Contact Us</a>
     <label id="helpLabel">Help</label>
     <button id="btnOtherPage" onclick="raf()">Visit our other page</button>
 
     <h2 id="resultTitle">Results:</h2>
     <div id="output"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        if (!localStorage.getItem("verifye")) {
+            Swal.fire('Error', 'Please log in first.', 'warning');
+            setTimeout(() => {
+                window.location.href = "file.html";
+            }, 3000);
+        }
+
         const translations = {
             en: {
                 title: "Write your text",
@@ -111,7 +117,7 @@
             const text = document.getElementById("inputField").value;
             const repeatCount = document.getElementById("numberOfRepeats").value;
             const output = document.getElementById("output");
-            alert(translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel);
+            Swal.fire('Success', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
 
             output.innerHTML = "";
             for (let i = 1; i <= repeatCount; i++) {
@@ -129,7 +135,7 @@
             selection.removeAllRanges();
             selection.addRange(range);
             document.execCommand("copy");
-            alert(translations[currentLang].alertCopied);
+            Swal.fire('Copied!', translations[currentLang].alertCopied, 'info');
         }
 
         function raf() {
@@ -138,8 +144,13 @@
 
         function logout() {
             localStorage.removeItem("loggedInUser");
-            alert(translations[currentLang].logoutMessage);
-            window.location.href = "file.html";
+            Swal.fire('Logged Out', translations[currentLang].logoutMessage, 'success');
+            localStorage.removeItem("verifye");
+          setTimeout(() => {
+                window.location.href = "file.html";
+            }, 3000);
+          
+ 
         }
     </script>
 </body>
