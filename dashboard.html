@@ -120,7 +120,7 @@
             const text = document.getElementById("inputField").value;
             const repeatCount = document.getElementById("numberOfRepeats").value;
             const output = document.getElementById("output");
-            var sound = document.getElementById("loginpound").play.();
+            var sound = document.getElementById("loginpound").play();
             Swal.fire('Success', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
 
             output.innerHTML = "";
@@ -139,7 +139,7 @@
             selection.removeAllRanges();
             selection.addRange(range);
             document.execCommand("copy");
-            var sound = document.getElementById("loginpound").play.();
+            var sound = document.getElementById("loginpound").play();
             Swal.fire('Copied!', translations[currentLang].alertCopied, 'info');
         }
 
@@ -150,7 +150,7 @@
         function logout() {
             localStorage.removeItem("loggedInUser");
             Swal.fire('Logged Out', translations[currentLang].logoutMessage, 'success');
-            var sound = document.getElementById("loginpound").play.();
+            var sound = document.getElementById("loginpound").play();
             localStorage.removeItem("verifye");
           setTimeout(() => {
                 window.location.href = "file.html";
