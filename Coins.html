@@ -72,6 +72,8 @@
     <audio id="ex" src="play.sound.mp3"></audio>
     <audio id="x" src="play.sound1.mp3"></audio>
     <audio id="c" src="coin.mp3"></audio>
+    <audio id="succ" src="succ.mp3"></audio>
+    <audio id="rap" src="tap.mp3"></audio>
 
     <div class="container">
         <h2>Claim Your Coins!</h2>
@@ -236,6 +238,7 @@
         }
 
         function showWithdrawPage() {
+            var sound = document.getElementById("tap").play();
             document.querySelector(".container").style.display = "none";
             document.getElementById("hiddenPage").style.display = "block";
         }
@@ -268,7 +271,7 @@
             document.getElementById("coinCount").textContent = "Coins: " + coins;
 
             Swal.fire('Successfully!', `You have withdrawn succesfully! ${withdrawAmount} coins. Your balance is ${coins} coins.`, 'success');
-            document.getElementById("ex").play(); // Play the audio
+            document.getElementById("succ").play(); // Play the audio
         }
 
         function goBack() {
