@@ -38,7 +38,7 @@
             const userInput = document.getElementById("captchaInput").value;
             if (userInput == captchaCode) {
                 startLoading(() => {
-                    window.location.href = "wap.html";
+                    window.location.replace("wap.html");
                     generateCaptcha();
                 });
             } else {
