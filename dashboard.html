@@ -150,7 +150,7 @@
     <audio id="loginSound" src="play.sound.mp3"></audio>
     <audio id="loginpound" src="play.sound1.mp3"></audio>
 
-    <input type="range" id="numberOfRepeats" min="1" max="777" value="1" step="1">
+    <input type="range" id="numberOfRepeats" min="1" max="1000" value="1" step="1">
     <span id="repeatValue">1</span> <span id="timesLabel">times</span>
     <label id="rangeLabel">Select number of repetitions</label>
 
@@ -249,7 +249,7 @@
 
             setTimeout(() => {
                 if (sound) sound.play();
-                Swal.fire('Successfully!', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
+                Swal.fire('Successfully', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
 
                 output.innerHTML = "";
                 for (let i = 1; i <= repeatCount; i++) {
@@ -272,7 +272,7 @@
             const sound = document.getElementById("loginSound");
             if (sound) sound.play();
 
-            Swal.fire('Successfully!, translations[currentLang].alertCopied, 'success');
+            Swal.fire('Successfully', translations[currentLang].alertCopied, 'success');
         }
 
         function raf() {
