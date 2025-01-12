@@ -97,14 +97,14 @@
     </div>
 
     <script>
-           if(!localStorage.getItem("lara")) {
+           if(!localStorage.getItem("lar")) {
                const sound = document.getElementById("ex");
                 if (sound) sound.play();
                Swal.fire('succesfully!', 'you claimed a 200 coins', 'success');
               const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
                     const newCoins = currentCoins + 200;
                      localStorage.setItem("coins", newCoins);
-                     localStorage.setItem("l", "true");
+                     localStorage.setItem("lar", "true");
                
            }
     
