@@ -170,7 +170,7 @@
                 Swal.fire('Error', 'Please log in first.', 'warning');
                 setTimeout(() => {
                     window.location.replace("file.html");
-                }, 1500);
+                }, 1000);
             }
         }, 3000);
 
@@ -249,7 +249,7 @@
 
             setTimeout(() => {
                 if (sound) sound.play();
-                Swal.fire('Success', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
+                Swal.fire('Successfully!', translations[currentLang].alertRepeat + repeatCount + " " + translations[currentLang].timesLabel, 'success');
 
                 output.innerHTML = "";
                 for (let i = 1; i <= repeatCount; i++) {
@@ -272,7 +272,7 @@
             const sound = document.getElementById("loginSound");
             if (sound) sound.play();
 
-            Swal.fire('Copied!', translations[currentLang].alertCopied, 'success');
+            Swal.fire('Successfully!, translations[currentLang].alertCopied, 'success');
         }
 
         function raf() {
@@ -289,7 +289,7 @@
             localStorage.removeItem("verifye");
             setTimeout(() => {
                 window.location.replace("file.html");
-            }, 1500);
+            }, 1000);
         }
     </script>
 </body>
