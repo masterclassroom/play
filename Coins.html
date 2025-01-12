@@ -97,9 +97,20 @@
     </div>
 
     <script>
-        
+           if(!localStorage.getItem("lara")) {
+               const sound = document.getElementById("ex");
+                if (sound) sound.play();
+               Swal.fire('succesfully!', 'you claimed a 200 coins', 'success');
+              const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
+                    const newCoins = currentCoins + 200;
+                     localStorage.setItem("coins", newCoins);
+                     localStorage.setItem("l", "true");
+               
+           }
     
-        document.addEventListener("DOMContentLoaded", function () {
+               
+        
+            document.addEventListener("DOMContentLoaded", function () {
             const alertKey = "seenSweetAlert";
             const alertTimeout = 86400000; // 24 hours in milliseconds
 
@@ -243,6 +254,21 @@
                 Swal.fire('Error', `Not enough coins. Your balance is ${coins} coins.`, 'error');
                 return;
             }
+                if(userId.length <= 7) {
+                    document.getElementById("x").play();
+                    Swal.fire('Error', 'id is less than 8 characters', 'warning');
+                    return;
+                }
+                    if(userId.length >= 9) {
+                        document.getElementById("x").play();
+                        Swal.fire('Error', 'id is big than 8 characters', 'warning');
+                        return;
+                    }
+                    if(withdrawAmount < 100) {
+                        document.getElementById("x").play();
+                        Swal.fire('Warning', 'minium wthdrawn is 100 coins', 'warning');
+                        return;
+                    }
 
             coins -= withdrawAmount;
             localStorage.setItem("coins", coins);
