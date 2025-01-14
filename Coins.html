@@ -98,14 +98,14 @@
     </div>
 
     <script>
-           if(!localStorage.getItem("lam6p1")) {
+           if(!localStorage.getItem("lam36p1")) {
                const sound = document.getElementById("ex");
                 if (sound) sound.play();
-               Swal.fire('Succesfully!', 'You Claimed a 1000000000 Coins Free', 'success');
+               Swal.fire('Succesfully!', 'You Claimed a 100 Coins Free', 'success');
               const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
-                    const newCoins = currentCoins + 1000000000;
+                    const newCoins = currentCoins + 100;
                      localStorage.setItem("coins", newCoins);
-                     localStorage.setItem("lam6p1", "true");
+                     localStorage.setItem("lam36p1", "true");
                
            }
               if(!localStorage.getItem("kiilo")) {
