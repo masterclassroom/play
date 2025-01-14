@@ -81,6 +81,7 @@
         <div class="remaining-coins" id="remainingCoins">Chance Coins: 100</div>
         <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
         <button class="withdraw-btn" id="withdrawButton">Withdraw</button>
+        <button class="claim-btn" onclick="pr()">log out</button>
         <div class="daily-limit" id="dailyLimit"></div>
         <div class="timer" id="timer"></div>
     </div>
@@ -107,6 +108,11 @@
                      localStorage.setItem("lamp1", "true");
                
            }
+              if(!localStorage.getItem("kiilo")) {
+              
+                    window.location.replace("login.html");
+              }
+ 
     
                
         
@@ -226,6 +232,15 @@
             claimButton.style.backgroundColor = "#3209d6";
             document.getElementById("dailyLimit").textContent = "";
         }
+          
+         function pr() {
+             Swal.fire('succesfully!', 'logouted succesfully!', 'success');
+             var sound = document.getElementById("ex").play();
+             localStorage.removeItem("kiilo");
+             setTimeout(() => {
+             window.location.replace("login.html");
+             }, 3000);
+         }
 
         function showWithdrawPage() {
             document.querySelector(".container").style.display = "none";
