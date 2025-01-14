@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            text-align: center;
+            color: #555;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 id="formTitle">Login</h2>
+
+        <!-- Foomka Login -->
+        <div id="loginForm">
+            <form>
+                <label for="loginUsername">Username:</label>
+                <input type="text" id="loginUsername" required><br>
+
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" required><br>
+
+                <button type="submit" id="loginBtn">Login</button>
+            </form>
+            <p>Haddii aadan haysan akoon, waxaad ka diiwaan gelin kartaa <a href="#" onclick="showSignUp()">Sign Up</a>.</p>
+        </div>
+
+        <!-- Foomka Sign Up -->
+        <div id="signUpForm" style="display:none;">
+            <form>
+                <label for="signUpUsername">Username:</label>
+                <input type="text" id="signUpUsername" required><br>
+
+                <label for="signUpPassword">Password:</label>
+                <input type="password" id="signUpPassword" required><br>
+
+                <button type="submit" id="signUpBtn">Sign Up</button>
+            </form>
+            <p>Haddii aad horey u leedahay akoon, waxaad ku gali kartaa <a href="#" onclick="showLogin()">Login</a>.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+    <script>
+        // Muujinta Foomka Sign Up
+        function showSignUp() {
+            document.getElementById("formTitle").innerText = "Sign Up";
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("signUpForm").style.display = "block";
+        }
+
+        // Muujinta Foomka Login
+        function showLogin() {
+            document.getElementById("formTitle").innerText = "Login";
+            document.getElementById("signUpForm").style.display = "none";
+            document.getElementById("loginForm").style.display = "block";
+        }
+
+        // Koodhka Login
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let username = document.getElementById("loginUsername").value;
+            let password = document.getElementById("loginPassword").value;
+
+            // Hubinta haddii xogta login-ka ay sax tahay
+            let storedUsername = localStorage.getItem("username");
+            let storedPassword = localStorage.getItem("password");
+
+            if (username === storedUsername && password === storedPassword) {
+                localStorage.setItem("kiilo", "true");
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Guul!',
+                    text: 'Waxaad si guul leh ugu gashay akoonkaaga.',
+                    confirmButtonText: 'OK'
+                });
+                setTimeout(() => {
+                        window.location.replace("Coins.html");
+                    },3000);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Khalad!',
+                    text: 'Username ama password ayaa khaldan.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
+        // Koodhka Sign Up
+        document.getElementById("signUpForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let username = document.getElementById("signUpUsername").value;
+            let password = document.getElementById("signUpPassword").value;
+
+            // Hubinta haddii user-ka horey u diiwaangashan yahay
+            if (localStorage.getItem("username")) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Khalad!',
+                    text: 'Waxaa horey u jira user. Kaliya qof hal mar ayaa isku diiwaangelin kara.',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                // Kaydinta xogta Sign Up
+                if (username && password) {
+                    localStorage.setItem("username", username);
+                    localStorage.setItem("password", password);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Diiwaangelinta Guul!',
+                        text: 'Waxaad si guul leh u diiwaangelisay akoonkaaga.',
+                        confirmButtonText: 'OK'
+                    });
+                    showLogin();  // U wareeji foomka login ka dib diiwaangelinta
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Khalad!',
+                        text: 'Fadlan buuxi dhammaan xogta.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
