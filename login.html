@@ -112,6 +112,7 @@
         .then((userCredential) => {
           const user = userCredential.user;
           if (user.emailVerified) {
+            localStorage.setItem("kiup", "true");
             Swal.fire('Login Successful', 'You are logged in successfully.', 'success');
             setTimeout(() => {
               window.location.replace("Coins.html");
