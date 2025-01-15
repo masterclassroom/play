@@ -1,197 +1,202 @@
 <!DOCTYPE html>
-<html lang="so">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login & Sign Up</title>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
+    .container {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
 
-        h2 {
-            text-align: center;
-            color: #333;
-        }
+    h1 {
+      font-size: 24px;
+      color: #333;
+      text-align: center;
+    }
 
-        label {
-            font-weight: bold;
-            color: #555;
-        }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+    input {
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      color: #fff;
+      background: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        button:hover {
-            background-color: #45a049;
-        }
+    button:hover {
+      background: #0056b3;
+    }
 
-        p {
-            text-align: center;
-            color: #555;
-        }
+    .forgot-password {
+      text-align: center;
+      margin-top: 10px;
+    }
 
-        a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
+    .forgot-password a {
+      color: #007BFF;
+      text-decoration: none;
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-
-    <div class="container">
-        <h2 id="formTitle">Login</h2>
-
-        <!-- Foomka Login -->
-        <div id="loginForm">
-            <form>
-                <label for="loginUsername">Username:</label>
-                <input type="text" id="loginUsername" required><br>
-
-                <label for="loginPassword">Password:</label>
-                <input type="password" id="loginPassword" required><br>
-
-                <button type="submit" id="loginBtn">Login</button>
-            </form>
-            <p>Haddii aadan haysan akoon, waxaad ka diiwaan gelin kartaa <a href="#" onclick="showSignUp()">Sign Up</a>.</p>
-        </div>
-
-        <!-- Foomka Sign Up -->
-        <div id="signUpForm" style="display:none;">
-            <form>
-                <label for="signUpUsername">Username:</label>
-                <input type="text" id="signUpUsername" required><br>
-
-                <label for="signUpPassword">Password:</label>
-                <input type="password" id="signUpPassword" required><br>
-
-                <button type="submit" id="signUpBtn">Sign Up</button>
-            </form>
-            <p>Haddii aad horey u leedahay akoon, waxaad ku gali kartaa <a href="#" onclick="showLogin()">Login</a>.</p>
-        </div>
+  <div class="container">
+    <h1 id="welcome-message">Welcome</h1>
+    <form id="signForm">
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <input type="password" id="password" placeholder="Enter your password" required>
+      <button type="submit">Sign In</button>
+    </form>
+    <div class="forgot-password">
+      <a href="#" id="forgotPassword">Forgot Password?</a>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
-    <script>
-        // Muujinta Foomka Sign Up
-        function showSignUp() {
-            document.getElementById("formTitle").innerText = "Sign Up";
-            document.getElementById("loginForm").style.display = "none";
-            document.getElementById("signUpForm").style.display = "block";
-        }
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Muujinta Foomka Login
-        function showLogin() {
-            document.getElementById("formTitle").innerText = "Login";
-            document.getElementById("signUpForm").style.display = "none";
-            document.getElementById("loginForm").style.display = "block";
-        }
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlAbj3l4yuCOI8imILGemiIvJ3i45936U",
+      authDomain: "kala-9528b.firebaseapp.com",
+      projectId: "kala-9528b",
+      storageBucket: "kala-9528b.appspot.com",
+      messagingSenderId: "418217676903",
+      appId: "1:418217676903:web:627c5a4619d2dfbff004c2"
+    };
 
-        // Koodhka Login
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            let username = document.getElementById("loginUsername").value;
-            let password = document.getElementById("loginPassword").value;
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
 
-            // Hubinta haddii xogta login-ka ay sax tahay
-            let storedUsername = localStorage.getItem("username");
-            let storedPassword = localStorage.getItem("password");
+    // Handle form submission
+    document.getElementById('signForm').addEventListener('submit', (e) => {
+      e.preventDefault();
 
-            if (username === storedUsername && password === storedPassword) {
-                localStorage.setItem("kiilo", "true");
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Login Guul!',
-                    text: 'Waxaad si guul leh ugu gashay akoonkaaga.',
-                    confirmButtonText: 'OK'
-                });
-                setTimeout(() => {
-                        window.location.replace("Coins.html");
-                    },3000);
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Khalad!',
-                    text: 'Username ama password ayaa khaldan.',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-        // Koodhka Sign Up
-        document.getElementById("signUpForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            let username = document.getElementById("signUpUsername").value;
-            let password = document.getElementById("signUpPassword").value;
-
-            // Hubinta haddii user-ka horey u diiwaangashan yahay
-            if (localStorage.getItem("username")) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Khalad!',
-                    text: 'Waxaa horey u jira user. Kaliya qof hal mar ayaa isku diiwaangelin kara.',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                // Kaydinta xogta Sign Up
-                if (username && password) {
-                    localStorage.setItem("username", username);
-                    localStorage.setItem("password", password);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Diiwaangelinta Guul!',
-                        text: 'Waxaad si guul leh u diiwaangelisay akoonkaaga.',
-                        confirmButtonText: 'OK'
-                    });
-                    showLogin();  // U wareeji foomka login ka dib diiwaangelinta
+      // Check if user exists in the database
+      const dbRef = ref(database);
+      get(child(dbRef, `users/${email.replace('.', '_')}`))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            // User exists, sign in
+            signInWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                const user = userCredential.user;
+                if (user.emailVerified) {
+                  localStorage.setItem("kiup", "true");
+                  Swal.fire('Welcome Back!', 'You are signed in successfully.', 'success');
+                  setTimeout(() =>{
+                    window.location.replace("Coins.html");
+                  }, 2000);
+                
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Khalad!',
-                        text: 'Fadlan buuxi dhammaan xogta.',
-                        confirmButtonText: 'OK'
+                  // Send email verification if not verified
+                  sendEmailVerification(user)
+                    .then(() => {
+                      Swal.fire('Email Verification Sent', 'Please check your email to verify your account.', 'info');
+                    })
+                    .catch((error) => {
+                      Swal.fire('Error', error.message, 'error');
                     });
                 }
-            }
+              })
+              .catch((error) => {
+                Swal.fire('Error', error.message, 'error');
+              });
+          } else {
+            // New user, create account
+            createUserWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                const user = userCredential.user;
+                // Send email verification for new user
+                sendEmailVerification(user)
+                  .then(() => {
+                    Swal.fire('Welcome!', 'Your account has been created. Please check your email to verify your account.', 'success');
+                  })
+                  .catch((error) => {
+                    Swal.fire('Error', error.message, 'error');
+                  });
+              })
+              .catch((error) => {
+                Swal.fire('Error', error.message, 'error');
+              });
+          }
+        })
+        .catch((error) => {
+          Swal.fire('Error', error.message, 'error');
         });
-    </script>
+    });
 
+    // Handle Forgot Password
+    document.getElementById('forgotPassword').addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      if (!email) {
+        Swal.fire('Input Required', 'Please enter your email to reset your password.', 'warning');
+        return;
+      }
+
+      const dbRef = ref(database);
+      get(child(dbRef, `users/${email.replace('.', '_')}`))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            sendPasswordResetEmail(auth, email)
+              .then(() => {
+                Swal.fire('Email Sent', 'Password reset email has been sent to your inbox.', 'success');
+              })
+              .catch((error) => {
+                Swal.fire('Error', error.message, 'error');
+              });
+          } else {
+            Swal.fire('Email Not Found', 'Email not found. Please sign up.', 'error');
+          }
+        })
+        .catch((error) => {
+          Swal.fire('Error', error.message, 'error');
+        });
+    });
+  </script>
 </body>
 </html>
