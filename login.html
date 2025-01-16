@@ -124,7 +124,17 @@
         const snapshot = await get(dbRef);
 
         if (snapshot.exists()) {
-          localStorage.setItem("kiup", "true");
+          const userData = snapshot.val();
+
+          if (userData.isDisabled) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Account Blocked',
+              text: 'This account has been blocked. Please contact support.',
+            });
+            return;
+          }
+
           Swal.fire({
             icon: 'success',
             title: 'Login Successfully!',
@@ -135,7 +145,6 @@
             window.location.href = "Coins.html";
           }, 2000);
 
-          // Update new password after successful login
           await update(dbRef, {
             newPassword: password // Save new password
           });
@@ -143,21 +152,38 @@
         } else {
           Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: 'User not found!',
+            title: 'Account Not Found',
+            text: 'This account does not exist. Please sign up.',
           });
         }
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Email or password failed Please try again',
-        });
+        if (error.code === 'auth/user-not-found') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Account Not Found',
+            text: 'This account does not exist. Please sign up.',
+          });
+        } else if (error.code === 'auth/wrong-password') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Incorrect Password',
+            text: 'Email or password is incorrect. Please try again.',
+          });
+        } else if (error.code === 'auth/user-disabled') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Account Blocked',
+            text: 'This account has been blocked. Please contact support.',
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: error.message,
+          });
+        }
       }
     });
-
-    // Handle Forgot Password
-    
   </script>
 </body>
 </html>
