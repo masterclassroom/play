@@ -74,7 +74,7 @@
     <input type="password" id="password" placeholder="Enter your password" required>
     <button id="loginBtn">Login</button>
     <div class="forgot-password">
-      <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+      <a href="forgot.html" id="forgotPasswordLink">Forgot Password?</a>
     </div>
     <div class="switch">
       Don't have an account? <a href="Sign up.html">Sign Up</a>
@@ -157,45 +157,7 @@
     });
 
     // Handle Forgot Password
-    document.getElementById('forgotPasswordLink').addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-
-      if (!email) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Input Required',
-          text: 'Please enter your email to reset your password.',
-        });
-        return;
-      }
-
-      try {
-        await sendPasswordResetEmail(auth, email);
-        Swal.fire({
-          icon: 'success',
-          title: 'Password Reset Sent',
-          text: 'Check your email to reset your password.',
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.message,
-        });
-      }
-    });
-
-    // Listen for Authentication Changes and Update Database
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const dbRef = ref(database, `users/${user.uid}`);
-        await update(dbRef, {
-          newPassword: "password cusub" // Ensure password is updated with a new one if required
-        });
-        console.log("Password cusub waa la cusboonaysiiyay.");
-      }
-    });
+    
   </script>
 </body>
 </html>
