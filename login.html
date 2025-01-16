@@ -83,8 +83,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     // Firebase configuration
     const firebaseConfig = {
@@ -108,11 +108,9 @@
       const password = document.getElementById('password').value;
 
       try {
-        // Authenticate user
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Check email verification
         if (!user.emailVerified) {
           Swal.fire({
             icon: 'info',
@@ -122,7 +120,6 @@
           return;
         }
 
-        // Check if user exists in the Realtime Database
         const dbRef = ref(database, `users/${user.uid}`);
         const snapshot = await get(dbRef);
 
@@ -134,10 +131,15 @@
             text: 'Welcome back!',
           });
 
-          // Redirect after login
           setTimeout(() => {
-            window.location.href = "Coins.html"; // Replace with your dashboard page
+            window.location.href = "Coins.html";
           }, 2000);
+
+          // Update new password after successful login
+          await update(dbRef, {
+            newPassword: password // Save new password
+          });
+          console.log("Password cusub waa la cusboonaysiiyay.");
         } else {
           Swal.fire({
             icon: 'error',
@@ -181,6 +183,17 @@
           title: 'Error',
           text: error.message,
         });
+      }
+    });
+
+    // Listen for Authentication Changes and Update Database
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const dbRef = ref(database, `users/${user.uid}`);
+        await update(dbRef, {
+          newPassword: "password cusub" // Ensure password is updated with a new one if required
+        });
+        console.log("Password cusub waa la cusboonaysiiyay.");
       }
     });
   </script>
