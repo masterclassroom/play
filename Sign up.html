@@ -4,127 +4,121 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up Page</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+      background-color: #f7f7f7;
     }
-
     .container {
-      background: #ffffff;
+      background: #fff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 400px;
     }
-
     h1 {
-      font-size: 24px;
-      color: #333;
       text-align: center;
+      margin-bottom: 20px;
     }
-
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
     input {
-      margin-bottom: 15px;
+      width: 100%;
       padding: 10px;
-      font-size: 16px;
+      margin-bottom: 15px;
       border: 1px solid #ddd;
       border-radius: 5px;
     }
-
     button {
+      width: 100%;
       padding: 10px;
-      font-size: 16px;
-      color: #fff;
+      color: white;
       background: #007BFF;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-
     button:hover {
       background: #0056b3;
     }
-
-    .sign-in {
+    .switch {
       text-align: center;
       margin-top: 10px;
     }
-
-    .sign-in a {
+    .switch a {
       color: #007BFF;
       text-decoration: none;
     }
-
-    .sign-in a:hover {
-      text-decoration: underline;
-    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <div class="container">
     <h1>Sign Up</h1>
-    <form id="signUpForm">
-      <input type="email" id="email" placeholder="Enter your email" required>
-      <input type="password" id="password" placeholder="Enter your password" required>
-      <button type="submit">Sign Up</button>
-    </form>
-    <div class="sign-in">
-      <p>Already have an account? <a href="login.html">log In</a></p>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <input type="password" id="password" placeholder="Enter your password" required>
+    <button id="signUpBtn">Sign Up</button>
+    <div class="switch">
+      Already have an account? <a href="login.html">Sign In</a>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
+    // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyBlAbj3l4yuCOI8imILGemiIvJ3i45936U",
-      authDomain: "kala-9528b.firebaseapp.com",
-      projectId: "kala-9528b",
-      storageBucket: "kala-9528b.appspot.com",
-      messagingSenderId: "418217676903",
-      appId: "1:418217676903:web:627c5a4619d2dfbff004c2"
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.firebasestorage.app",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const database = getDatabase(app);
 
-    document.getElementById('signUpForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-
+    // Handle Sign Up
+    document.getElementById('signUpBtn').addEventListener('click', async () => {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          sendEmailVerification(user)
-            .then(() => {
-              Swal.fire('Account Created!', 'Please check your email to verify your account.', 'success');
-              setTimeout(() => {
-                window.location.replace("login.html");
-              }, 2000);
-            })
-            .catch((error) => {
-              Swal.fire('Error', error.message, 'error');
-            });
-        })
-        .catch((error) => {
-          Swal.fire('Error', error.message, 'error');
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save user data to Realtime Database
+        const userRef = ref(database, `users/${user.uid}`);
+        await set(userRef, {
+          email: email,
+          password: password
         });
+
+        // Send Email Verification
+        await sendEmailVerification(user);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Account Created!',
+          text: 'Please check your email for verification.',
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message,
+        });
+      }
     });
   </script>
 </body>
