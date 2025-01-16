@@ -127,7 +127,7 @@
         const snapshot = await get(dbRef);
 
         if (snapshot.exists()) {
-          localStorage.setItem("kiup, "true");
+          localStorage.setItem("kiup", "true");
           Swal.fire({
             icon: 'success',
             title: 'Login Successful!',
@@ -142,7 +142,7 @@
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'User not found in the database!',
+            text: 'User not found!',
           });
         }
       } catch (error) {
