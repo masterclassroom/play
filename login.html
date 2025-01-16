@@ -127,6 +127,7 @@
         const snapshot = await get(dbRef);
 
         if (snapshot.exists()) {
+          localStorage.setItem("kiup, "true");
           Swal.fire({
             icon: 'success',
             title: 'Login Successful!',
@@ -135,7 +136,7 @@
 
           // Redirect after login
           setTimeout(() => {
-            window.location.href = "dashboard.html"; // Replace with your dashboard page
+            window.location.href = "Coins.html"; // Replace with your dashboard page
           }, 2000);
         } else {
           Swal.fire({
