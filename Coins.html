@@ -1,308 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Claim Coins</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-
-        .container, .hidden-page {
-            text-align: center;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .container {
-            display: block;
-        }
-
-        .hidden-page {
-            display: none;
-        }
-
-        .coin-count, .remaining-coins, .daily-limit {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-
-        .claim-btn, .withdraw-btn {
-            background-color: #3209d6;
-            color: white;
-            padding: 10px 20px;
-            font-size: 18px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 10px;
-        }
-
-        .claim-btn:hover, .withdraw-btn:hover {
-            background-color: #2808b5;
-        }
-
-        .timer {
-            font-size: 16px;
-            color: red;
-            margin-top: 20px;
-        }
-
-        input {
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 50%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>Claim Coins</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      background-color: #3209d6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2808b5;
+    }
+  </style>
 </head>
 <body>
-    <audio id="ex" src="play.sound.mp3"></audio>
-    <audio id="x" src="play.sound1.mp3"></audio>
-    <audio id="c" src="coin.mp3"></audio>
-    <audio id="succ" src="suc.mp3"></audio>
-    <audio id="rap" src="tap.mp3"></audio>
+  <div class="container">
+    <h2>Claim Your Coins</h2>
+    <div id="coinCount">Coins: 0</div>
+    <button id="claimButton">Claim 10 Coins</button>
+    <button id="withdrawButton">Withdraw</button>
+    <button id="logoutButton">Logout</button>
+  </div>
 
-    <div class="container">
-        <h2>Claim Your Coins!</h2>
-        <div class="coin-count" id="coinCount">Balance Coins: 0</div>
-        <div class="remaining-coins" id="remainingCoins">Chance Coins: 100</div>
-        <button class="claim-btn" id="claimButton">Claim 10 Coins</button>
-        <button class="withdraw-btn" id="withdrawButton">Withdraw</button>
-        <button class="claim-btn" onclick="pr()">log out</button>
-        <div class="daily-limit" id="dailyLimit"></div>
-        <div class="timer" id="timer"></div>
-    </div>
+  <script type="module">
+    // Import Firebase Modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-    <div class="hidden-page" id="hiddenPage">
-        <h2>Withdraw Your Coins</h2>
-        <label for="userId">Enter Your ID:</label>
-        <input type="number" id="userId" placeholder="Enter your ID">
-        <br><br>
-        <label for="withdrawAmount">Enter Amount to Withdraw:</label>
-        <input type="number" id="withdrawAmount" placeholder="Enter Amount">
-        <button class="withdraw-btn" id="confirmWithdrawButton">Withdraw</button>
-        <button class="withdraw-btn" id="backButton">Back</button>
-    </div>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.firebasestorage.app",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
 
-    <script>
-           if(!localStorage.getItem("lam36p1")) {
-               const sound = document.getElementById("ex");
-                if (sound) sound.play();
-               Swal.fire('Succesfully!', 'You Claimed a 100 Coins Free', 'success');
-              const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
-                    const newCoins = currentCoins + 100;
-                     localStorage.setItem("coins", newCoins);
-                     localStorage.setItem("lam36p1", "true");
-               
-           }
-              if(!localStorage.getItem("kiup")) {
-              
-                    window.location.replace("login.html");
-              }
- 
-    
-               
-        
-            document.addEventListener("DOMContentLoaded", function () {
-            const alertKey = "seenSweetAlert";
-            const alertTimeout = 86400000; // 24 hours in milliseconds
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
 
-            // Check if alert has been seen and time has passed
-            const lastSeen = localStorage.getItem(alertKey);
-            const now = Date.now();
+    // DOM Elements
+    const coinCountDiv = document.getElementById("coinCount");
+    const claimButton = document.getElementById("claimButton");
+    const withdrawButton = document.getElementById("withdrawButton");
+    const logoutButton = document.getElementById("logoutButton");
 
-            if (!lastSeen || now - lastSeen > alertTimeout) {
-                // Show SweetAlert as a simple alert (only one button)
-                Swal.fire({
-                    title: "daily login Rewards",
-                    text: "Do You want to claim 10 coins.",
-                    icon: "info",  // Choose an icon
-                    confirmButtonText: "Ok"
-                }).then(() => {
-                    var sound = document.getElementById("ex").play();
-                    Swal.fire('Succesfully', 'You claimed a 10 coins daily login Rewards', 'success');
-                    const currentCoins = parseInt(localStorage.getItem("coins")) || 0;
-                    const newCoins = currentCoins + 10;
-                    localStorage.setItem("coins", newCoins);
-                    // Save the current timestamp when user acknowledges the alert
-                    localStorage.setItem(alertKey, now);
-                    return;
-                });
-            }
-        });
-    
-        function loadCoins() {
-            const coins = parseInt(localStorage.getItem("coins")) || 0;
-            const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
+    // Global Variables
+    let userId = null;
+    let userCoins = 0;
 
-            document.getElementById("coinCount").textContent = "Coins: " + coins;
-            document.getElementById("remainingCoins").textContent = "Chance Coins: " + remainingCoins;
+    // Auth State Listener
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        userId = user.uid;
+        await loadCoins();
+      } else {
+        window.location.href = "login.html"; // Redirect to login if not authenticated
+      }
+    });
 
-            const dailyLimitEndTime = localStorage.getItem("dailyLimitEndTime");
-            if (dailyLimitEndTime) {
-                const timeLeft = Math.max(0, Math.floor((new Date(dailyLimitEndTime) - new Date()) / 1000));
-                if (timeLeft > 0) {
-                    startTimer(timeLeft);
-                    disableClaimButton();
-                }
-            }
-        }
+    // Load Coins from Firebase
+    async function loadCoins() {
+      const coinsRef = ref(database, `users/${userId}/coins`);
+      const snapshot = await get(coinsRef);
 
-        function claimCoins() {
-            var sound = document.getElementById("c").play();
-            const coins = parseInt(localStorage.getItem("coins")) || 0;
-            const remainingCoins = parseInt(localStorage.getItem("remainingCoins")) || 100;
+      if (snapshot.exists()) {
+        userCoins = snapshot.val();
+      } else {
+        userCoins = 0;
+        await set(coinsRef, userCoins); // Initialize coins if not set
+      }
 
-            if (coins >= 1000000) {
-                alert("Maximum value balance reached. Please withdraw.");
-                return;
-            }
+      updateCoinDisplay();
+    }
 
-            if (remainingCoins <= 0) {
-                alert("You have reached your daily limit.");
-                return;
-            }
+    // Update Coin Display
+    function updateCoinDisplay() {
+      coinCountDiv.textContent = `Coins: ${userCoins}`;
+    }
 
-            const newCoins = coins + 1; // Ku dar 10 coins halkii 1
-            const newRemainingCoins = remainingCoins - 10;
+    // Claim Coins
+    claimButton.addEventListener("click", async () => {
+      userCoins += 10; // Kordhi coins-ka
+      const coinsRef = ref(database, `users/${userId}/coins`);
+      
+      // Isticmaal "set" halkii aad ka isticmaali lahayd "update" si aad u hubiso in coins-ka ay cusbooneysiinayaan si sax ah
+      await set(coinsRef, userCoins); 
+      updateCoinDisplay();
+      Swal.fire("Success!", "You claimed 10 coins!", "success");
+    });
 
-            localStorage.setItem("coins", newCoins);
-            localStorage.setItem("remainingCoins", newRemainingCoins);
+    // Withdraw Coins
+    withdrawButton.addEventListener("click", () => {
+      Swal.fire("Feature Coming Soon", "The withdraw feature is under development.", "info");
+    });
 
-            document.getElementById("coinCount").textContent = "Coins: " + newCoins;
-            document.getElementById("remainingCoins").textContent = "Chance Coins: " + newRemainingCoins;
-
-            if (newRemainingCoins === 0) {
-                setDailyLimitTimer();
-            }
-        }
-
-        function setDailyLimitTimer() {
-            const now = new Date();
-            const endTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour
-            localStorage.setItem("dailyLimitEndTime", endTime.toISOString());
-            startTimer(3600);
-            disableClaimButton();
-        }
-
-        function startTimer(seconds) {
-            const timerElement = document.getElementById("timer");
-            const interval = setInterval(() => {
-                if (seconds <= 0) {
-                    clearInterval(interval);
-                    enableClaimButton();
-                    localStorage.removeItem("dailyLimitEndTime");
-                } else {
-                    timerElement.textContent = "Time Left: " + formatTime(seconds);
-                    seconds--;
-                }
-            }, 1000);
-        }
-
-        function formatTime(seconds) {
-            const hrs = Math.floor(seconds / 3600);
-            const mins = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function disableClaimButton() {
-            const claimButton = document.getElementById("claimButton");
-            claimButton.disabled = true;
-            claimButton.style.backgroundColor = "#ccc";
-            document.getElementById("dailyLimit").textContent = "You have reached your daily limit.";
-        }
-
-        function enableClaimButton() {
-            const claimButton = document.getElementById("claimButton");
-            claimButton.disabled = false;
-            claimButton.style.backgroundColor = "#3209d6";
-            document.getElementById("dailyLimit").textContent = "";
-        }
-          
-         function pr() {
-             Swal.fire('succesfully!', 'logouted succesfully!', 'success');
-             var sound = document.getElementById("ex").play();
-             localStorage.removeItem("kiup");
-             setTimeout(() => {
-             window.location.replace("login.html");
-             }, 2000);
-         }
-
-        function showWithdrawPage() {
-            document.querySelector(".container").style.display = "none";
-            document.getElementById("hiddenPage").style.display = "block";
-        }
-
-        function withdrawCoins() {
-            const userId = document.getElementById("userId").value.trim();
-            const withdrawAmount = parseInt(document.getElementById("withdrawAmount").value) || 0;
-            let coins = parseInt(localStorage.getItem("coins")) || 0;
-
-            if (!userId) {
-                document.getElementById("x").play(); // Play the audio
-                Swal.fire('Error', 'Enter your ID.', 'question');
-                return;
-            }
-
-            if (withdrawAmount <= 0) {
-                document.getElementById("x").play(); // Play the audio
-                Swal.fire('Error', 'Enter a amount.', 'question');
-                return;
-            }
-
-            if (withdrawAmount > coins) {
-                document.getElementById("x").play(); // Play the audio
-                Swal.fire('Error', `Not enough coins. Your balance is ${coins} coins.`, 'error');
-                return;
-            }
-                if(userId.length <= 7) {
-                    document.getElementById("x").play();
-                    Swal.fire('Error', 'id is less than 8 characters', 'warning');
-                    return;
-                }
-                    if(userId.length >= 9) {
-                        document.getElementById("x").play();
-                        Swal.fire('Error', 'id is big than 8 characters', 'warning');
-                        return;
-                    }
-                    if(withdrawAmount < 100) {
-                        document.getElementById("x").play();
-                        Swal.fire('Warning', 'minium wthdrawn is 100 coins', 'warning');
-                        return;
-                    }
-
-            coins -= withdrawAmount;
-            localStorage.setItem("coins", coins);
-            document.getElementById("coinCount").textContent = "Coins: " + coins;
-
-            Swal.fire('Successfully!', `You have withdrawn succesfully! ${withdrawAmount} coins. Your balance is ${coins} coins.`, 'success');
-            document.getElementById("succ").play(); // Play the audio
-        }
-
-        function goBack() {
-            document.querySelector(".container").style.display = "block";
-            document.getElementById("hiddenPage").style.display = "none";
-        }
-
-        window.onload = loadCoins;
-        document.getElementById("claimButton").addEventListener("click", claimCoins);
-        document.getElementById("withdrawButton").addEventListener("click", showWithdrawPage);
-        document.getElementById("confirmWithdrawButton").addEventListener("click", withdrawCoins);
-        document.getElementById("backButton").addEventListener("click", goBack);
-    </script>
+    // Logout
+    logoutButton.addEventListener("click", async () => {
+      await signOut(auth);
+      Swal.fire("Logged Out", "You have been logged out successfully.", "success");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+    });
+  </script>
 </body>
 </html>
