@@ -26,6 +26,7 @@ function isValidEmail(email) {
 
 // Handle Sign Up
 document.getElementById('signUpBtn').addEventListener('click', async () => {
+  const username = document.getElementById("username").value;
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
@@ -77,6 +78,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
     // Save user data to Realtime Database
     const userRef = ref(database, `users/${user.uid}`);
     await set(userRef, {
+      username: username,
       email: email,
       password: password
     });
