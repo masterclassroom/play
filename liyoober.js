@@ -56,7 +56,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         title: 'Login Successfully!',
         text: 'Welcome back!',
       });
-      localStorage.setItem("kiup", "true");
+      localStorage.setItem("lognar", "true");
 
       setTimeout(() => {
         window.location.href = "Coins.html";
