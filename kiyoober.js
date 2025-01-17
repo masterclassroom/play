@@ -27,7 +27,7 @@ const logoutButton = document.getElementById("logoutButton");
 
 // Global Variables
 let userId = null;
-let userCoins = 0;
+let userCoins = 10;
 
 // Auth State Listener
 onAuthStateChanged(auth, async (user) => {
@@ -47,7 +47,7 @@ async function loadCoins() {
   if (snapshot.exists()) {
     userCoins = snapshot.val();
   } else {
-    userCoins = 10;
+    userCoins = 0;
     await set(coinsRef, userCoins); // Initialize coins if not set
   }
 
