@@ -47,7 +47,7 @@ async function loadCoins() {
   if (snapshot.exists()) {
     userCoins = snapshot.val();
   } else {
-    userCoins = 0;
+    userCoins = 10;
     await set(coinsRef, userCoins); // Initialize coins if not set
   }
 
@@ -61,11 +61,11 @@ function updateCoinDisplay() {
 
 // Claim Coins
 claimButton.addEventListener("click", async () => {
-  userCoins += 10;
+  userCoins += 1;
   const coinsRef = ref(database, `users/${userId}/coins`);
   await set(coinsRef, userCoins); 
   updateCoinDisplay();
-  Swal.fire("Successfully!", "You claimed 10 coins!", "success");
+  Swal.fire("Successfully!", "You claimed 1 coins!", "success");
 });
 
 // Withdraw Coins
