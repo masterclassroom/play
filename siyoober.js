@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -29,63 +29,73 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
-  // Validate email format
-  if (!isValidEmail(email)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Email',
-      text: 'Please enter a valid email address.',
-    });
-    return;
-  }
-
-  // Check if password length is at least 6 characters
-  if (password.length < 6) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Weak Password',
-      text: 'Password must be at least 6 characters long.',
-    });
-    return;
-  }
-
-  // Check if email is already registered in the Realtime Database
-  const emailRef = ref(database, `users/`);
-  const snapshot = await get(emailRef);
-
-  let emailExists = false;
-  snapshot.forEach((childSnapshot) => {
-    if (childSnapshot.val().email === email) {
-      emailExists = true;
+  try {
+    // Validate email format
+    if (!isValidEmail(email)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address.',
+      });
+      return;
     }
-  });
 
-  if (emailExists) {
+    // Check if password length is at least 6 characters
+    if (password.length < 6) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Weak Password',
+        text: 'Password must be at least 6 characters long.',
+      });
+      return;
+    }
+
+    // Check if email is already registered in the Realtime Database
+    const emailRef = ref(database, `users/`);
+    const snapshot = await get(emailRef);
+
+    let emailExists = false;
+    snapshot.forEach((childSnapshot) => {
+      if (childSnapshot.val().email === email) {
+        emailExists = true;
+      }
+    });
+
+    if (emailExists) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Email Already Registered',
+        text: 'This email is already associated with an account.',
+      });
+      return;
+    }
+
+    // Create User
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Save user data to Realtime Database
+    const userRef = ref(database, `users/${user.uid}`);
+    await set(userRef, {
+      email: email,
+      password: password
+    });
+
+    // Send Email Verification
+    await sendEmailVerification(user);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Account Created!',
+      text: 'Please check your email for verification.',
+    });
+
+  } catch (error) {
+    // Handle errors
     Swal.fire({
       icon: 'error',
-      title: 'Email Already Registered',
-      text: 'This email is already associated with an account.',
+      title: 'Error',
+      text: error.message,
     });
-    return;
   }
-
-  // Create User
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  const user = userCredential.user;
-
-  // Save user data to Realtime Database
-  const userRef = ref(database, `users/${user.uid}`);
-  await set(userRef, {
-    email: email,
-    password: password
-  });
-
-  // Send Email Verification
-  await sendEmailVerification(user);
-
-  Swal.fire({
-    icon: 'success',
-    title: 'Account Created!',
-    text: 'Please check your email for verification.',
-  });
 });
