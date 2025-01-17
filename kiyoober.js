@@ -76,14 +76,14 @@ withdrawButton.addEventListener("click", () => {
 // Logout
 logoutButton.addEventListener("click", async () => {
   await signOut(auth);
-  localStorage.removeItem("lognar");
+  localStorage.removeItem("loggedinn");
   Swal.fire("Logged Out", "You have been logged out successfully.", "success");
   setTimeout(() => {
     window.location.href = "login.html";
   }, 2000);
 });
 
-if(!localStorage.getItem("lognar")) {
+if(!localStorage.getItem("loggedinn")) {
   alert("please log in");
   window.location.replace("login.html");
 }
