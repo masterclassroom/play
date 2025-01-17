@@ -65,7 +65,7 @@ claimButton.addEventListener("click", async () => {
   const coinsRef = ref(database, `users/${userId}/coins`);
   await set(coinsRef, userCoins); 
   updateCoinDisplay();
-  Swal.fire("Success!", "You claimed 10 coins!", "success");
+  Swal.fire("Successfully!", "You claimed 10 coins!", "success");
 });
 
 // Withdraw Coins
@@ -76,8 +76,14 @@ withdrawButton.addEventListener("click", () => {
 // Logout
 logoutButton.addEventListener("click", async () => {
   await signOut(auth);
+  localStorage.removeItem("lognar");
   Swal.fire("Logged Out", "You have been logged out successfully.", "success");
   setTimeout(() => {
     window.location.href = "login.html";
   }, 2000);
 });
+
+if(!localStorage.getItem("lognar")() {
+  alert("please log in");
+  window.location.replace("login.html");
+}
