@@ -83,7 +83,7 @@ logoutButton.addEventListener("click", async () => {
   }, 2000);
 });
 
-if(!localStorage.getItem("lognar")() {
+if(!localStorage.getItem("lognar")) {
   alert("please log in");
   window.location.replace("login.html");
 }
