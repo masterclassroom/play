@@ -27,7 +27,7 @@ const logoutButton = document.getElementById("logoutButton");
 
 // Global Variables
 let userId = null;
-let userCoins = 10;
+let userCoins = 0;
 
 // Auth State Listener
 onAuthStateChanged(auth, async (user) => {
