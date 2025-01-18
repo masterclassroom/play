@@ -23,6 +23,36 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  // Email format validation
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  if (!emailPattern.test(email)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Email',
+      text: 'Please enter a valid email address.',
+    });
+    return;
+  }
+
+  if (!password) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Password Required',
+      text: 'Please enter a password.',
+    });
+    return;
+  }
+
+  // Password length validation
+  if (password.length < 6) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Password Too Short',
+      text: 'Password must be at least 6 characters long.',
+    });
+    return;
+  }
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -67,26 +97,26 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       });
       console.log("Password cusub waa la cusboonaysiiyay.");
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Account Not Found',
-        text: 'This account does not exist. Please sign up.',
-      });
+      const usersRef = ref(database, 'users');
+      const usersSnapshot = await get(usersRef);
+
+      if (usersSnapshot.exists()) {
+        const users = usersSnapshot.val();
+        const emailExists = Object.values(users).some(user => user.email === email);
+
+        if (!emailExists) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Email Not Registered',
+            text: 'This email is not registered. Please sign up first.',
+          });
+          return;
+        }
+      }
     }
+    
   } catch (error) {
-    if (error.code === 'auth/user-not-found') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Account Not Found',
-        text: 'This account does not exist. Please sign up.',
-      });
-    } else if (error.code === 'auth/wrong-password') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Incorrect Password',
-        text: 'Email or password is incorrect. Please try again.',
-      });
-    } else if (error.code === 'auth/user-disabled') {
+    if (error.code === 'auth/user-disabled') {
       Swal.fire({
         icon: 'error',
         title: 'Account Blocked',
