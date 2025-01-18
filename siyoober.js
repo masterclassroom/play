@@ -36,7 +36,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       Swal.fire({
         icon: 'error',
         title: 'Invalid Email',
-        text: 'Please enter a valid email address.',
+        text: 'Please enter email address.',
       });
       return;
     }
