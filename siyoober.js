@@ -66,7 +66,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       Swal.fire({
         icon: 'error',
         title: 'Email Already Registered',
-        text: 'This email is already associated with an account.',
+        text: 'This email is already registered.',
       });
       return;
     }
