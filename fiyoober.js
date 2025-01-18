@@ -26,7 +26,7 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
   if (!email) {
     Swal.fire({
       icon: 'warning',
-      title: 'warning',
+      title: 'Warning',
       text: 'Please enter your email to reset your password.',
     });
     return;
@@ -44,7 +44,7 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
       if (!emailExists) {
         Swal.fire({
           icon: 'error',
-          title: 'warning,
+          title: 'warning',
           text: 'Email not registered please register.',
         });
         return;
