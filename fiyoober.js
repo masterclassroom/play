@@ -25,7 +25,7 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
 
   if (!email) {
     Swal.fire({
-      icon: 'warning',
+      icon: 'error',
       title: 'Warning',
       text: 'Please enter your email to reset your password.',
     });
