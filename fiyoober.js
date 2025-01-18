@@ -54,7 +54,7 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
       await sendPasswordResetEmail(auth, email);
       Swal.fire({
         icon: 'success',
-        title: 'Successfully!,
+        title: 'Successfully!',
         text: 'Check your email to reset your password.',
       });
     } else {
