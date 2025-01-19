@@ -78,6 +78,9 @@ updatePasswordButton.addEventListener("click", async () => {
       "Your password has been updated successfully.",
       "success"
     );
+    setTimeout(() => {
+      window.location.replace("Coins.html");
+    }, 2000);
   } catch (error) {
     Swal.fire("Error", error.message, "error");
   }
