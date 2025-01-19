@@ -28,28 +28,41 @@ onAuthStateChanged(auth, (user) => {
     const buyButtons = document.querySelectorAll('.btn-buy');
     buyButtons.forEach((button) => {
       button.addEventListener('click', async (event) => {
-        const courseName = event.target.getAttribute('data-course'); // Get course name
-        const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`); // Path to store purchase data
+        const courseName = event.target.getAttribute('data-course');
+        const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
-        // Check if the user has already purchased the course
         try {
-          const snapshot = await get(userRef); // Retrieve current purchase data for the course
+          const snapshot = await get(userRef);
           if (snapshot.exists() && snapshot.val().purchased) {
-            // If the course is already purchased, show an alert
-            alert(`Waad iibsatay koorsada: ${courseName} mar hore. Mahadsanid!`);
+            Swal.fire({
+              title: 'Koorsada Hore Ayaa La Iibsaday!',
+              text: `Waad iibsatay koorsada: ${courseName} mar hore. Mahadsanid!`,
+              icon: 'info',
+              confirmButtonText: 'Ok'
+            });
             console.log(`Course ${courseName} already purchased.`);
           } else {
-            // If the course is not yet purchased, save the purchase data
             await set(userRef, {
               purchased: true,
-              courseName: courseName, // Save the name of the course
-              timestamp: new Date().toISOString() // Save the purchase timestamp
+              courseName: courseName,
+              timestamp: new Date().toISOString()
             });
 
-            alert(`Waad iibsatay koorsada: ${courseName}. Mahadsanid!`);
+            Swal.fire({
+              title: 'Iibsashada Waa Guul!',
+              text: `Waad iibsatay koorsada: ${courseName}. Mahadsanid!`,
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
             console.log(`Purchase saved for course: ${courseName}`);
           }
         } catch (error) {
+          Swal.fire({
+            title: 'Error!',
+            text: `Waxaa dhacay khalad: ${error.message}`,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
           console.error("Error checking or saving purchase:", error.message);
         }
       });
@@ -59,8 +72,14 @@ onAuthStateChanged(auth, (user) => {
     const viewPurchasedBtn = document.getElementById('view-purchased-btn');
     viewPurchasedBtn.addEventListener('click', () => {
       if (!user) {
-        alert("Please log in first.");
-        window.location.href = "login.html";
+        Swal.fire({
+          title: 'Log in First!',
+          text: 'Fadlan marka hore geli akoonkaaga.',
+          icon: 'warning',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          window.location.href = "login.html";
+        });
       } else {
         window.location.href = "purchased.html";
       }
@@ -75,14 +94,10 @@ onAuthStateChanged(auth, (user) => {
 // About Modal
 const aboutBtn = document.getElementById('about-btn');
 aboutBtn.addEventListener('click', () => {
-  document.getElementById('about-modal').style.display = 'block';
+  Swal.fire({
+    title: 'About Us',
+    text: 'This is about our platform. Mahadsanid!',
+    icon: 'info',
+    confirmButtonText: 'Close'
+  });
 });
-
-function closeAbout() {
-  document.getElementById('about-modal').style.display = 'none';
-}
-
-// Close Purchased Courses Modal
-function closePurchasedCourses() {
-  document.getElementById('purchased-courses-modal').style.display = 'none';
-            }
