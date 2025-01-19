@@ -84,8 +84,9 @@ updatePasswordButton.addEventListener("click", async () => {
 });
 
  if(!sessionStorage.getItem("siitar")) {
-   Swal.fire('Warning', '', 'warning');
+   Swal.fire('Warning', '!!', 'warning');
    setTimeout(() => {
      window.location.href = "Coins.html";
    }, 2000);
+ }
                             
