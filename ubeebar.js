@@ -59,6 +59,7 @@ updateUsernameButton.addEventListener("click", async () => {
   }
   if(newUsername.length>14) {
     Swal.fire('Error', 'Invalid username', 'error');
+    return;
   }
 
   try {
