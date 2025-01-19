@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waaberi Academy</title>
+  <link rel="stylesheet" href="akiidar.css">
+</head>
+<body>
+  <header>
+    <h1>Boys Academy</h1>
+    <nav>
+      <ul>
+        <li><a href="https://wa.me/252672146979" target="_blank" class="green-link">Contact</a></li>
+        <li><a href="#" id="about-btn" class="green-link">About</a></li>
+        <li><a href="#" id="view-purchased-btn" class="green-link">View Purchased Courses</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="courses">
+    <h2>Koorsooyin Tayo Leh</h2>
+
+    <!-- Course 1 -->
+    <div class="course-card">
+      <h3>Siraha Muqaal Samaynta</h3>
+      <p>Macallin: Abdirahman Waaberi</p>
+      <p><span class="price">$10.00</span></p>
+      <button class="btn-buy" data-course="Siraha Muqaal Samaynta">Iibso</button>
+    </div>
+
+    <!-- Course 2 -->
+    <div class="course-card">
+      <h3>Ku Baro Premiere Pro</h3>
+      <p>Macallin: Abdirahman Waaberi</p>
+      <p><span class="price">$10.00</span></p>
+      <button class="btn-buy" data-course="Ku Baro Premiere Pro">Iibso</button>
+    </div>
+
+    <!-- Course 3 -->
+    <div class="course-card">
+      <h3>Sirta Epic Ta Pes</h3>
+      <p>Macallin: Maxamed</p>
+      <p><span class="price">$15.00</span></p>
+      <button class="btn-buy" data-course="Sirta Epic Ta Pes">Iibso</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Boys Academy</p>
+  </footer>
+
+  <script type="module" src="akiidar.js"></script>
+  <div id="about-modal" style="display:none;">
+    <p>Websitekan waxa iska leh Boys Academy.</p>
+    <button onclick="closeAbout()">Close</button>
+  </div>
+
+  <div id="purchased-courses-modal" style="display:none;">
+    <ul id="purchased-courses-list"></ul>
+    <button onclick="closePurchasedCourses()">Close</button>
+  </div>
+</body>
+              </html>
