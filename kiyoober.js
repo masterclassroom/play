@@ -99,7 +99,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
        }, 3000);
 
   function seteer() {
-      window.location.href = "Changep.html";
       sessionStorage.setItem("siitar", "true");
+      window.location.href = "Changep.html";
   }
   
