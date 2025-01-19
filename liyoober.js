@@ -90,7 +90,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       localStorage.setItem("loggedinn", "true");
 
       setTimeout(() => {
-        window.location.href = "Coins.html";
+        window.location.href = "Academy.html";
       }, 2000);
 
       // Save the new password (optional, confirm the requirement)
