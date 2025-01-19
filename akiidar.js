@@ -101,3 +101,9 @@ aboutBtn.addEventListener('click', () => {
     confirmButtonText: 'Close'
   });
 });
+
+const logoutBtn = document.getElementById('logout-btn');
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth)
+      alert("sign out successfully ");
+    }
