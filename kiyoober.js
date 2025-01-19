@@ -97,4 +97,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
        setTimeout(()=> {
          document.getElementById("claimButton").disabled = false;
        }, 3000);
+
+  function seteer() {
+      window.location.href = "Changep.html";
+      sessionStorage.setItem("siitar", "true");
+  }
   
