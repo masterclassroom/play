@@ -84,17 +84,17 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       Swal.fire({
         icon: 'success',
         title: 'Login Successfully!',
-        text: 'Welcome back!',
+        text: `Welcome back, ${userData.username || 'User'}!`,
       });
+
       localStorage.setItem("loggedinn", "true");
 
       setTimeout(() => {
         window.location.href = "Coins.html";
       }, 2000);
 
-      await update(dbRef, {
-        newPassword: password // Save new password
-      });
+      // Save the new password (optional, confirm the requirement)
+      await update(dbRef, { newPassword: password });
       console.log("Password cusub waa la cusboonaysiiyay.");
     } else {
       const usersRef = ref(database, 'users');
@@ -112,15 +112,33 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
           });
           return;
         }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Database Error',
+          text: 'User database is empty or inaccessible.',
+        });
       }
     }
-    
+
   } catch (error) {
     if (error.code === 'auth/user-disabled') {
       Swal.fire({
         icon: 'error',
         title: 'Account Blocked',
         text: 'This account has been blocked. Please contact support.',
+      });
+    } else if (error.code === 'auth/wrong-password') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'The password you entered is incorrect. Please try again.',
+      });
+    } else if (error.code === 'auth/user-not-found') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'No account found with this email. Please sign up first.',
       });
     } else {
       Swal.fire({
