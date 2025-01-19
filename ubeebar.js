@@ -57,6 +57,9 @@ updateUsernameButton.addEventListener("click", async () => {
     Swal.fire("Error", "You must be logged in to update your username.", "error");
     return;
   }
+  if(newUsername.length>14) {
+    Swal.fire('Error', 'Invalid username', 'error');
+  }
 
   try {
     // Step 1: Update Username in Real-Time Database
