@@ -98,7 +98,4 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
          document.getElementById("claimButton").disabled = false;
        }, 3000);
 
-  function change() {
-      sessionStorage.setItem("siitar", "true");
-  }
   
