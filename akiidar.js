@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase Configuration
@@ -102,8 +102,13 @@ aboutBtn.addEventListener('click', () => {
   });
 });
 
+// Logout function
 const logoutBtn = document.getElementById('logout-btn');
-    logoutBtn.addEventListener('click', () => {
-      signOut(auth)
-      alert("sign out successfully ");
-    }
+logoutBtn.addEventListener('click', () => {
+  signOut(auth).then(() => {
+    alert("Signed out successfully");
+    window.location.href = "login.html"; // Redirect to login page after signing out
+  }).catch((error) => {
+    console.error("Error signing out: ", error.message);
+  });
+});
