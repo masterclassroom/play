@@ -66,9 +66,9 @@ onAuthStateChanged(auth, (user) => {
             if (isConfirmed) {
               // Simulate payment process
               Swal.fire({
-                title: 'succesfulyy',
-                text: 'fadlan dir lacagta',
-                icon: 'question',
+                title: 'Warning',
+                text: 'fadlan dir lacagta ka dib screen shot ka soo qaad',
+                icon: 'warning',
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   const phoneNumber = result.value;
