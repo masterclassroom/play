@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Koorso Video</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    video {
+      width: 350px; /* Ballaca muuqaalka */
+      height: 250px; /* Dhererka muuqaalka */
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome! You Purchased Koorso</h1>
+  <video controls src="kala.mp4"></video>
+</body>
+<script>
+  if (!sessionStorage.getItem("koorso")) {
+    alert("Please login first");
+    window.location.replace("koorsoo.html");
+  }
+</script>
+</html>
