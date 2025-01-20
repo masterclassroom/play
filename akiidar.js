@@ -33,28 +33,69 @@ onAuthStateChanged(auth, (user) => {
 
         try {
           const snapshot = await get(userRef);
-          if (snapshot.exists() && snapshot.val().purchased) {
-            Swal.fire({
-              title: 'Koorsada Hore Ayaa La Iibsaday!',
-              text: `Waad iibsatay koorsada: ${courseName} mar hore. Mahadsanid!`,
-              icon: 'info',
-              confirmButtonText: 'Ok'
-            });
-            console.log(`Course ${courseName} already purchased.`);
+
+          if (snapshot.exists()) {
+            const purchaseStatus = snapshot.val();
+            if (purchaseStatus.purchased === false) {
+              Swal.fire({
+                title: 'Codsigaaga waa la diiwaangeliyay!',
+                text: `Fadlan sug 24 saac gudahood: ${courseName}.`,
+                icon: 'info',
+                confirmButtonText: 'Ok'
+              });
+              console.log(`Request for course ${courseName} is already recorded.`);
+            } else if (purchaseStatus.purchased === true) {
+              Swal.fire({
+                title: 'Koorsada Waa La Iibiyay!',
+                text: `Waad iibsatay koorsada: ${courseName}.`,
+                icon: 'success',
+                confirmButtonText: 'Ok'
+              });
+              console.log(`Course ${courseName} already purchased.`);
+            }
           } else {
-            await set(userRef, {
-              purchased: true,
-              courseName: courseName,
-              timestamp: new Date().toISOString()
+            const { isConfirmed } = await Swal.fire({
+              title: 'Miyaad hubtaa?',
+              text: `Ma rabtaa inaad iibsatid koorsada ${courseName}?`,
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: 'Haa',
+              cancelButtonText: 'Maya'
             });
 
-            Swal.fire({
-              title: 'Iibsashada Waa Guul!',
-              text: `Waad iibsatay koorsada: ${courseName}. Mahadsanid!`,
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-            console.log(`Purchase saved for course: ${courseName}`);
+            if (isConfirmed) {
+              // Simulate payment process
+              Swal.fire({
+                title: 'succesfulyy',
+                text: 'fadlan dir lacagta',
+                icon: 'question',
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const phoneNumber = result.value;
+                  console.log(`Simulating payment to *220*${phoneNumber}*1000#`);
+
+                  await set(userRef, {
+                    purchased: false,
+                    courseName: courseName,
+                    timestamp: new Date().toISOString()
+                  });
+
+                  Swal.fire({
+                    title: 'Codsiga Waa La Diiwaangeliyay!',
+                    text: `Fadlan sug 24 saac gudahood inta maamulka uu xaqiijinayo.`,
+                    icon: 'info',
+                    confirmButtonText: 'Ok'
+                  });
+                } else {
+                  Swal.fire({
+                    title: 'Lacag Bixinta Waa La Joojiyay!',
+                    text: 'Ma aadan dhammeystirin iibka.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                  });
+                }
+              });
+            }
           }
         } catch (error) {
           Swal.fire({
@@ -66,23 +107,6 @@ onAuthStateChanged(auth, (user) => {
           console.error("Error checking or saving purchase:", error.message);
         }
       });
-    });
-
-    // View Purchased Courses
-    const viewPurchasedBtn = document.getElementById('view-purchased-btn');
-    viewPurchasedBtn.addEventListener('click', () => {
-      if (!user) {
-        Swal.fire({
-          title: 'Log in First!',
-          text: 'Fadlan marka hore geli akoonkaaga.',
-          icon: 'warning',
-          confirmButtonText: 'Ok'
-        }).then(() => {
-          window.location.href = "login.html";
-        });
-      } else {
-        window.location.href = "purchased.html";
-      }
     });
 
   } else {
