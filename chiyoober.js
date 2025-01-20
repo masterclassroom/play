@@ -74,12 +74,12 @@ updatePasswordButton.addEventListener("click", async () => {
 
     // Show success message after updating the password
     Swal.fire(
-      "Password Updated Successfully",
-      "Your password has been updated successfully.",
+      "Successfully",
+      "Your password has been updated",
       "success"
     );
     setTimeout(() => {
-      window.location.replace("Coins.html");
+      window.location.replace("Academy.html");
     }, 2000);
   } catch (error) {
     Swal.fire("Error", error.message, "error");
