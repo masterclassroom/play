@@ -48,7 +48,7 @@ onAuthStateChanged(auth, (user) => {
             // Check which link to use based on the course name or index
             let courseLink = '';
             if (course === 'Sirta Epic Ta Pes') {
-              courseLink = 'video.waaberiboys.sss.html';
+              courseLink = 'Video.waaberiboys.sss.html';
             } else if (course === 'Ku Baro Premiere Pro') {
               courseLink = 'video.kbpp.html';
             } else {
