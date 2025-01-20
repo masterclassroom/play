@@ -20,11 +20,11 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 // Check if user is logged in
+// Check if the user is logged in and fetch the course data
 onAuthStateChanged(auth, (user) => {
   if (user) {
     const userRef = ref(database, `users/${user.uid}/purchases`);
     const purchasedCoursesList = document.getElementById('purchased-courses-list');
-    const videoPlayer = document.getElementById('video-player'); // Main video player
     
     get(userRef).then((snapshot) => {
       if (snapshot.exists()) {
@@ -33,31 +33,35 @@ onAuthStateChanged(auth, (user) => {
         purchasedCoursesList.innerHTML = ''; // Clear any previous data
 
         for (const course in courses) {
-          const courseData = courses[course];
-          if (courseData.purchased === true) {
+          if (courses[course].purchased === true) {
             hasPurchasedCourses = true;
 
-            // Create a list item for the course
+            // Add course to the list
             const li = document.createElement('li');
-            li.textContent = `Course: ${course}`;
-            li.style.marginBottom = '10px';
-
-            // Play course video on click
-            li.addEventListener('click', () => {
-              const hiddenVideo = document.querySelector(
-                `#hidden-videos video[data-course="${course}"]`
-              );
-
-              if (hiddenVideo) {
-                videoPlayer.src = hiddenVideo.querySelector('source').src; // Set video source
-                videoPlayer.style.display = 'block'; // Show video player
-                videoPlayer.play(); // Auto-play the video
-              } else {
-                alert("Video not found for this course.");
-              }
-            });
-
+            li.textContent = course; // Display the course name
             purchasedCoursesList.appendChild(li);
+
+            // Check if the course has a video
+            if (courses[course].videoUrl) {
+              // Create a div to hold the video
+              const videoDiv = document.createElement('div');
+              videoDiv.style.display = 'block'; // Ensure it's block level
+
+              // Create video element
+              const videoElement = document.createElement('video');
+              videoElement.setAttribute('controls', 'true'); // Add controls like play, pause, etc.
+              videoElement.setAttribute('src', courses[course].videoUrl); // Set video URL from Firebase
+
+              // Append the video to the div
+              videoDiv.appendChild(videoElement);
+
+              // Append the video div below the course
+              purchasedCoursesList.appendChild(videoDiv);
+            } else {
+              const noVideoMessage = document.createElement('p');
+              noVideoMessage.textContent = "No video available for this course.";
+              purchasedCoursesList.appendChild(noVideoMessage);
+            }
           }
         }
 
