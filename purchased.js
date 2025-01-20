@@ -41,27 +41,27 @@ onAuthStateChanged(auth, (user) => {
             li.textContent = course; // Display the course name
             purchasedCoursesList.appendChild(li);
 
-            // Check if the course has a video
-            if (courses[course].videoUrl) {
-              // Create a div to hold the video
-              const videoDiv = document.createElement('div');
-              videoDiv.style.display = 'block'; // Ensure it's block level
+            // Create a button and link for the purchased course with different links
+            const courseLinkButton = document.createElement('button');
+            courseLinkButton.textContent = 'Go to Course';
 
-              // Create video element
-              const videoElement = document.createElement('video');
-              videoElement.setAttribute('controls', 'true'); // Add controls like play, pause, etc.
-              videoElement.setAttribute('src', courses[course].videoUrl); // Set video URL from Firebase
-
-              // Append the video to the div
-              videoDiv.appendChild(videoElement);
-
-              // Append the video div below the course
-              purchasedCoursesList.appendChild(videoDiv);
+            // Check which link to use based on the course name or index
+            let courseLink = '';
+            if (course === 'Sirta Epic Ta Pes') {
+              courseLink = 'video.sss.html';
+            } else if (course === 'Ku Baro Premiere Pro') {
+              courseLink = 'video.kbpp.html';
             } else {
-              const noVideoMessage = document.createElement('p');
-              noVideoMessage.textContent = "No video available for this course.";
-              purchasedCoursesList.appendChild(noVideoMessage);
+              courseLink = 'sms.html';
             }
+
+            // Button click event to navigate to the course
+            courseLinkButton.onclick = () => {
+              window.location.href = courseLink;
+              sessionStorage.setItem("koorso", "true")
+            };
+
+            purchasedCoursesList.appendChild(courseLinkButton);
           }
         }
 
