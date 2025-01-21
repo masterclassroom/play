@@ -43,16 +43,17 @@ onAuthStateChanged(auth, (user) => {
 
             // Create a button and link for the purchased course with different links
             const courseLinkButton = document.createElement('button');
+            courseLinkButton.className = 'goto';
             courseLinkButton.textContent = 'Go to Course';
 
             // Check which link to use based on the course name or index
             let courseLink = '';
             if (course === 'Sirta Epic Ta Pes') {
-              courseLink = 'Video waaberiboyssss.html';
+              courseLink = 'tijaabo.html';
             } else if (course === 'Ku Baro Premiere Pro') {
-              courseLink = 'video.kbpp.html';
+              courseLink = 'purchased.html';
             } else {
-              courseLink = 'sms.html';
+              courseLink = 'purchased.html';
             }
 
             // Button click event to navigate to the course
