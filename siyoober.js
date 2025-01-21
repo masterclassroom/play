@@ -28,6 +28,7 @@ function isValidEmail(email) {
 document.getElementById('signUpBtn').addEventListener('click', async () => {
   const username = document.getElementById("username").value;
   const email = document.getElementById('email').value;
+  const number = document.getElementById("number").value;
   const password = document.getElementById('password').value;
 
   try {
@@ -70,6 +71,21 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       });
       return;
     }
+    let numberExists = false;
+    snapshot.forEach((childSnapshot) => {
+      if (childSnapshot.val().number === number) {
+        numberExists = true;
+      }
+    });
+
+    if (numberExists) {
+      Swal.fire({
+        icon: 'error',
+        title: 'number Already Registered',
+        text: 'This Phone number is already registered.',
+      });
+      return;
+    }
 
     // Create User
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -80,6 +96,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
     await set(userRef, {
       username: username,
       email: email,
+      number: number,
       password: password
     });
 
