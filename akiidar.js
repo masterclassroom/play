@@ -38,8 +38,8 @@ onAuthStateChanged(auth, (user) => {
             const purchaseStatus = snapshot.val();
             if (purchaseStatus.purchased === false) {
               Swal.fire({
-                title: 'Codsigaaga waa la diiwaangeliyay!',
-                text: `Fadlan sug 24 saac gudahood: ${courseName}.`,
+                title: '',
+                text: ` koor sadan mar hore ayaad cod satay Fadlan nala soo xirir sii u iibsato koorsada: ${courseName}.`,
                 icon: 'info',
                 confirmButtonText: 'Ok'
               });
@@ -47,7 +47,7 @@ onAuthStateChanged(auth, (user) => {
             } else if (purchaseStatus.purchased === true) {
               Swal.fire({
                 title: 'Koorsada Waa La Iibiyay!',
-                text: `Waad iibsatay koorsada: ${courseName}.`,
+                text: `Waad iibsatay koorsada: ${courseName}. mar hore fadlan gal qaybta view purchasedka`,
                 icon: 'success',
                 confirmButtonText: 'Ok'
               });
@@ -55,7 +55,7 @@ onAuthStateChanged(auth, (user) => {
             }
           } else {
             const { isConfirmed } = await Swal.fire({
-              title: 'Miyaad hubtaa?',
+              title: 'Ma doonaysa inaad iibsato?',
               text: `Ma rabtaa inaad iibsatid koorsada ${courseName}?`,
               icon: 'question',
               showCancelButton: true,
@@ -66,9 +66,9 @@ onAuthStateChanged(auth, (user) => {
             if (isConfirmed) {
               // Simulate payment process
               Swal.fire({
-                title: 'Warning',
-                text: 'fadlan dir lacagta ka dib screen shot ka soo qaad',
-                icon: 'warning',
+                title: '',
+                text: 'Fadlan naga la soo xirir contacts xaga sare saaran',
+                icon: '',
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   const phoneNumber = result.value;
@@ -79,9 +79,10 @@ onAuthStateChanged(auth, (user) => {
                     courseName: courseName,
                     timestamp: new Date().toISOString()
                   });
+                    return;
 
                   Swal.fire({
-                    title: 'Codsiga Waa La Diiwaangeliyay!',
+                    title: '!',
                     text: `Fadlan sug 24 saac gudahood inta maamulka uu xaqiijinayo.`,
                     icon: 'info',
                     confirmButtonText: 'Ok'
@@ -136,3 +137,4 @@ logoutBtn.addEventListener('click', () => {
     console.error("Error signing out: ", error.message);
   });
 });
+
