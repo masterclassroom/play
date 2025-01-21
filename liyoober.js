@@ -58,15 +58,11 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     const user = userCredential.user;
 
     if (!user.emailVerified) {
-      await user.sendEmailVerification();
-
       Swal.fire({
         icon: 'info',
         title: 'Email Not Verified',
-        text: 'Please verify your email before logging in. A verification email has been sent.',
+        text: 'Please verify your email before logging in.',
       });
-
-      await auth.signOut();
       return;
     }
 
@@ -96,6 +92,10 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       setTimeout(() => {
         window.location.href = "Academy.html";
       }, 2000);
+
+      // Save the new password (optional, confirm the requirement)
+      await update(dbRef, { newPassword: password });
+      console.log("Password cusub waa la cusboonaysiiyay.");
     } else {
       const usersRef = ref(database, 'users');
       const usersSnapshot = await get(usersRef);
