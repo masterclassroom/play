@@ -1,69 +1,68 @@
-/* General Styles */
+/* General Styling */
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
-/* Header Styles */
 header {
-  background-color: hotpink;
+  background-color: #2d3b2f;
   color: white;
-  padding: 1em 0;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.header-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.nav-links {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 15px;
-}
-
-.nav-links a {
-  color: black;
-  text-decoration: none;
-  font-size: 1rem;
-}
-
-.nav-links a:hover {
-  text-decoration: underline;
-}
-
-.btn-logout {
-  background-color: red;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.btn-logout:hover {
-  background-color: #e63939;
-}
-
-/* Courses Section */
-.courses {
-  padding: 30px;
-  background-color: #ffffff;
+  padding: 15px;
   text-align: center;
 }
 
-.courses h2 {
-  margin-bottom: 20px;
+header h1 {
+  margin: 0;
   font-size: 2rem;
-  color: #003366;
 }
 
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin: 0 15px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+nav ul li a:hover {
+  color: #61c97d;
+}
+
+footer {
+  background-color: #2d3b2f;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+/* Course Cards Styling */
+.courses {
+  padding: 20px;
+  text-align: center;
+}
+
+.course-card {
+  background-color: aliceblue;
+  margin: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
 .courses-container {
   display: flex;
   flex-wrap: wrap;
@@ -71,49 +70,80 @@ header {
   gap: 50px;
 }
 
-.course-card {
-  background: aliceblue;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  width: 400px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.course-card:hover {
+  transform: scale(1.05);
 }
 
 .course-card h3 {
-  color: green;
-  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.course-card p {
+  font-size: 1.1rem;
+  color: #666;
 }
 
 .course-card .price {
-  color: #28a745;
+  font-size: 1.2rem;
+  color: #2d3b2f;
   font-weight: bold;
-  margin: 100px 0;
 }
 
 .btn-buy {
-  background-color: blue;
-  width: 300px;
+  background-color: #61c97d;
   color: white;
-  border: none;
   padding: 10px 20px;
-  border-radius: 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .btn-buy:hover {
-  background-color: #00509e;
+  background-color: grey;
 }
 
-/* Footer Styles */
-footer {
-  background-color: #003366;
+.btn-logout {
+  background-color: #e74c3c;
   color: white;
-  text-align: center;
-  padding: 10px 0;
-  margin-top: 20px;
-  font-size: 0.9rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+.btn-logout:hover {
+  background-color: #c0392b;
+}
+
+/* Modal Styling for About Us */
+.swal2-popup {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.swal2-title {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.swal2-content {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.swal2-confirm {
+  background-color: #61c97d;
+  color: white;
+  border-radius: 5px;
+}
+
+.swal2-confirm:hover {
+  background-color: #4c9a5f;
+}
