@@ -49,7 +49,7 @@ onAuthStateChanged(auth, (user) => {
             // Check which link to use based on the course name or index
             let courseLink = '';
             if (course === 'Sirta Epic Ta Pes') {
-              courseLink = 'tijaabo.html';
+              courseLink = 'purchased.html';
             } else if (course === 'Ku Baro Premiere Pro') {
               courseLink = 'purchased.html';
             } else {
