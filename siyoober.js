@@ -20,7 +20,7 @@ const database = getDatabase(app);
 
 // Function to validate email format
 function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex to check valid email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
@@ -37,7 +37,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       Swal.fire({
         icon: 'error',
         title: 'Invalid Email',
-        text: 'Please enter email address.',
+        text: 'Please enter a valid email address.',
       });
       return;
     }
@@ -52,14 +52,19 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       return;
     }
 
-    // Check if email is already registered in the Realtime Database
+    // Check if email or phone number is already registered
     const emailRef = ref(database, `users/`);
     const snapshot = await get(emailRef);
 
     let emailExists = false;
+    let numberExists = false;
+
     snapshot.forEach((childSnapshot) => {
       if (childSnapshot.val().email === email) {
         emailExists = true;
+      }
+      if (childSnapshot.val().number === number) {
+        numberExists = true;
       }
     });
 
@@ -71,18 +76,12 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       });
       return;
     }
-    let numberExists = false;
-    snapshot.forEach((childSnapshot) => {
-      if (childSnapshot.val().number === number) {
-        numberExists = true;
-      }
-    });
 
     if (numberExists) {
       Swal.fire({
         icon: 'error',
-        title: 'number Already Registered',
-        text: 'This Phone number is already registered.',
+        title: 'Number Already Registered',
+        text: 'This phone number is already registered.',
       });
       return;
     }
@@ -91,13 +90,24 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // Get current date and time with AM/PM
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // Convert 24-hour to 12-hour format
+    const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${hours}:${minutes} ${ampm}`;
+
     // Save user data to Realtime Database
     const userRef = ref(database, `users/${user.uid}`);
     await set(userRef, {
       username: username,
       email: email,
       number: number,
-      password: password
+      password: password,
+      signUpDate: formattedDate, // Add sign-up date with AM/PM
     });
 
     // Send Email Verification
