@@ -1,6 +1,7 @@
+// app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -8,7 +9,7 @@ const firebaseConfig = {
   authDomain: "exam-81b90.firebaseapp.com",
   databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
   projectId: "exam-81b90",
-  storageBucket: "exam-81b90.firebasestorage.app",
+  storageBucket: "exam-81b90.appspot.com",
   messagingSenderId: "461178422237",
   appId: "1:461178422237:web:8433ab42b524b0a17bac34"
 };
@@ -22,34 +23,34 @@ const database = getDatabase(app);
 document.getElementById('loginBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
+  const errorMessage = document.getElementById('error-message');
+  const succesMessage = document.getElementById('succes-message');
+
+  // Clear previous error messages
+  errorMessage.style.display = 'none';
+  errorMessage.innerText = '';
+  
+  succesMessage.style.display = 'none';
+  succesMessage.innerText = '';
 
   // Email format validation
   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   if (!emailPattern.test(email)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Email',
-      text: 'Please enter a valid email address.',
-    });
+    errorMessage.style.display = 'block';
+    errorMessage.innerText = 'Please enter a valid email address.';
     return;
   }
 
   if (!password) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Password Required',
-      text: 'Please enter a password.',
-    });
+    errorMessage.style.display = 'block';
+    errorMessage.innerText = 'Please enter your password.';
     return;
   }
 
   // Password length validation
   if (password.length < 6) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Password Too Short',
-      text: 'Password must be at least 6 characters long.',
-    });
+    errorMessage.style.display = 'block';
+    errorMessage.innerText = 'Password must be at least 6 characters long.';
     return;
   }
 
@@ -58,11 +59,8 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     const user = userCredential.user;
 
     if (!user.emailVerified) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Email Not Verified',
-        text: 'Please verify your email before logging in.',
-      });
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Please verify your email before logging in.';
       return;
     }
 
@@ -73,79 +71,31 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       const userData = snapshot.val();
 
       if (userData.isDisabled) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Account Blocked',
-          text: 'This account has been blocked. Please contact support.',
-        });
+        errorMessage.style.display = 'block';
+        errorMessage.innerText = 'This account has been disabled. Please contact support.';
         return;
       }
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Login Successfully!',
-        text: `Welcome back, ${userData.username || 'User'}!`,
-      });
-
-      localStorage.setItem("loggedinn", "true");
-
+      
+      succesMessage.style.display = 'block';
+      succesMessage.innerText = 'succesfully! login welcome back to your account',
+      
       setTimeout(() => {
         window.location.href = "Academy.html";
       }, 2000);
-
-      // Save the new password (optional, confirm the requirement)
-      await update(dbRef, { newPassword: password });
-      console.log("Password cusub waa la cusboonaysiiyay.");
     } else {
-      const usersRef = ref(database, 'users');
-      const usersSnapshot = await get(usersRef);
-
-      if (usersSnapshot.exists()) {
-        const users = usersSnapshot.val();
-        const emailExists = Object.values(users).some(user => user.email === email);
-
-        if (!emailExists) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Email Not Registered',
-            text: 'This email is not registered. Please sign up first.',
-          });
-          return;
-        }
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Database Error',
-          text: 'User database is empty or inaccessible.',
-        });
-      }
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'No account found with this email.';
     }
-
   } catch (error) {
-    if (error.code === 'auth/user-disabled') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Account Blocked',
-        text: 'This account has been blocked. Please contact support.',
-      });
-    } else if (error.code === 'auth/wrong-password') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
-        text: 'The password you entered is incorrect. Please try again.',
-      });
+    if (error.code === 'auth/wrong-password') {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Incorrect password. Please try again.';
     } else if (error.code === 'auth/user-not-found') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
-        text: 'No account found with this email. Please sign up first.',
-      });
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'No account found with this email.';
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
-        text: error.message,
-      });
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'An error occurred. Please try again.';
     }
   }
 });
