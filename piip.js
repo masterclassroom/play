@@ -58,7 +58,3 @@ document.getElementById('backButton').addEventListener('click', () => {
 document.getElementById('edit').addEventListener('click', () => {
     window.location.href = "Select.html";
 });
-
-      if(!sessionStorage.getItem("teep")) {
-          window.location.replace("Academy.html");
-      }
