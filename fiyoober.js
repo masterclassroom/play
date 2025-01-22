@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getAuth, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,22 +18,30 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
+// Show alert message
+function showAlert(message, type) {
+  const alertBox = document.getElementById('alertBox');
+  alertBox.style.display = 'block';
+  alertBox.className = type; // 'error' or 'success'
+  alertBox.textContent = message;
+
+  setTimeout(() => {
+    alertBox.style.display = 'none';
+    alertBox.className = ''; // Clear classes
+  }, 5000);
+}
+
 // Handle Forgot Password
 document.getElementById('forgotPasswordBtn').addEventListener('click', async (e) => {
   e.preventDefault();
   const email = document.getElementById('reset').value;
 
   if (!email) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Warning',
-      text: 'Please enter your email to reset your password.',
-    });
+    showAlert('Please enter your email to reset your password.', 'error');
     return;
   }
 
   try {
-    // Check if the email exists in the database
     const dbRef = ref(database, 'users');
     const snapshot = await get(dbRef);
 
@@ -42,44 +50,16 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
       const emailExists = Object.values(users).some(user => user.email === email);
 
       if (!emailExists) {
-        Swal.fire({
-          icon: 'error',
-          title: 'warning',
-          text: 'Email not registered please register.',
-        });
+        showAlert('Email not Registered. Please Register.', 'error');
         return;
       }
 
-      // Send password reset email
       await sendPasswordResetEmail(auth, email);
-      Swal.fire({
-        icon: 'success',
-        title: 'Successfully!',
-        text: 'Check your email to reset your password.',
-      });
+      showAlert('Successfully sent check your email to reset.', 'success');
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'No Users Found',
-        text: 'Database is empty. Please sign up.',
-      });
+      showAlert('Database is empty. Please sign up.', 'error');
     }
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message,
-    });
-  }
-});
-
-// Listen for Authentication Changes and Update Database
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    const dbRef = ref(database, `users/${user.uid}`);
-    await update(dbRef, {
-      newPassword: "waiting....", // Ensure password is updated with a new one if required
-    });
-    console.log("Password cusub waa la cusboonaysiiyay.");
+    showAlert(error.message, 'error');
   }
 });
