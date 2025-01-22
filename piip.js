@@ -56,7 +56,7 @@ document.getElementById('backButton').addEventListener('click', () => {
 
 // Edit button functionality
 document.getElementById('edit').addEventListener('click', () => {
-    window.location.href = "select.html";
+    window.location.href = "Select.html";
 });
 
       if(!sessionStorage.getItem("teep")) {
