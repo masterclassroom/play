@@ -1,69 +1,75 @@
+/* styles.css */
 body {
   font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
-  background-color: aqua;
 }
 
 .container {
-  background: white;
-  padding: 20px;
-  border-radius: 40px;
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  text-align: center;
 }
 
 h1 {
-  text-align: center;
   margin-bottom: 20px;
 }
 
 input {
   width: 94%;
   padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 50px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
   width: 100%;
   padding: 10px;
-  color: white;
-  background: blue;
+  background-color: #007bff;
+  color: #fff;
   border: none;
-  border-radius: 0px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background: blue;
+  background-color: #0056b3;
 }
 
+.forgot-password,
 .switch {
-  text-align: center;
   margin-top: 10px;
+  font-size: 14px;
 }
 
+.forgot-password a,
 .switch a {
-  color: #007BFF;
+  color: #007bff;
   text-decoration: none;
 }
 
-.forgot-password {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.forgot-password a {
-  color: #007BFF;
-  text-decoration: none;
-}
-
-.forgot-password a:hover {
+.forgot-password a:hover,
+.switch a:hover {
   text-decoration: underline;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.succes-message {
+  color: green;
+  margin-bottom: 10px;
+  font-size: 15px;
+  
 }
