@@ -1,3 +1,4 @@
+// siyoober.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
@@ -8,7 +9,7 @@ const firebaseConfig = {
   authDomain: "exam-81b90.firebaseapp.com",
   databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
   projectId: "exam-81b90",
-  storageBucket: "exam-81b90.firebasestorage.app",
+  storageBucket: "exam-81b90.appspot.com",
   messagingSenderId: "461178422237",
   appId: "1:461178422237:web:8433ab42b524b0a17bac34"
 };
@@ -18,7 +19,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Function to validate email format
+// Helper function to show error messages
+
+// Validate email format
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
@@ -30,25 +33,41 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const number = document.getElementById("number").value;
   const password = document.getElementById('password').value;
+  const errorMessage = document.getElementById('error-message');
+  const succesMessage = document.getElementById('succes-message');
+
+  // Clear previous error messages
+  errorMessage.style.display = 'none';
+  errorMessage.innerText = '';
+  
+  succesMessage.style.display = 'none';
+  succesMessage.innerText = '';
 
   try {
-    // Validate email format
-    if (!isValidEmail(email)) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Email',
-        text: 'Please enter a valid email address.',
-      });
+    // Clear any previous errors
+
+    // Validate inputs
+    if (!username) {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Username is required';
       return;
     }
 
-    // Check if password length is at least 6 characters
-    if (password.length < 6) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Weak Password',
-        text: 'Password must be at least 6 characters long.',
-      });
+    if (!isValidEmail(email)) {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Invaild email adress';
+      return;
+    }
+
+    if (!number ||number .length<10) {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Phone number is required';
+      return;
+    }
+
+    if (password.length < 8) {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Password must be at least 6 characters long.';
       return;
     }
 
@@ -69,20 +88,14 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
     });
 
     if (emailExists) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Email Already Registered',
-        text: 'This email is already registered.',
-      });
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Email already registered';
       return;
     }
 
     if (numberExists) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Number Already Registered',
-        text: 'This phone number is already registered.',
-      });
+     errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Phone number already registered';
       return;
     }
 
@@ -90,15 +103,9 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Get current date and time with AM/PM
+    // Get current date and time
     const now = new Date();
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12; // Convert 24-hour to 12-hour format
-    const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1)
-      .toString()
-      .padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${hours}:${minutes} ${ampm}`;
+    const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     // Save user data to Realtime Database
     const userRef = ref(database, `users/${user.uid}`);
@@ -106,25 +113,21 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       username: username,
       email: email,
       number: number,
-      password: password,
-      signUpDate: formattedDate, // Add sign-up date with AM/PM
+      signUpDate: formattedDate,
     });
 
     // Send Email Verification
     await sendEmailVerification(user);
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Account Created!',
-      text: 'Please check your email for verification.',
-    });
+    // Redirect to login page
+    succesMessage.style.display = 'block';
+      succesMessage.innerText = 'Account greated succesfully';
+    setTimeout(() => {
+    window.location.href = "login.html";
+    },2500);
 
   } catch (error) {
     // Handle errors
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message,
-    });
+    showError(error.message);
   }
 });
