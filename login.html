@@ -5,21 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
   <link rel="stylesheet" href="liyoober.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <div class="container">
     <h1>Login</h1>
+    <!-- Error message container -->
+    <div id="error-message" class="error-message" style="display: none;"></div>
+    <div id="succes-message" class="succes-message" style="display: none;"></div>
+    
+    <!-- Input fields -->
     <input type="email" id="email" placeholder="Enter your email" required>
     <input type="password" id="password" placeholder="Enter your password" required>
+    
+    <!-- Login button -->
     <button id="loginBtn">Login</button>
+    
+    <!-- Links -->
     <div class="forgot-password">
       <a href="forgot.html" id="forgotPasswordLink">Forgot Password?</a>
     </div>
     <div class="switch">
-      Don't have an account? <a href="Sign up.html">Sign Up</a>
+      Don't have an account? <a href="SignUp.html">Sign Up</a>
     </div>
   </div>
+
+  <!-- JavaScript -->
   <script type="module" src="liyoober.js"></script>
 </body>
 </html>
