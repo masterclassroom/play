@@ -138,3 +138,7 @@ logoutBtn.addEventListener('click', () => {
   });
 });
 
+function sei() {
+  sessionStorage.setItem("teep", "true");
+}
+
