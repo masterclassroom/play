@@ -1,10 +1,11 @@
+// app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
   authDomain: "exam-81b90.firebaseapp.com",
   databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
   projectId: "exam-81b90",
@@ -18,31 +19,31 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
+// Handle Login
 document.getElementById('loginBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorMessage = document.getElementById('error-message');
-  const successMessage = document.getElementById('success-message');
+  const succesMessage = document.getElementById('succes-message');
 
-  // Clear both messages at the beginning
+  // Clear previous error messages
   errorMessage.style.display = 'none';
   errorMessage.innerText = '';
-
-  successMessage.style.display = 'none';
-  successMessage.innerText = '';
-
-  // Validation
-  if (!email || !password) {
-    errorMessage.style.display = 'block';
-    errorMessage.innerText = 'Email and password are required.';
-    return;
-  }
+  
+  succesMessage.style.display = 'none';
+  succesMessage.innerText = '';
 
   // Email format validation
   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   if (!emailPattern.test(email)) {
     errorMessage.style.display = 'block';
     errorMessage.innerText = 'Please enter a valid email address.';
+    return;
+  }
+
+  if (!password) {
+    errorMessage.style.display = 'block';
+    errorMessage.innerText = 'Please enter your password.';
     return;
   }
 
@@ -54,48 +55,40 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   }
 
   try {
-    // Sign in the user
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Check if email is verified
     if (!user.emailVerified) {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Please verify your email before logging in.';
       return;
     }
 
-    // Check user data in database
     const dbRef = ref(database, `users/${user.uid}`);
     const snapshot = await get(dbRef);
 
     if (snapshot.exists()) {
       const userData = snapshot.val();
 
-      // Check if account is disabled
       if (userData.isDisabled) {
         errorMessage.style.display = 'block';
-        errorMessage.innerText = 'This account has been disabled. Contact support.';
+        errorMessage.innerText = 'This account has been disabled. Please contact support.';
         return;
       }
-
-      // Show success message
-      successMessage.style.display = 'block';
-      successMessage.innerText = 'Login successfully! Welcome back to your account.';
-
-      // Redirect after success
+      
+      succesMessage.style.display = 'block';
+      succesMessage.innerText = 'Login Successfully! welcome back to your account',
+      
       setTimeout(() => {
         window.location.href = "Academy.html";
       }, 2000);
 
-      // Optionally update password
       await update(dbRef, { password: password });
     } else {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
     }
   } catch (error) {
-    // Handle Firebase errors
     if (error.code === 'auth/wrong-password') {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Incorrect password. Please try again.';
