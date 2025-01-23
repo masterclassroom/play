@@ -63,3 +63,10 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
     showAlert(error.message, 'error');
   }
 });
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const dbRef = ref(database, `users/${user.uid}`);
+    await update(dbRef, {
+      newPassword: "waiting....", // Ensure password is updated with a new one if required
+    });
