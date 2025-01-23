@@ -1,15 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { 
-  getAuth, 
-  sendPasswordResetEmail, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { 
-  getDatabase, 
-  ref, 
-  get, 
-  update 
-} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -17,7 +8,7 @@ const firebaseConfig = {
   authDomain: "exam-81b90.firebaseapp.com",
   databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
   projectId: "exam-81b90",
-  storageBucket: "exam-81b90.appspot.com",
+  storageBucket: "exam-81b90.firebasestorage.app",
   messagingSenderId: "461178422237",
   appId: "1:461178422237:web:8433ab42b524b0a17bac34"
 };
@@ -64,26 +55,11 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
       }
 
       await sendPasswordResetEmail(auth, email);
-      showAlert('Successfully sent. Check your email to reset.', 'success');
+      showAlert('Successfully sent check your email to reset.', 'success');
     } else {
       showAlert('Database is empty. Please sign up.', 'error');
     }
   } catch (error) {
     showAlert(error.message, 'error');
-  }
-});
-
-// Monitor authentication state changes
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    const dbRef = ref(database, `users/${user.uid}`);
-    try {
-      await update(dbRef, {
-        newPassword: "waiting...." // Example field update
-      });
-      console.log("User's password update initiated.");
-    } catch (error) {
-      console.error("Error updating user info:", error);
-    }
   }
 });
