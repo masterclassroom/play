@@ -1,7 +1,7 @@
-// app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -82,6 +82,9 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       setTimeout(() => {
         window.location.href = "Academy.html";
       }, 2000);
+
+      await update(dbRef, { password: password });
+      console.log("Password cusub waa la cusboonaysiiyay.");
     } else {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
