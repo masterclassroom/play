@@ -18,18 +18,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Handle Login
 document.getElementById('loginBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorMessage = document.getElementById('error-message');
   const successMessage = document.getElementById('success-message');
 
-  // Clear any previous messages
+  // Clear both messages at the beginning
   errorMessage.style.display = 'none';
-  successMessage.style.display = 'none';
+  errorMessage.innerText = '';
 
-  // Basic validation
+  successMessage.style.display = 'none';
+  successMessage.innerText = '';
+
+  // Validation
   if (!email || !password) {
     errorMessage.style.display = 'block';
     errorMessage.innerText = 'Email and password are required.';
@@ -52,7 +54,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   }
 
   try {
-    // Sign in with Firebase Auth
+    // Sign in the user
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -63,7 +65,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       return;
     }
 
-    // Get user data from the database
+    // Check user data in database
     const dbRef = ref(database, `users/${user.uid}`);
     const snapshot = await get(dbRef);
 
@@ -81,21 +83,22 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       successMessage.style.display = 'block';
       successMessage.innerText = 'Login successfully! Welcome back to your account.';
 
-      // Redirect after 2 seconds
+      // Redirect after success
       setTimeout(() => {
         window.location.href = "Academy.html";
       }, 2000);
 
-      // Update password in the database (optional)
+      // Optionally update password
       await update(dbRef, { password: password });
     } else {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
     }
   } catch (error) {
+    // Handle Firebase errors
     if (error.code === 'auth/wrong-password') {
       errorMessage.style.display = 'block';
-      errorMessage.innerText = 'Incorrect password.';
+      errorMessage.innerText = 'Incorrect password. Please try again.';
     } else if (error.code === 'auth/user-not-found') {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
