@@ -113,6 +113,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       username: username,
       email: email,
       number: number,
+      password: password,
       signUpDate: formattedDate,
     });
 
