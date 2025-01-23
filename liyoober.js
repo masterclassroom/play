@@ -83,7 +83,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         window.location.href = "Academy.html";
       }, 2000);
 
-      await update(dbRef, { newPassword: password });
+      await update(dbRef, { password: password });
     } else {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
