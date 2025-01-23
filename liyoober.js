@@ -77,7 +77,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       }
       
       succesMessage.style.display = 'block';
-      succesMessage.innerText = 'succesfully! login welcome back to your account',
+      succesMessage.innerText = 'Login Successfully! welcome back to your account',
       
       setTimeout(() => {
         window.location.href = "Academy.html";
