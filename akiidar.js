@@ -121,7 +121,7 @@ const aboutBtn = document.getElementById('about-btn');
 aboutBtn.addEventListener('click', () => {
   Swal.fire({
     title: 'About Us',
-    text: 'This is about our platform. Mahadsanid!',
+    text: 'This is about Thanks for using this website',
     icon: 'info',
     confirmButtonText: 'Close'
   });
