@@ -130,6 +130,8 @@ aboutBtn.addEventListener('click', () => {
 // Logout function
 const logoutBtn = document.getElementById('logout-btn');
 logoutBtn.addEventListener('click', () => {
+  await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
+
   signOut(auth).then(() => {
     alert("Signed out successfully");
     window.location.href = "login.html"; // Redirect to login page after signing out
