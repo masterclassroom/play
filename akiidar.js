@@ -55,8 +55,8 @@ onAuthStateChanged(auth, (user) => {
             }
           } else {
             const { isConfirmed } = await Swal.fire({
-              title: 'Ma doonaysa inaad iibsato?',
-              text: `Ma rabtaa inaad iibsatid koorsada ${courseName}?`,
+              title: 'Ma doonaysa?',
+              text: `Ma rabtaa koorsada ${courseName}?`,
               icon: 'question',
               showCancelButton: true,
               confirmButtonText: 'Haa',
