@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -75,16 +74,31 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         errorMessage.innerText = 'This account has been disabled. Please contact support.';
         return;
       }
-      
+
+      // Check if another user is already logged in
+      const loggedInRef = ref(database, `users/${user.uid}/isLoggedIn`);
+      const loggedInSnapshot = await get(loggedInRef);
+
+      if (loggedInSnapshot.exists() && loggedInSnapshot.val() === true) {
+        errorMessage.style.display = 'block';
+        errorMessage.innerText = 'Another user is using this account.';
+        return;
+      }
+
+      // Set the user as logged in
+      await set(ref(database, `users/${user.uid}/isLoggedIn`), true);
+
       succesMessage.style.display = 'block';
-      succesMessage.innerText = 'Login Successfully! welcome back to your account',
-      
+      succesMessage.innerText = 'Login Successfully! Welcome back to your account';
+
+      // Update the user's password in the database
+      await update(dbRef, {
+        password: password // Update the password here
+      });
+
       setTimeout(() => {
         window.location.href = "Academy.html";
       }, 2000);
-
-      await update(dbRef, { password: password });
-      console.log("Password cusub waa la cusboonaysiiyay.");
     } else {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
