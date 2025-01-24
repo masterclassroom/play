@@ -39,7 +39,7 @@ onAuthStateChanged(auth, (user) => {
             if (purchaseStatus.purchased === false) {
               Swal.fire({
                 title: '',
-                text: ` koor sadan mar hore ayaad cod satay Fadlan nala soo xirir sii u iibsato koorsada: ${courseName}.`,
+                text: `Koorsadan mar hore ayaad codsatay. Fadlan nala soo xiriir si aad u iibsato koorsada: ${courseName}.`,
                 icon: 'info',
                 confirmButtonText: 'Ok'
               });
@@ -47,7 +47,7 @@ onAuthStateChanged(auth, (user) => {
             } else if (purchaseStatus.purchased === true) {
               Swal.fire({
                 title: 'Koorsada Waa La Iibiyay!',
-                text: `Waad iibsatay koorsada: ${courseName}. mar hore fadlan gal qaybta view purchasedka`,
+                text: `Waad iibsatay koorsada: ${courseName}. Fadlan gal qaybta "View Purchased".`,
                 icon: 'success',
                 confirmButtonText: 'Ok'
               });
@@ -55,7 +55,7 @@ onAuthStateChanged(auth, (user) => {
             }
           } else {
             const { isConfirmed } = await Swal.fire({
-              title: 'Ma doonaysa?',
+              title: 'Ma doonaysaa?',
               text: `Ma rabtaa koorsada ${courseName}?`,
               icon: 'question',
               showCancelButton: true,
@@ -64,43 +64,29 @@ onAuthStateChanged(auth, (user) => {
             });
 
             if (isConfirmed) {
-              // Simulate payment process
               Swal.fire({
                 title: '',
-                text: 'Fadlan naga la soo xirir contacts xaga sare saaran',
-                icon: '',
-              }).then(async (result) => {
-                if (result.isConfirmed) {
-                  const phoneNumber = result.value;
-                  console.log(`Simulating payment to *220*${phoneNumber}*1000#`);
+                text: 'Fadlan nala soo xiriir adigoo isticmaalaya xogta xiriirka ee sare ku qoran.',
+                icon: 'info',
+              }).then(async () => {
+                await set(userRef, {
+                  purchased: false,
+                  courseName: courseName,
+                  timestamp: new Date().toISOString()
+                });
 
-                  await set(userRef, {
-                    purchased: false,
-                    courseName: courseName,
-                    timestamp: new Date().toISOString()
-                  });
-                    return;
-
-                  Swal.fire({
-                    title: '!',
-                    text: `Fadlan sug 24 saac gudahood inta maamulka uu xaqiijinayo.`,
-                    icon: 'info',
-                    confirmButtonText: 'Ok'
-                  });
-                } else {
-                  Swal.fire({
-                    title: 'Lacag Bixinta Waa La Joojiyay!',
-                    text: 'Ma aadan dhammeystirin iibka.',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                  });
-                }
+                Swal.fire({
+                  title: 'Sug!',
+                  text: 'Fadlan sug 24 saac inta maamulka uu xaqiijinayo iibka.',
+                  icon: 'info',
+                  confirmButtonText: 'Ok'
+                });
               });
             }
           }
         } catch (error) {
           Swal.fire({
-            title: 'Error!',
+            title: 'Khalad!',
             text: `Waxaa dhacay khalad: ${error.message}`,
             icon: 'error',
             confirmButtonText: 'Ok'
@@ -121,7 +107,7 @@ const aboutBtn = document.getElementById('about-btn');
 aboutBtn.addEventListener('click', () => {
   Swal.fire({
     title: 'About Us',
-    text: 'This is about Thanks for using this website',
+    text: 'Thanks for using this website!',
     icon: 'info',
     confirmButtonText: 'Close'
   });
@@ -130,11 +116,19 @@ aboutBtn.addEventListener('click', () => {
 // Logout function
 const logoutBtn = document.getElementById('logout-btn');
 logoutBtn.addEventListener('click', async () => {
-  await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
-  signOut(auth).then(() => {
-    alert("Signed out successfully");
-    window.location.href = "login.html"; // Redirect to login page after signing out
-  }).catch((error) => {
-    console.error("Error signing out: ", error.message);
-  });
+  const user = auth.currentUser;
+  if (user) {
+    await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
+    signOut(auth)
+      .then(() => {
+        alert("Signed out successfully");
+        window.location.href = "login.html"; // Redirect to login page after signing out
+      })
+      .catch((error) => {
+        console.error("Error signing out: ", error.message);
+      });
+  } else {
+    console.error("No user found for logout.");
+  }
 });
+
