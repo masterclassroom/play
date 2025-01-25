@@ -112,7 +112,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       errorMessage.innerText = 'No account found with this email.';
     } else {
       errorMessage.style.display = 'block';
-      errorMessage.innerText = 'An error occurred. Please try again.';
+      errorMessage.innerText = 'Invalid email or password please try again.';
     }
   }
 });
