@@ -39,7 +39,7 @@ onAuthStateChanged(auth, (user) => {
             if (purchaseStatus.purchased === false) {
               Swal.fire({
                 title: '',
-                text: `Koorsadan mar hore ayaad codsatay. Fadlan nala soo xiriir si aad u iibsato koorsada: ${courseName}.`,
+                text: `Koorsadan mar hore ayaad codsatay. Fadlan nala soo xiriir si iibka loo xaqiijiyo oo aad u iibsato koorsada: ${courseName}.`,
                 icon: 'info',
                 confirmButtonText: 'Ok'
               });
@@ -76,9 +76,9 @@ onAuthStateChanged(auth, (user) => {
                 });
 
                 Swal.fire({
-                  title: 'Sug!',
-                  text: 'Fadlan sug 24 saac inta maamulka uu xaqiijinayo iibka.',
-                  icon: 'info',
+                  title: 'Verify!',
+                  text: 'Fadlan nala soo xidhiidh si loo xaqiijiyo iibka.',
+                  icon: '',
                   confirmButtonText: 'Ok'
                 });
               });
