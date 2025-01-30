@@ -1,67 +1,122 @@
-/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+    background: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .container {
-  background: #fff;
-  padding: 20px 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  text-align: center;
+    display: flex;
+    width: 750px;
+    background: linear-gradient(135deg, #002244, #00ffaa);
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00ffaa;
+    overflow: hidden;
 }
 
-h1 {
-  margin-bottom: 20px;
+.signup-box {
+    width: 55%;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    text-align: center;
 }
 
-input {
-  width: 94%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.signup-box h2 {
+    margin-bottom: 20px;
+}
+
+.input-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    outline: none;
+    color: white;
+    font-size: 16px;
+}
+
+.input-box label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #aaa;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.input-box input:focus ~ label,
+.input-box input:valid ~ label {
+    top: -10px;
+    left: 0;
+    font-size: 12px;
+    color: #00ffaa;
+}
+
+.input-box .icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
 }
 
 button {
-  width: 25%;
-  padding: 10px;
-  background-color: #941b1b;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    background:  #00ffee;
+    border: none;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
 button:hover {
-  background-color: #941b1b;
+    background: #00ffee;
 }
 
-.forgot-password,
-.switch {
-  margin-top: 10px;
-  font-size: 14px;
+p {
+    margin-top: 10px;
+    font-size: 14px;
 }
 
-.forgot-password a,
-.switch a {
-  color: #007bff;
-  text-decoration: none;
+p a {
+    color: #00ffaa;
+    text-decoration: none;
 }
 
-.forgot-password a:hover,
-.switch a:hover {
-  text-decoration: underline;
+p a:hover {
+    text-decoration: underline;
 }
 
+.welcome-box {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.2);
+}
 .error-message {
   color: red;
   margin-bottom: 10px;
@@ -73,3 +128,4 @@ button:hover {
   font-size: 15px;
   
 }
+
