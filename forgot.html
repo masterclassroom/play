@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forgot Password</title>
-  <link rel="stylesheet" href="fiyoober.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reissue password</title>
+    <link rel="stylesheet" href="fiyoober.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Reissue password</h1>
-    <div id="alertBox"></div>
-    <input type="email" id="reset" placeholder="Enter your email" required>
-    <button id="forgotPasswordBtn">Send reset</button>
-    <div class="switch">
-      <a href="login.html">Back to Login</a>
+    <div class="container">
+        <div class="forgot-box">
+            <h2>Reissue password</h2>
+            <div id="alertBox"></div>
+            <form>
+                <div class="input-box">
+                    <input type="email" id="reset" required>
+                    <label>Email</label>
+                    <span class="icon">📧</span>
+                </div>
+                <button id="forgotPasswordBtn" type="button" class="send-btn">Send reset</button>
+                <p><a href="login.html">Back to Login</a></p>
+            </form>
+        </div>
     </div>
-  </div>
-  <script type="module" src="fiyoober.js"></script>
+    <script type="module" src="fiyoober.js"></script>
 </body>
 </html>
