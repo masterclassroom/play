@@ -1,26 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
 body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f4f7fc;
+    background: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
+
 .container {
-  background: #fff;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
+    width: 400px;
+    background: linear-gradient(135deg, #220044, #00aaff);
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00aaff;
+    padding: 30px;
+    text-align: center;
+    color: white;
 }
-h1 {
-  text-align: center;
-  color: #000000;
-  margin-bottom: 20px;
-  font-size: 24px;
+
+.forgot-box h2 {
+    margin-bottom: 10px;
+}
+
+.forgot-box p {
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.input-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    outline: none;
+    color: white;
+    font-size: 16px;
+}
+
+.input-box label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #aaa;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.input-box input:focus ~ label,
+.input-box input:valid ~ label {
+    top: -10px;
+    left: 0;
+    font-size: 12px;
+    color: #00aaff;
+}
+
+.input-box .icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #00aaff;
+    border: none;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #0088cc;
+}
+
+p a {
+    display: block;
+    margin-top: 15px;
+    color: #00aaff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
 }
 #alertBox {
   display: none;
@@ -40,38 +119,4 @@ h1 {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
-}
-input {
-  width: 94%;
-  padding: 12px;
-  margin-bottom: 18px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-}
-button {
-  width: 100%;
-  padding: 12px;
-  color: white;
-  background-color: #941b1b;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-button:hover {
-  background-color: #941b1b;
-}
-.switch {
-  text-align: center;
-  margin-top: 15px;
-}
-.switch a {
-  color: #007BFF;
-  text-decoration: none;
-  font-size: 14px;
-}
-.switch a:hover {
-  text-decoration: underline;
 }
