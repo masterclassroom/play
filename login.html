@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
-  <link rel="stylesheet" href="liyoober.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="liyoober.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Login</h1>
-    <!-- Error message container -->
-    <div id="error-message" class="error-message" style="display: none;"></div>
+    <div class="container">
+        <div class="login-box">
+            <h2>Login</h2>
+            <div id="error-message" class="error-message" style="display: none;"></div>
     <div id="succes-message" class="succes-message" style="display: none;"></div>
-    
-    <!-- Input fields -->
-    <input type="email" id="email" placeholder="Enter your email" required>
-    <input type="password" id="password" placeholder="Enter your password" required>
-    
-    <!-- Login button -->
-    <button id="loginBtn">Login</button>
-    
-    <!-- Links -->
-    <div class="forgot-password">
-      <a href="forgot.html" id="forgotPasswordLink">Forgot Password?</a>
+            <form>
+                <div class="input-box">
+                    <input type="email" id="email" required>
+                    <label>Email</label>
+                    <span class="icon">📧</span>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="password" required>
+                    <label>Password</label>
+                    <span class="icon">🔑</span>
+                </div>
+                <button id="loginBtn" type="button">Login</button>
+               <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+                <p><a href="forgot.html">Forgot password</a></p>
+            </form>
+        </div>
+        <div class="welcome-box">
+            <h2>WELCOME BACK!</h2>
+            <p>If you experience any problems, please contact us.</p>
+            <a href="https://wa.me/252672146979" target="_blank">contact</a>
+        </div>
     </div>
-    <div class="switch">
-      Don't have an account? <a href="Sign up.html">Register</a>
-    </div>
-  </div>
-
-  <!-- JavaScript -->
-  <script type="module" src="liyoober.js"></script>
+    <script type="module" src="liyoober.js"></script>
 </body>
 </html>
