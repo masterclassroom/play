@@ -147,3 +147,17 @@ footer {
 .swal2-confirm:hover {
   background-color: #4c9a5f;
 }
+.btn-free {
+  background-color: #61c97d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-free:hover {
+  background-color: grey;
+  }
