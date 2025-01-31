@@ -24,15 +24,28 @@ const passwordChangeSection = document.getElementById("passwordChangeSection");
 const oldPasswordInput = document.getElementById("oldPassword");
 const newPasswordInput = document.getElementById("newPassword");
 const updatePasswordButton = document.getElementById("updatePasswordButton");
+const messageDiv = document.createElement("div"); // Message Div
+messageDiv.style.marginTop = "10px";
+messageDiv.style.padding = "10px";
+messageDiv.style.borderRadius = "5px";
+messageDiv.style.display = "none";
+passwordChangeSection.appendChild(messageDiv);
+
+// Function to show messages
+function showMessage(text, isSuccess) {
+  messageDiv.textContent = text;
+  messageDiv.style.display = "block";
+  messageDiv.style.color = isSuccess ? "green" : "red";
+  messageDiv.style.border = isSuccess ? "2px solid green" : "2px solid red";
+  setTimeout(() => {
+    messageDiv.style.display = "none";
+  }, 3000);
+}
 
 // Check User Auth State
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    Swal.fire(
-      "Not Logged In",
-      "You must be logged in to access this page. Redirecting to login...",
-      "warning"
-    );
+    alert("You must be logged in to access this page. Redirecting to login...");
     setTimeout(() => {
       window.location.href = "login.html"; // Replace with your login page
     }, 2000);
@@ -50,13 +63,13 @@ updatePasswordButton.addEventListener("click", async () => {
   const newPassword = newPasswordInput.value.trim();
   
   if (!oldPassword || !newPassword) {
-    Swal.fire("Error", "Please fill in both fields.", "error");
+    showMessage("Please fill in both fields.", false);
     return;
   }
 
   const user = auth.currentUser;
   if (!user) {
-    Swal.fire("Error", "You must be logged in to update your password.", "error");
+    showMessage("You must be logged in to update your password.", false);
     return;
   }
 
@@ -72,18 +85,13 @@ updatePasswordButton.addEventListener("click", async () => {
     const userRef = ref(database, `users/${user.uid}/password`);
     await set(userRef, newPassword);
 
-    // Show success message after updating the password
-    Swal.fire(
-      "Successfully",
-      "Your password has been updated",
-      "success"
-    );
+    // Show success message
+    showMessage("Your password has been updated successfully!", true);
+    
     setTimeout(() => {
       window.location.replace("Academy.html");
     }, 2000);
   } catch (error) {
-    Swal.fire("Error", error.message, "error");
+    showMessage(error.message, false);
   }
 });
-
- 
