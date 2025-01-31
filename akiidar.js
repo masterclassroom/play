@@ -78,11 +78,58 @@ onAuthStateChanged(auth, (user) => {
                 Swal.fire({
                   title: 'Verify!',
                   text: 'Fadlan nala soo xidhiidh si loo xaqiijiyo iibka.',
-                  icon: '',
+                  icon: 'info',
                   confirmButtonText: 'Ok'
                 });
               });
             }
+          }
+        } catch (error) {
+          Swal.fire({
+            title: 'Khalad!',
+            text: `Waxaa dhacay khalad: ${error.message}`,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+          console.error("Error checking or saving purchase:", error.message);
+        }
+      });
+    });
+
+    // Handle free courses
+    const freeButtons = document.querySelectorAll('.btn-free');
+    freeButtons.forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        const courseName = event.target.getAttribute('data-course');
+        const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+
+        try {
+          const snapshot = await get(userRef);
+
+          if (snapshot.exists()) {
+            const purchaseStatus = snapshot.val();
+            if (purchaseStatus.purchased === true) {
+              Swal.fire({
+                title: '',
+                text: `Mar hore ayaad furatay koorsada: ${courseName}.`,
+                icon: 'info',
+                confirmButtonText: 'Ok'
+              });
+              console.log(`Course ${courseName} already accessed.`);
+            }
+          } else {
+            Swal.fire({
+              title: 'Successfully!',
+              text: `Waad furatay koorsada ${courseName}`,
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+
+            await set(userRef, {
+              purchased: true,
+              courseName: courseName,
+              timestamp: new Date().toISOString()
+            });
           }
         } catch (error) {
           Swal.fire({
@@ -131,4 +178,3 @@ logoutBtn.addEventListener('click', async () => {
     console.error("No user found for logout.");
   }
 });
-
