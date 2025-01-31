@@ -50,7 +50,7 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', async (e)
       const emailExists = Object.values(users).some(user => user.email === email);
 
       if (!emailExists) {
-        showAlert('Email not Registered. Please Register.', 'error');
+        showAlert('This email not registered.', 'error');
         return;
       }
 
