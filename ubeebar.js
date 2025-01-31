@@ -23,24 +23,21 @@ const showUsernameChangeButton = document.getElementById("showUsernameChange");
 const usernameChangeSection = document.getElementById("usernameChangeSection");
 const newUsernameInput = document.getElementById("newUsername");
 const updateUsernameButton = document.getElementById("updateUsernameButton");
+const messageBox = document.getElementById("message");
 
 // Check User Auth State
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    Swal.fire(
-      "Not Logged In",
-      "You must be logged in to access this page. Redirecting to login...",
-      "warning"
-    );
+    showMessage("You must be logged in to access this page. Redirecting to login...", "error");
     setTimeout(() => {
-      window.location.href = "login.html"; // Replace with your login page
+      window.location.href = "login.html"; 
     }, 2000);
   }
 });
 
 // Show Username Change Section
 showUsernameChangeButton.addEventListener("click", () => {
-  usernameChangeSection.style.display = "block";
+  usernameChangeSection.classList.remove("hidden");
 });
 
 // Update Username
@@ -48,32 +45,37 @@ updateUsernameButton.addEventListener("click", async () => {
   const newUsername = newUsernameInput.value.trim();
   
   if (!newUsername) {
-    Swal.fire("Error", "Please enter a new username.", "error");
+    showMessage("Please enter a new username.", "error");
+    return;
+  }
+
+  if (newUsername.length > 14) {
+    showMessage("Invalid username. Must be 14 characters or less.", "error");
     return;
   }
 
   const user = auth.currentUser;
   if (!user) {
-    Swal.fire("Error", "You must be logged in to update your username.", "error");
-    return;
-  }
-  if(newUsername.length>14) {
-    Swal.fire('Error', 'Invalid username', 'error');
+    showMessage("You must be logged in to update your username.", "error");
     return;
   }
 
   try {
-    // Step 1: Update Username in Real-Time Database
     const userRef = ref(database, `users/${user.uid}/username`);
     await set(userRef, newUsername);
-
-    // Step 2: Show success message after updating the username
-    Swal.fire(
-      "Username Updated Successfully",
-      "Your username has been updated successfully.",
-      "success"
-    );
+    showMessage("Your username has been updated successfully.", "success");
   } catch (error) {
-    Swal.fire("Error", error.message, "error");
+    showMessage(error.message, "error");
   }
 });
+
+// Show Message Function
+function showMessage(text, type) {
+  messageBox.textContent = text;
+  messageBox.className = type;
+  messageBox.classList.remove("hidden");
+
+  setTimeout(() => {
+    messageBox.classList.add("hidden");
+  }, 3000);
+                }
