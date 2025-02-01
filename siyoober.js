@@ -52,7 +52,16 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       errorMessage.innerText = 'Username is required';
       return;
     }
-
+    if(username.length > 25) {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Username error';
+      return;
+    }
+    if(password.length > 25) {
+      errorMessage.style.display = 'block';
+      errorMessage.innerText = 'Password error';
+      return;
+    }
     if (!isValidEmail(email)) {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Invaild email adress';
@@ -67,7 +76,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
 
     if (password.length < 8) {
       errorMessage.style.display = 'block';
-      errorMessage.innerText = 'Password must be at least 6 characters long.';
+      errorMessage.innerText = 'Password must be at least 8 characters long.';
       return;
     }
 
