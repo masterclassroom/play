@@ -49,8 +49,8 @@ updateUsernameButton.addEventListener("click", async () => {
     return;
   }
 
-  if (newUsername.length > 14) {
-    showMessage("Invalid username. Must be 14 characters or less.", "error");
+  if (newUsername.length > 25) {
+    showMessage("Invalid username. Must be 25 characters or less.", "error");
     return;
   }
 
