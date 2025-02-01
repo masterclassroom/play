@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello, World!</title>
+    <style>
+        /* Qurxinta Background-ka */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(120deg, #0073e6, #00bcd4);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Qurxinta Videos */
+        video {
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            border: 3px solid white;
+            margin-top: 10px;
+        }
+
+        /* Qaabeynta Div-yada */
+        div {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 700px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Qurxinta Links */
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: white;
+            color: #0073e6;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background: #00bcd4;
+            color: white;
+        }
+    h1 {
+        background: green;
+    }
+    </style>
+</head>
+<body>
+
+    <div id="siraha" style="display: none;">
+        <video controls src="kara.mp4"></video>
+        <h1>Waxaad iibsatay koorsada siraha muuqaal samaynta</h1>
+    </div>
+
+    <div id="pri" style="display: none;">
+        <video controls src="kala.mp4"></video>
+        <h1>Tani waa Premiere Pro</h1>
+    </div>
+
+    <div id="epic" style="display: none;">
+        <h1>koorsada epic efootball</h1>
+        <h3>koorsadan waxa la furaya 10/2/2025</h3>
+    </div>
+    <a href="purchased.html">laabo</a>
+
+    <script>
+        if (sessionStorage.getItem("siraha")) {
+            document.getElementById("siraha").style.display = "block";
+        } 
+
+        if (sessionStorage.getItem("epic")) {
+            document.getElementById("epic").style.display = "block";
+        } 
+
+        if (sessionStorage.getItem("pri")) {
+            document.getElementById("pri").style.display = "block";
+        }
+    </script>
+
+</body>
+      </html>
