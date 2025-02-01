@@ -48,18 +48,22 @@ onAuthStateChanged(auth, (user) => {
 
             // Check which link to use based on the course name or index
             let courseLink = '';
+            let sessionKey = '';
             if (course === 'Sirta Epic Ta Pes') {
-              courseLink = 'purchased.html';
+             sessionKey = "epic";
+              courseLink = 'courses.html';
             } else if (course === 'Ku Baro Premiere Pro') {
-              courseLink = 'purchased.html';
+              sessionKey = "pri"
+              courseLink = 'gsgd.html';
             } else {
-              courseLink = 'purchased.html';
+              sessionKey = "siraha";
+              courseLink = 'gsgd.html';
             }
 
             // Button click event to navigate to the course
             courseLinkButton.onclick = () => {
               window.location.href = courseLink;
-              sessionStorage.setItem("koorso", "true")
+              sessionStorage.setItem(sessionKey, "true");
             };
 
             purchasedCoursesList.appendChild(courseLinkButton);
