@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello, World!</title>
+    <title>Boys Academy courses</title>
     <style>
         /* Qurxinta Background-ka */
         body {
@@ -50,9 +50,10 @@
             background: #00bcd4;
             color: white;
         }
-    h1 {
-        background: green;
-    }
+
+        h1 {
+            background: green;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +75,23 @@
     <a href="purchased.html">laabo</a>
 
     <script>
+        // Shaqada tirtiraysa sessionStorage marka page-ka la xiro, refresh gareeyo ama tab-ka laga baxo
+        function clearSessionStorage() {
+            sessionStorage.clear();
+        }
+
+        // Tirtir sessionStorage marka user-ku ka baxo page-ka
+        window.addEventListener("pagehide", clearSessionStorage);
+        window.addEventListener("beforeunload", clearSessionStorage);
+
+        // Tirtir sessionStorage marka tab-ku uu "hidden" noqdo (user-ka ka wareego)
+        window.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "hidden") {
+                clearSessionStorage();
+            }
+        });
+
+        // Hubi haddii sessionStorage leeyahay wax kaydsan, soo bandhig qeybaha la xiriira
         if (sessionStorage.getItem("siraha")) {
             document.getElementById("siraha").style.display = "block";
         } 
@@ -88,4 +106,4 @@
     </script>
 
 </body>
-      </html>
+</html>
