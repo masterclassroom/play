@@ -54,10 +54,10 @@ onAuthStateChanged(auth, (user) => {
               courseLink = 'courses.html';
             } else if (course === 'Ku Baro Premiere Pro') {
               sessionKey = "pri"
-              courseLink = 'gsgd.html';
+              courseLink = 'courses.html';
             } else {
               sessionKey = "siraha";
-              courseLink = 'gsgd.html';
+              courseLink = 'courses.html';
             }
 
             // Button click event to navigate to the course
