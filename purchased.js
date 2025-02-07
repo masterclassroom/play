@@ -49,14 +49,14 @@ onAuthStateChanged(auth, (user) => {
             // Check which link to use based on the course name or index
             let courseLink = '';
             let sessionKey = '';
-            if (course === 'Sirta Epic Ta Pes') {
-             sessionKey = "epic";
+            if (course === 'Siraha Muqaal Samaynta') {
+             sessionKey = "siraha";
               courseLink = 'courses.html';
-            } else if (course === 'Ku Baro Premiere Pro') {
-              sessionKey = "pri"
+            } else if (course === 'Soo Dajinta Pes 25 Mobile Kasta') {
+              sessionKey = "Dajinta"
               courseLink = 'courses.html';
             } else {
-              sessionKey = "siraha";
+              sessionKey = "Sirta Pes 25";
               courseLink = 'courses.html';
             }
 
