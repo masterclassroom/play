@@ -25,34 +25,21 @@ onAuthStateChanged(auth, (user) => {
     console.log("User logged in:", user.email);
 
     // Handle course purchase
-    const buyButtons = document.querySelectorAll('.btn-buy');
-    buyButtons.forEach((button) => {
+    document.querySelectorAll('.btn-buy').forEach((button) => {
       button.addEventListener('click', async (event) => {
         const courseName = event.target.getAttribute('data-course');
-        const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+        const userRef = ref(database, `users/${user.uid}/payments/${courseName}`);
 
         try {
           const snapshot = await get(userRef);
 
           if (snapshot.exists()) {
-            const purchaseStatus = snapshot.val();
-            if (purchaseStatus.purchased === false) {
-              Swal.fire({
-                title: '',
-                text: `Koorsadan mar hore ayaad codsatay. Fadlan nala soo xiriir si iibka loo xaqiijiyo oo aad u iibsato koorsada: ${courseName}.`,
-                icon: 'info',
-                confirmButtonText: 'Ok'
-              });
-              console.log(`Request for course ${courseName} is already recorded.`);
-            } else if (purchaseStatus.purchased === true) {
-              Swal.fire({
-                title: 'Koorsada Waa La Iibiyay!',
-                text: `Waad iibsatay koorsada: ${courseName}. Fadlan gal qaybta "View Purchased".`,
-                icon: 'success',
-                confirmButtonText: 'Ok'
-              });
-              console.log(`Course ${courseName} already purchased.`);
-            }
+            Swal.fire({
+              title: '',
+              text: `Mar hore ayaad codsatay koorsada: ${courseName}.`,
+              icon: 'info',
+              confirmButtonText: 'Ok'
+            });
           } else {
             const { isConfirmed } = await Swal.fire({
               title: 'Ma doonaysaa?',
@@ -64,24 +51,7 @@ onAuthStateChanged(auth, (user) => {
             });
 
             if (isConfirmed) {
-              Swal.fire({
-                title: '',
-                text: 'Fadlan nala soo xiriir adigoo isticmaalaya xogta xiriirka ee sare ku qoran.',
-                icon: 'info',
-              }).then(async () => {
-                await set(userRef, {
-                  purchased: false,
-                  courseName: courseName,
-                  timestamp: new Date().toISOString()
-                });
-
-                Swal.fire({
-                  title: 'Verify!',
-                  text: 'Fadlan nala soo xidhiidh si loo xaqiijiyo iibka.',
-                  icon: 'info',
-                  confirmButtonText: 'Ok'
-                });
-              });
+              window.location.href = `payment.html?course=${encodeURIComponent(courseName)}`;
             }
           }
         } catch (error) {
@@ -91,14 +61,13 @@ onAuthStateChanged(auth, (user) => {
             icon: 'error',
             confirmButtonText: 'Ok'
           });
-          console.error("Error checking or saving purchase:", error.message);
         }
       });
     });
+    
 
     // Handle free courses
-    const freeButtons = document.querySelectorAll('.btn-free');
-    freeButtons.forEach((button) => {
+    document.querySelectorAll('.btn-free').forEach((button) => {
       button.addEventListener('click', async (event) => {
         const courseName = event.target.getAttribute('data-course');
         const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
@@ -107,16 +76,12 @@ onAuthStateChanged(auth, (user) => {
           const snapshot = await get(userRef);
 
           if (snapshot.exists()) {
-            const purchaseStatus = snapshot.val();
-            if (purchaseStatus.purchased === true) {
-              Swal.fire({
-                title: '',
-                text: `Mar hore ayaad furatay koorsada: ${courseName}.`,
-                icon: 'info',
-                confirmButtonText: 'Ok'
-              });
-              console.log(`Course ${courseName} already accessed.`);
-            }
+            Swal.fire({
+              title: '',
+              text: `Mar hore ayaad furatay koorsada: ${courseName}.`,
+              icon: 'info',
+              confirmButtonText: 'Ok'
+            });
           } else {
             Swal.fire({
               title: 'Successfully!',
@@ -138,7 +103,6 @@ onAuthStateChanged(auth, (user) => {
             icon: 'error',
             confirmButtonText: 'Ok'
           });
-          console.error("Error checking or saving purchase:", error.message);
         }
       });
     });
@@ -150,8 +114,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // About Modal
-const aboutBtn = document.getElementById('about-btn');
-aboutBtn.addEventListener('click', () => {
+document.getElementById('about-btn').addEventListener('click', () => {
   Swal.fire({
     title: 'About Us',
     text: 'Thanks for using this website!',
@@ -161,8 +124,7 @@ aboutBtn.addEventListener('click', () => {
 });
 
 // Logout function
-const logoutBtn = document.getElementById('logout-btn');
-logoutBtn.addEventListener('click', async () => {
+document.getElementById('logout-btn').addEventListener('click', async () => {
   const user = auth.currentUser;
   if (user) {
     await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
