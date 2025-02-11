@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lacag Bixin</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+            authDomain: "exam-81b90.firebaseapp.com",
+            databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+            projectId: "exam-81b90",
+            storageBucket: "exam-81b90.appspot.com",
+            messagingSenderId: "461178422237",
+            appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+            measurementId: "G-KKDNZBZLPG"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Get course name from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseName = urlParams.get('course') || "Unknown Course";
+
+        // Handle form submission
+        document.addEventListener("DOMContentLoaded", () => {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    document.getElementById('payment-form').addEventListener('submit', function(event) {
+                        event.preventDefault();
+
+                        const username = document.getElementById('username').value;
+                        const email = document.getElementById('email').value;
+                        const phone = document.getElementById('phone').value;
+                        const paymentNumber = document.getElementById('payment-number').value;
+
+                        const paymentRef = ref(database, `users/${user.uid}/payments/${courseName}`);
+
+                        set(paymentRef, {
+                            userId: user.uid,
+                            courseName: courseName,
+                            username: username,
+                            email: email,
+                            phone: phone,
+                            paymentNumber: paymentNumber,
+                            timestamp: new Date().toISOString()
+                        }).then(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Successfully!',
+                                text: 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.',
+                                confirmButtonText: 'Ok'
+                            }).then(() => {
+                                window.history.back();
+                            });
+                        }).catch((error) => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Khalad!',
+                                text: `Waxaa dhacay khalad: ${error.message}`,
+                                confirmButtonText: 'Ok'
+                            });
+                        });
+                    });
+                } else {
+                    window.location.href = "login.html";
+                }
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        input, select, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Lacag Bixinta</h2>
+    <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
+    
+    <form id="payment-form">
+        <label>Magacaaga</label>
+        <input type="text" id="username" placeholder="Gali magacaaga" required>
+        
+        <label>Emailkaaga</label>
+        <input type="email" id="email" placeholder="Gali emailkaaga" required>
+        
+        <label>Numberkaaga</label>
+        <input type="number" id="phone" placeholder="Gali numberkaaga" required>
+        
+        <label>Numberka lacagta lagaso dirayo</label>
+        <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
+        
+        <button type="submit">Codso</button>
+    </form>
+
+    <button onclick="window.history.back()">Back</button>
+</div>
+
+<script>
+    document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course') || "Unknown Course";
+</script>
+
+</body>
+</html>
