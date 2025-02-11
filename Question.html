@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .faq-container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .faq-question {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border: none;
+            margin:10px;
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #ccc;
+        }
+        .faq-answer {
+            display: none;
+            padding: 10px;
+            background-color: grey;
+            color: white;
+            border-left: 3px solid #007bff;
+            position: up
+        }
+    </style>
+</head>
+<body>
+
+<div class="faq-container">
+    <button class="faq-question">1. Ma ku daawan karaa koorsadda taleefankayga gacanta?</button>
+    <div class="faq-answer">
+        <p>Haa, dhammaan koorsooyinka ku jira websitekan waxaad ku daawan kartaa taleefankaaga gacanta ama kumbuyuutarkaaga.</p>
+    </div>
+
+    <button class="faq-question">2. Waa maxay siyaabaha lacag bixinta ee lagu bixiyo?</button>
+    <div class="faq-answer">
+        <p>Lacagta waxaa lagu bixin karaa iyadoo la adeegsanayo kartida bangiyada, PayPal, ama adeegyo kale Sida Evc ama Zaad iwm.</p>
+    </div>
+  <button class="faq-question">3. Side u isticmaala koorso aan iibsaday?</button>
+    <div class="faq-answer">
+        <p>Si aad u isticmaasho koorsooyinkaaga gal qaybta purchased course ama halkan .</p>
+        <a href="purchased.html">Halkan</a>
+    </div>
+  <button class="faq-question">4. koorsada haddan iibsado ma live mise waa mar kaliya?</button>
+    <div class="faq-answer">
+        <p>may dhamaan koorsooyinka ku jira websitekan waa kuwa hore loo sii duubay markastana waad daawan karta.</p>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll(".faq-question").forEach(button => {
+        button.addEventListener("click", function() {
+            const answer = this.nextElementSibling;
+            if (answer.style.display === "block") {
+                answer.style.display = "none";
+            } else {
+                answer.style.display = "block";
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
