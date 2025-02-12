@@ -43,6 +43,7 @@
                         const email = document.getElementById('email').value;
                         const phone = document.getElementById('phone').value;
                         const paymentNumber = document.getElementById('payment-number').value;
+                        const paymentMethod = document.getElementById('payment-method').value;
 
                         const paymentRef = ref(database, `users/${user.uid}/payments/${courseName}`);
 
@@ -53,7 +54,16 @@
                             email: email,
                             phone: phone,
                             paymentNumber: paymentNumber,
+                            paymentMethod: paymentMethod,
                             timestamp: new Date().toISOString()
+                        });
+
+                        const purchase = ref(database, `users/${user.uid}/purchases/${courseName}`);
+
+                        set(purchase, {
+                            userId: user.uid,
+                            courseName: courseName,
+                            purchased: false
                         }).then(() => {
                             Swal.fire({
                                 icon: 'success',
@@ -72,6 +82,22 @@
                             });
                         });
                     });
+                    
+                    // Function to handle the payment method redirection
+                    function dir(event) {
+                        event.preventDefault(); // Prevent form submission
+                        const dirid = document.getElementById("payment-method").value;
+                        if (dirid === "Zaad") {
+                            window.location.href = "tel:*220*672146979*0#"; // Zaad number
+                        } else if (dirid === "Evc") {
+                            window.location.href = "tel:*150*672146979#"; // Evc number
+                        } else if (dirid === "Somtel") {
+                            window.location.href = "tel:*200*672146979#"; // Somtel number
+                        }
+                    }
+                    
+                    // Bind the payment method redirection to button click
+                    document.querySelector('button[onclick="dir(event)"]').addEventListener('click', dir);
                 } else {
                     window.location.href = "login.html";
                 }
@@ -84,7 +110,14 @@
             background-color: #f4f4f4;
             text-align: center;
             padding: 20px;
+            animation: fadeIn 1s ease-in-out;
         }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
         .container {
             max-width: 400px;
             background: white;
@@ -92,7 +125,14 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin: auto;
+            animation: slideIn 1s ease-out;
         }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
         input, select, button {
             width: 100%;
             margin: 10px 0;
@@ -100,14 +140,25 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         button {
             background: #28a745;
             color: white;
             font-size: 16px;
             cursor: pointer;
         }
+
         button:hover {
             background: #218838;
+        }
+
+        select {
+            background-color: #f8f9fa;
+            font-size: 16px;
+        }
+
+        h2 {
+            color: #28a745;
         }
     </style>
 </head>
@@ -118,19 +169,24 @@
     <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
     
     <form id="payment-form">
-        <label>Magacaaga</label>
-        <input type="text" id="username" placeholder="Gali magacaaga" required>
-        
-        <label>Emailkaaga</label>
+       
+        <input type="text" id="username" placeholder="Gali magacaaga" required>     
+       
         <input type="email" id="email" placeholder="Gali emailkaaga" required>
-        
-        <label>Numberkaaga</label>
+      
         <input type="number" id="phone" placeholder="Gali numberkaaga" required>
         
-        <label>Numberka lacagta lagaso dirayo</label>
         <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
         
+        <label>Habka Lacagta</label>
+        <select id="payment-method" required>
+            <option value="Zaad">Zaad</option>
+            <option value="Evc">Evc</option>
+            <option value="Somtel">Somtel</option>
+        </select>
+        
         <button type="submit">Codso</button>
+        <button type="button" onclick="dir(event)">Dir lacagta</button>
     </form>
 
     <button onclick="window.history.back()">Back</button>
