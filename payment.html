@@ -43,7 +43,14 @@
                         const email = document.getElementById('email').value;
                         const phone = document.getElementById('phone').value;
                         const paymentNumber = document.getElementById('payment-number').value;
-                        const paymentMethod = document.getElementById('payment-method').value;
+                        const paymentMethod = document.getElementById('payment-method').value;                                                       
+                        
+                            
+                         
+                        if(phone.length <10) {
+                            Swal.fire('', 'Fadlan gali number dhamaystiran','');
+                            return;
+                        }                            
 
                         const paymentRef = ref(database, `users/${user.uid}/payments/${courseName}`);
 
@@ -94,6 +101,9 @@
                         } else if (dirid === "Somtel") {
                             window.location.href = "tel:*200*672146979#"; // Somtel number
                         }
+                        else {
+                            Swal.fire('', 'Fadlan dooro Habka lacagta', '',);
+                        }
                     }
                     
                     // Bind the payment method redirection to button click
@@ -138,18 +148,18 @@
             margin: 10px 0;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 10px;
         }
 
         button {
-            background: #28a745;
+            background: #041dc2;
             color: white;
             font-size: 16px;
             cursor: pointer;
         }
 
         button:hover {
-            background: #218838;
+            background: #041dc9;
         }
 
         select {
@@ -180,13 +190,14 @@
         
         <label>Habka Lacagta</label>
         <select id="payment-method" required>
+            <option value="none" disabled selected>Dooro</option>
             <option value="Zaad">Zaad</option>
             <option value="Evc">Evc</option>
             <option value="Somtel">Somtel</option>
         </select>
         
+        <button type="buttom" onclick="dir(event)">Dir lacagta</button>
         <button type="submit">Codso</button>
-        <button type="button" onclick="dir(event)">Dir lacagta</button>
     </form>
 
     <button onclick="window.history.back()">Back</button>
@@ -197,4 +208,4 @@
 </script>
 
 </body>
-</html>
+            </html>
