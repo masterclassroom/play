@@ -28,6 +28,7 @@ onAuthStateChanged(auth, (user) => {
     document.querySelectorAll('.btn-buy').forEach((button) => {
       button.addEventListener('click', async (event) => {
         const courseName = event.target.getAttribute('data-course');
+        const price = event.target.getAttribute('price');
         const userRef = ref(database, `users/${user.uid}/payments/${courseName}`);
 
         try {
@@ -51,7 +52,7 @@ onAuthStateChanged(auth, (user) => {
             });
 
             if (isConfirmed) {
-              window.location.href = `payment.html?course=${encodeURIComponent(courseName)}`;
+              window.location.href = `payment.html?course=${encodeURIComponent(courseName)}&price=${encodeURIComponent(price)}`;
             }
           }
         } catch (error) {
