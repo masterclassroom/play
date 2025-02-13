@@ -66,6 +66,9 @@ updatePasswordButton.addEventListener("click", async () => {
     showMessage("Please fill in both fields.", false);
     return;
   }
+   if(newPassword.length > 24 ) {
+     showMessage("Your password is very tall.", false);
+   }
 
   const user = auth.currentUser;
   if (!user) {
