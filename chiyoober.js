@@ -68,6 +68,7 @@ updatePasswordButton.addEventListener("click", async () => {
   }
    if(newPassword.length > 24 ) {
      showMessage("Your password is very tall.", false);
+     return;
    }
 
   const user = auth.currentUser;
