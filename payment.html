@@ -36,78 +36,87 @@
         document.addEventListener("DOMContentLoaded", () => {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    document.getElementById('payment-form').addEventListener('submit', function(event) {
+                    document.getElementById('payment-form').addEventListener('submit', async function(event) {
                         event.preventDefault();
 
                         const username = document.getElementById('username').value;
                         const email = document.getElementById('email').value;
                         const phone = document.getElementById('phone').value;
                         const paymentNumber = document.getElementById('payment-number').value;
-                        const paymentMethod = document.getElementById('payment-method').value;                                                       
-                        
-                            
-                         
-                        if(phone.length <10) {
-                            Swal.fire('', 'Fadlan gali number dhamaystiran','');
+                        const paymentMethod = document.getElementById('payment-method').value;
+
+                        if (phone.length < 10) {
+                            Swal.fire('', 'Fadlan gali number dhamaystiran', '');
                             return;
-                        }                            
+                        }
 
-                        const paymentRef = ref(database, `users/${user.uid}/payments/${courseName}`);
-
-                        set(paymentRef, {
-                            userId: user.uid,
-                            courseName: courseName,
-                            username: username,
-                            email: email,
-                            phone: phone,
-                            paymentNumber: paymentNumber,
-                            paymentMethod: paymentMethod,
-                            timestamp: new Date().toISOString()
+                        const { isConfirmed } = await Swal.fire({
+                            title: 'Ma Hubtaa?',
+                            text: `Ma Hubta inaad iib sato koorsada ${courseName}?`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Haa',
+                            cancelButtonText: 'Maya'
                         });
 
-                        const purchase = ref(database, `users/${user.uid}/purchases/${courseName}`);
+                        if (isConfirmed) {
+                            const paymentRef = ref(database, `users/${user.uid}/payments/${courseName}`);
+                            const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
-                        set(purchase, {
-                            userId: user.uid,
-                            courseName: courseName,
-                            purchased: false
-                        }).then(() => {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Successfully!',
-                                text: 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.',
-                                confirmButtonText: 'Ok'
-                            }).then(() => {
-                                window.history.back();
-                            });
-                        }).catch((error) => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Khalad!',
-                                text: `Waxaa dhacay khalad: ${error.message}`,
-                                confirmButtonText: 'Ok'
-                            });
-                        });
+                            try {
+                                await set(paymentRef, {
+                                    userId: user.uid,
+                                    courseName: courseName,
+                                    username: username,
+                                    email: email,
+                                    phone: phone,
+                                    paymentNumber: paymentNumber,
+                                    paymentMethod: paymentMethod,
+                                    timestamp: new Date().toISOString()
+                                });
+
+                                await set(purchaseRef, {
+                                    userId: user.uid,
+                                    courseName: courseName,
+                                    purchased: false
+                                });
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Successfully!',
+                                    text: 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.',
+                                    confirmButtonText: 'Ok'
+                                }).then(() => {
+                                    window.history.back();
+                                });
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Khalad!',
+                                    text: `Waxaa dhacay khalad: ${error.message}`,
+                                    confirmButtonText: 'Ok'
+                                });
+                            }
+                        }
                     });
-                    
+
                     // Function to handle the payment method redirection
                     function dir(event) {
                         event.preventDefault(); // Prevent form submission
                         const dirid = document.getElementById("payment-method").value;
                         if (dirid === "Zaad") {
-                            window.location.href = "tel:*220*672146979*0#"; // Zaad number
+                            window.location.href = "tel:*220*672146979*0#";
                         } else if (dirid === "Evc") {
-                            window.location.href = "tel:*150*672146979#"; // Evc number
+                            window.location.href = "tel:*150*672146979#";
                         } else if (dirid === "Somtel") {
-                            window.location.href = "tel:*200*672146979#"; // Somtel number
-                        }
-                        else {
-                            Swal.fire('', 'Fadlan dooro Habka lacagta', '',);
+                            window.location.href = "tel:*200*672146979#";
+                        } else {
+                            Swal.fire('', 'Fadlan dooro Habka lacagta', '');
                         }
                     }
-                    
+
                     // Bind the payment method redirection to button click
-                    document.querySelector('button[onclick="dir(event)"]').addEventListener('click', dir);
+                    document.getElementById('payment-button').addEventListener('click', dir);
                 } else {
                     window.location.href = "login.html";
                 }
@@ -177,15 +186,12 @@
 <div class="container">
     <h2>Lacag Bixinta</h2>
     <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
-    
+    <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
+
     <form id="payment-form">
-       
         <input type="text" id="username" placeholder="Gali magacaaga" required>     
-       
         <input type="email" id="email" placeholder="Gali emailkaaga" required>
-      
         <input type="number" id="phone" placeholder="Gali numberkaaga" required>
-        
         <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
         
         <label>Habka Lacagta</label>
@@ -195,8 +201,8 @@
             <option value="Evc">Evc</option>
             <option value="Somtel">Somtel</option>
         </select>
-        
-        <button type="buttom" onclick="dir(event)">Dir lacagta</button>
+
+        <button type="button" id="payment-button">Dir lacagta</button>
         <button type="submit">Codso</button>
     </form>
 
@@ -205,7 +211,8 @@
 
 <script>
     document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course') || "Unknown Course";
+    document.getElementById('pricer').innerText = new URLSearchParams(window.location.search).get('price') || "Unknown Price";
 </script>
 
 </body>
-            </html>
+    </html>
