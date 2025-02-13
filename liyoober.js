@@ -87,10 +87,6 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
       // Set the user as logged in
       await set(ref(database, `users/${user.uid}/isLoggedIn`), true);
-
-      succesMessage.style.display = 'block';
-      succesMessage.innerText = 'Login Successfully! Welcome back to your account';
-
       // Update the user's password in the database
       await update(dbRef, {
         password: password // Update the password here
@@ -98,7 +94,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
       setTimeout(() => {
         window.location.href = "Academy.html";
-      }, 2000);
+      }, 1000);
     } else {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'No account found with this email.';
