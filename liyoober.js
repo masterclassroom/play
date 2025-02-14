@@ -58,6 +58,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     const user = userCredential.user;
 
     if (!user.emailVerified) {
+      await sendEmailVerification(user);
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Please verify your email before logging in.';
       return;
