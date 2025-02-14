@@ -25,7 +25,7 @@ onAuthStateChanged(auth, (user) => {
     console.log("User logged in:", user.email);
     if(!localStorage.getItem("pinned")) {
     Swal.fire('Warning', 'Please a pin code','warning');
-      .then(() {
+      .then(() => {
         window.location.href = "Verification.html";
       }
 
