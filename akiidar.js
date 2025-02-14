@@ -52,7 +52,7 @@ onAuthStateChanged(auth, (user) => {
             });
 
             if (isConfirmed) {
-              window.location.href = `payment.html?course=details=${encodeURIComponent(courseName)}&price=${encodeURIComponent(price)}`;
+              window.location.href = `payment.html?course=details=${encodeURIComponent(courseName)}&price222=${encodeURIComponent(price)}`;
             }
           }
         } catch (error) {
