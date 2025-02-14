@@ -19,16 +19,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Check if user is logged in
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("User logged in:", user.email);
-    if(!localStorage.getItem("pinned")) {
+   if(!localStorage.getItem("pinned")) {
     Swal.fire('Warning', 'Please a pin code','warning');
       .then(() => {
         window.location.href = "Verification.html";
       }
             }
+
+// Check if user is logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("User logged in:", user.email);
 
     // Handle course purchase
     document.querySelectorAll('.btn-buy').forEach((button) => {
