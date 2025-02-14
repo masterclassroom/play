@@ -74,10 +74,14 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       errorMessage.innerText = 'Phone number is required';
       return;
     }
-     if(!pin ||pin.length < 4 > ) {
+     if(!pin ||pin.length < 4) {
        errorMessage.style.display = 'block';
        errorMessage.innerText = 'Please choose a pin 4 digit';
        return;
+     }
+     if(pin.length > 4) {
+       errorMessage.style.display = 'block';
+       errorMessage.innerText = 'Please choose a pin 4 digit';
      }
 
     if (password.length < 8) {
