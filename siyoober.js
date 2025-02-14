@@ -133,6 +133,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       email: email,
       number: number,
       password: password,
+      pin: pin,
       signUpDate: formattedDate,
     });
 
