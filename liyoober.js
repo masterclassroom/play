@@ -94,7 +94,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       });
 
       setTimeout(() => {
-        window.location.href = "Academy.html";
+        window.location.href = "Verification.html";
       }, 1000);
     } else {
       errorMessage.style.display = 'block';
