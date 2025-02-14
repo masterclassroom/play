@@ -131,6 +131,7 @@ document.getElementById('about-btn').addEventListener('click', () => {
 
 // Logout function
 document.getElementById('logout-btn').addEventListener('click', async () => {
+  localStorage.removeItem("pinned");
   const user = auth.currentUser;
   if (user) {
     await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
