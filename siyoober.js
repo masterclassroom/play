@@ -82,6 +82,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
      if(pin.length > 4) {
        errorMessage.style.display = 'block';
        errorMessage.innerText = 'Please choose a pin 4 digit';
+       return;
      }
 
     if (password.length < 8) {
