@@ -30,7 +30,7 @@
 
         // Get course name from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const courseName = urlParams.get('course') || "Unknown Course";
+        const courseName = urlParams.get('course=details') || "Unknown Course";
 
         // Handle form submission
         document.addEventListener("DOMContentLoaded", () => {
@@ -248,7 +248,7 @@ function dir(event) {
 </div>
 
 <script>
-    document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course') || "Unknown Course";
+    document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course=details') || "Unknown Course";
     document.getElementById('pricer').innerText = new URLSearchParams(window.location.search).get('price') || "Unknown Price";
 </script>
 
