@@ -110,6 +110,9 @@
                             window.location.href = "tel:*150*672146979#";
                         } else if (dirid === "Somtel") {
                             window.location.href = "tel:*200*672146979#";
+                        }
+                        else if(dirid === "Soltelco") {
+                            window.location.href = "tel:*770*672146979*0#;
                         } else {
                             Swal.fire('', 'Fadlan dooro Habka lacagta', '');
                         }
@@ -198,6 +201,7 @@
         <select id="payment-method" required>
             <option value="none" disabled selected>Dooro</option>
             <option value="Zaad">Zaad</option>
+            <option value="Soltelco">Soltelco</option>
             <option value="Evc">Evc</option>
             <option value="Somtel">Somtel</option>
         </select>
