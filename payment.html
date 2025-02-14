@@ -30,7 +30,7 @@
 
         // Get course name from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const courseName = urlParams.get('course=details') || "Unknown Course";
+        const courseName = urlParams.get('course') || "Unknown Course";
 
         // Handle form submission
         document.addEventListener("DOMContentLoaded", () => {
