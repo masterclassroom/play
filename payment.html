@@ -98,26 +98,54 @@
                                 });
                             }
                         }
-                    });
+                    });                
 
                     // Function to handle the payment method redirection
-                    function dir(event) {
-                        event.preventDefault(); // Prevent form submission
-                        const dirid = document.getElementById("payment-method").value;
-                        if (dirid === "Zaad") {
-                            window.location.href = "tel:*220*672146979*0#";
-                        } else if (dirid === "Evc") {
-                            window.location.href = "tel:*150*672146979#";
-                        } else if (dirid === "Somtel") {
-                            window.location.href = "tel:*200*672146979#";
-                        }
-                        else if (dirid === "Soltelco") {
-                            window.location.href = "tel:*770*672146979*0#";
-                        } else {
-                            Swal.fire('', 'Fadlan dooro Habka lacagta', '');
-                        }
-                    }
+                    // Function to handle the payment method redirection
+function dir(event) {
+    event.preventDefault(); // Prevent form submission
+    const dirid = document.getElementById("payment-method").value;
+    const currencyType = document.getElementById("currency-type").value; // Qiimaha lacagta
+    let price = parseFloat(document.getElementById("pricer").innerText) || price;
+    let priceStr = price.toFixed(0); // Qiimaha saxda ah (2 meelood oo jaha)
 
+    // Haddii currencyType uu yahay Shilling, qiimaha la badalo
+    if (currencyType === "shilling") {
+        price = price * 10000;  // 1 USD = 220 Shilling (isticmaal qiimaha saxda ah)
+        priceStr = price.toFixed(0); // Update price with shilling
+    }
+
+    // Haddii habka lacagta Zaad, Evc, Soltelco, ama Somtel
+    if (dirid === "Zaad") {
+        if (currencyType === "usd") {
+            window.location.href = `tel:*880*634041087*${priceStr}#`; // Telesom USD
+        } else if (currencyType === "shilling") {
+            window.location.href = `tel:*220*634041087*${priceStr}#`; // Telesom Shilling
+        }
+    } else if (dirid === "Evc") {
+        if (currencyType === "usd") {
+            window.location.href = `tel:*150*634041087*${priceStr}#`; // EVC USD
+        } else if (currencyType === "shilling") {
+            window.location.href = `tel:*150*634041087*${priceStr}#`; // EVC Shilling
+        }
+    } else if (dirid === "Somtel") {
+        if (currencyType === "usd") {
+            window.location.href = `tel:*200*634041087*${priceStr}#`; // Somtel USD
+        } else if (currencyType === "shilling") {
+            window.location.href = `tel:*200*634041087*${priceStr}#`; // Somtel Shilling
+        }
+    } else if (dirid === "Soltelco") {
+        if (currencyType === "shilling") {
+            window.location.href = `tel:*770*634041087*${priceStr}#`; // Soltelco USD
+        } 
+          else if(currencyType === "usd") {
+              Swal.fire('','Soltelco ma taageerto Dollar', '');
+          }
+    } else {
+        Swal.fire('', 'Fadlan dooro Habka lacagta', '');
+    }
+}
+                    
                     // Bind the payment method redirection to button click
                     document.getElementById('payment-button').addEventListener('click', dir);
                 } else {
@@ -189,10 +217,10 @@
 <div class="container">
     <h2>Lacag Bixinta</h2>
     <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
-    <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
+    <p><strong>Qiimaha:$</strong> <span id="pricer"></span></p>
 
     <form id="payment-form">
-        <input type="text" id="username" placeholder="Gali magacaaga" required>     
+        <input type="text" id="username" placeholder="Gali magacaaga" required>  
         <input type="email" id="email" placeholder="Gali emailkaaga" required>
         <input type="number" id="phone" placeholder="Gali numberkaaga" required>
         <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
@@ -205,6 +233,12 @@
             <option value="Evc">Evc</option>
             <option value="Somtel">Somtel</option>
         </select>
+        <label>Nooca Lacagta</label>
+<select id="currency-type" required>
+    <option value="waxba" disabled selected>None</option>
+    <option value="usd">USD</option>
+    <option value="shilling">Shilling</option>
+</select>
 
         <button type="button" id="payment-button">Dir lacagta</button>
         <button type="submit">Codso</button>
