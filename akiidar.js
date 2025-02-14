@@ -19,13 +19,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-   if(!localStorage.getItem("pinned")) {
-    Swal.fire('Warning', 'Please a pin code','warning');
-      .then(() => {
-        window.location.href = "Verification.html";
-      }
-            }
-
 // Check if user is logged in
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -149,3 +142,9 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     console.error("No user found for logout.");
   }
 });
+ if(!localStorage.getItem("pinned")) {
+    Swal.fire('Warning', 'Please a pin code','warning');
+      .then(() => {
+        window.location.href = "Verification.html";
+      }
+            }
