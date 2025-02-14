@@ -23,6 +23,11 @@ const database = getDatabase(app);
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("User logged in:", user.email);
+    if(!localStorage.getItem("pinned")) {
+    Swal.fire('Warning', 'Please a pin code','warning');
+      .then(() {
+        window.location.href = "Verification.html";
+      }
 
     // Handle course purchase
     document.querySelectorAll('.btn-buy').forEach((button) => {
