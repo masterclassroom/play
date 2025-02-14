@@ -28,6 +28,7 @@ onAuthStateChanged(auth, (user) => {
       .then(() => {
         window.location.href = "Verification.html";
       }
+            }
 
     // Handle course purchase
     document.querySelectorAll('.btn-buy').forEach((button) => {
