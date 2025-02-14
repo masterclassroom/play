@@ -33,6 +33,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const number = document.getElementById("number").value;
   const password = document.getElementById('password').value;
+  const pin = document.getElementById('pincode').value;
   const errorMessage = document.getElementById('error-message');
   const succesMessage = document.getElementById('succes-message');
 
@@ -73,6 +74,11 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       errorMessage.innerText = 'Phone number is required';
       return;
     }
+     if(!pin || pin.length < > ) {
+       errorMessage.style.display = 'block';
+       errorMessage.innerText = 'Please choose a pin 4 digit';
+       return;
+     }
 
     if (password.length < 8) {
       errorMessage.style.display = 'block';
