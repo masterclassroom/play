@@ -40,7 +40,7 @@ document.getElementById('jecker').addEventListener('click', async () => {
         }
         
         if (!code) {
-            Swal.fire('Error', 'Please enter a verification code!', 'warning');
+            Swal.fire('Error', 'Please enter a pin code!', 'warning');
             return;
         }
 
@@ -59,7 +59,7 @@ document.getElementById('jecker').addEventListener('click', async () => {
         console.log("Stored Pin:", savedPin); // Log-ka arag si aad u xaqiijiso
 
         if (savedPin === code) {
-            Swal.fire('Success!', 'Pin is correct!', 'success').then(() => {
+            Swal.fire('Successfully!', 'Pin is correct!', 'success').then(() => {
                 localStorage.setItem("pinned", "true");
                 window.location.href = "Academy.html"; // Haddii pin sax yahay, user wuu gudbiyaa
             });
