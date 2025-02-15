@@ -97,6 +97,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
 
     let emailExists = false;
     let numberExists = false;
+    let usernameExists = false;
 
     snapshot.forEach((childSnapshot) => {
       if (childSnapshot.val().email === email) {
@@ -104,6 +105,9 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       }
       if (childSnapshot.val().number === number) {
         numberExists = true;
+      }
+      if (childSnapshot.val().username === username) {
+        usernameExists = true;
       }
     });
 
@@ -118,6 +122,11 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       errorMessage.innerText = 'Phone number already registered';
       return;
     }
+     if(usernameExists) {
+       errorMessage.style.display = 'block';
+       errorMessage.innerText = 'Username is token';
+       return;
+     }
 
     // Create User
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
