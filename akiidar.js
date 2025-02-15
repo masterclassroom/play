@@ -142,13 +142,6 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     console.error("No user found for logout.");
   }
 });
-if (!localStorage.getItem("pinned")) {
-    Swal.fire({
-        title: 'Warning',
-        text: 'Please enter a pin code',
-        icon: 'warning',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        window.location.href = "Verification.html";
-    });
+if (!localStorage.getItem("pinned")) { 
+        window.location.href = "Pincode.html";
 }
