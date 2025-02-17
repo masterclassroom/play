@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 // ✅ Firebase Config
@@ -31,21 +31,21 @@ onAuthStateChanged(auth, (user) => {
 // ✅ Marka button la riixo, hubi pin code
 document.getElementById('jecker').addEventListener('click', async () => {
     try {
-        const code = document.getElementById("pincode").value.trim(); // Hel pincode la geliyay
         const user = auth.currentUser; // Isticmaalaha hadda jira
-        
         if (!user) {
             Swal.fire('Error', 'You must be logged in first!', 'error');
             return;
         }
-        
+
+        const logRef = ref(database, `users/${user.uid}/pinned`);
+        const code = document.getElementById("pincode").value.trim(); // Hel pincode la geliyay
+
         if (!code) {
             Swal.fire('Error', 'Please enter a pin code!', 'warning');
             return;
         }
 
-        const userID = user.uid;
-        const userRef = ref(database, `users/${userID}`); // Xogta user-ka
+        const userRef = ref(database, `users/${user.uid}`); // Xogta user-ka
         const snapshot = await get(userRef);
 
         if (!snapshot.exists()) {
@@ -55,13 +55,13 @@ document.getElementById('jecker').addEventListener('click', async () => {
 
         const userData = snapshot.val();
         const savedPin = userData.Pin; // Hel Pin code-ka kaydsan
-        
+
         console.log("Stored Pin:", savedPin); // Log-ka arag si aad u xaqiijiso
 
         if (savedPin === code) {
-            Swal.fire('Successfully!', 'Pin is correct!', 'success').then(() => {
-                localStorage.setItem("pinned", "true");
-                window.location.href = "Academy.html"; // Haddii pin sax yahay, user wuu gudbiyaa
+            Swal.fire('Successfully!', 'Pin is correct!', 'success').then(async () => {
+                await set(logRef, { pinned: null });
+                window.location.href = "Academy.html";
             });
         } else {
             Swal.fire('Error', 'Incorrect pin!', 'error'); // Pin code khalad ah
