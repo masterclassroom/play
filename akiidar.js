@@ -20,128 +20,159 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 // Check if user is logged in
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("User logged in:", user.email);
-
-    // Handle course purchase
-    document.querySelectorAll('.btn-buy').forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        const courseName = event.target.getAttribute('data-course');
-        const price = event.target.getAttribute('price');
-        const userRef = ref(database, `users/${user.uid}/payments/${courseName}`);
-
-        try {
-          const snapshot = await get(userRef);
-
-          if (snapshot.exists()) {
-            Swal.fire({
-              title: '',
-              text: `Mar hore ayaad codsatay koorsada: ${courseName}.`,
-              icon: 'info',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            const { isConfirmed } = await Swal.fire({
-              title: 'Ma doonaysaa?',
-              text: `Ma rabtaa koorsada ${courseName}?`,
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonText: 'Haa',
-              cancelButtonText: 'Maya'
-            });
-
-            if (isConfirmed) {
-              window.location.href = `payment.html?course:details=${encodeURIComponent(courseName)}&price:details=${encodeURIComponent(price)}`;
-            }
-          }
-        } catch (error) {
-          Swal.fire({
-            title: 'Khalad!',
-            text: `Waxaa dhacay khalad: ${error.message}`,
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
-      });
-    });
-    
-
-    // Handle free courses
-    document.querySelectorAll('.btn-free').forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        const courseName = event.target.getAttribute('data-course');
-        const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
-
-        try {
-          const snapshot = await get(userRef);
-
-          if (snapshot.exists()) {
-            Swal.fire({
-              title: '',
-              text: `Mar hore ayaad furatay koorsada: ${courseName}.`,
-              icon: 'info',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Successfully!',
-              text: `Waad furatay koorsada ${courseName}`,
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-
-            await set(userRef, {
-              purchased: true,
-              courseName: courseName,
-              timestamp: new Date().toISOString()
-            });
-          }
-        } catch (error) {
-          Swal.fire({
-            title: 'Khalad!',
-            text: `Waxaa dhacay khalad: ${error.message}`,
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
-      });
-    });
-
-  } else {
-    // Redirect to login page if user is not logged in
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
     window.location.href = "login.html";
+    return;
+  }
+
+  console.log("User logged in:", user.email);
+  const userRef = ref(database, `users/${user.uid}/pinned`);
+
+  try {
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) {
+      window.location.href = 'Pincode.html';
+    }
+  } catch (error) {
+    console.error("Error fetching pin:", error.message);
   }
 });
 
-// About Modal
-document.getElementById('about-btn').addEventListener('click', () => {
-  Swal.fire({
-    title: 'About Us',
-    text: 'Thanks for using this website!',
-    icon: 'info',
-    confirmButtonText: 'Close'
+// DOMContentLoaded to ensure elements exist before adding event listeners
+document.addEventListener("DOMContentLoaded", () => {
+  // Handle course purchase
+  document.querySelectorAll('.btn-buy').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const courseName = event.target.getAttribute('data-course');
+      const price = event.target.getAttribute('price');
+      const userRef = ref(database, `users/${auth.currentUser.uid}/payments/${courseName}`);
+
+      try {
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+          Swal.fire({
+            title: '',
+            text: `Mar hore ayaad codsatay koorsada: ${courseName}.`,
+            icon: 'info',
+            confirmButtonText: 'Ok'
+          });
+        } else {
+          const { isConfirmed } = await Swal.fire({
+            title: 'Ma doonaysaa?',
+            text: `Ma rabtaa koorsada ${courseName}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Haa',
+            cancelButtonText: 'Maya'
+          });
+
+          if (isConfirmed) {
+            window.location.href = `payment.html?course:details=${encodeURIComponent(courseName)}&price:details=${encodeURIComponent(price)}`;
+          }
+        }
+      } catch (error) {
+        Swal.fire({
+          title: 'Khalad!',
+          text: `Waxaa dhacay khalad: ${error.message}`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }
+    });
   });
-});
 
-// Logout function
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  localStorage.removeItem("pinned");
-  const user = auth.currentUser;
-  if (user) {
-    await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
-    signOut(auth)
-      .then(() => {
-        alert("Signed out successfully");
-        window.location.href = "login.html"; // Redirect to login page after signing out
-      })
-      .catch((error) => {
-        console.error("Error signing out: ", error.message);
+  // Handle free courses
+  document.querySelectorAll('.btn-free').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const courseName = event.target.getAttribute('data-course');
+      const userRef = ref(database, `users/${auth.currentUser.uid}/purchases/${courseName}`);
+
+      try {
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+          Swal.fire({
+            title: '',
+            text: `Mar hore ayaad furatay koorsada: ${courseName}.`,
+            icon: 'info',
+            confirmButtonText: 'Ok'
+          });
+        } else {
+          Swal.fire({
+            title: 'Successfully!',
+            text: `Waad furatay koorsada ${courseName}`,
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+
+          await set(userRef, {
+            purchased: true,
+            courseName: courseName,
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          title: 'Khalad!',
+          text: `Waxaa dhacay khalad: ${error.message}`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }
+    });
+  });
+
+  // About Modal
+  const aboutBtn = document.getElementById('about-btn');
+  if (aboutBtn) {
+    aboutBtn.addEventListener('click', () => {
+      Swal.fire({
+        title: 'About Us',
+        text: 'Thanks for using this website!',
+        icon: 'info',
+        confirmButtonText: 'Close'
       });
-  } else {
-    console.error("No user found for logout.");
+    });
+  }
+
+  // Logout function
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      localStorage.removeItem("pinned");
+      const user = auth.currentUser;
+      if (user) {
+        await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
+        const outRef = ref(database, `users/${user.uid}/active`);
+        const dataRef = ref(database, `users/${user.uid}/pinned`);
+        const snapshot = await get(outRef);
+        
+        if (snapshot.exists()) {
+          await set(dataRef, {
+            pinned: true
+          });
+
+          signOut(auth)
+            .then(() => {
+              alert("Signed out successfully");
+              window.location.href = "login.html";
+            })
+            .catch((error) => {
+              console.error("Error signing out: ", error.message);
+            });
+        } else {
+          signOut(auth)
+            .then(() => {
+              alert("Waad baxday adigoo aan pin kugu xidhnayn.");
+              window.location.href = "login.html"; // Optional: Redirect to login page
+            })
+            .catch((error) => {
+              console.error("Error signing out: ", error.message);
+            });
+        }
+      }
+    });
   }
 });
-if (!localStorage.getItem("pinned")) { 
-        window.location.href = "Pincode.html";
-}
