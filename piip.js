@@ -13,7 +13,7 @@ const firebaseConfig = {
 // Initialize Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -21,12 +21,22 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 // Check if the user is logged in
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // User is logged in
         const userID = user.uid;
-        const userRef = ref(database, 'users/' + userID);
+        const userRef = ref(database, `users/${userID}`);
+        const pinRef = ref(database, `users/${userID}/active`);
+        const checkbox = document.getElementById("myCheckbox");
 
+        // Handle checkbox state based on existing pin
+        try {
+            const snapshot = await get(pinRef); // Await for pin data
+            checkbox.checked = snapshot.exists();
+        } catch (error) {
+            console.error("Error fetching pin data: ", error);
+        }
+
+        // Fetch user data (Username, Email, Phone Number)
         onValue(userRef, (snapshot) => {
             const userData = snapshot.val();
             if (userData) {
@@ -43,6 +53,27 @@ onAuthStateChanged(auth, (user) => {
                 document.getElementById('userEmail').textContent = "";
             }
         });
+
+        // Handle checkbox change
+        async function checkboxChanged() {
+            const userRef = ref(database, `users/${userID}/active`);
+            if (checkbox.checked) {
+                await set(userRef, {
+                    active:true,
+                });
+                
+                
+            } else {
+                Swal.fire("Successfully!", "Pin removed successfully", "success");
+                await set(userRef, {
+                    active: null // Set the pin to null in the database
+                });
+            }
+        }
+
+        // Attach event listener to checkbox
+        document.getElementById("myCheckbox").addEventListener("change", checkboxChanged);
+
     } else {
         alert("You must be logged in to view this page.");
         window.location.href = "login.html";
