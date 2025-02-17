@@ -37,3 +37,9 @@ p {
 #backButton:hover, #edit:hover {
     background-color: #0056b3;
 }
+#myCheckbox {
+    border-radius: 500px;
+    cursor: pointer;
+    width: 5%;
+    height: 20px;
+}   
