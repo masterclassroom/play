@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           signOut(auth)
             .then(() => {
-              alert("Waad baxday adigoo aan pin kugu xidhnayn.");
+              alert("Signed out successfully.");
               window.location.href = "login.html"; // Optional: Redirect to login page
             })
             .catch((error) => {
