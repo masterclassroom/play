@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lacag Bixin</title>
+    <title>Payment</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module">
         // Import Firebase
@@ -28,128 +28,129 @@
         const auth = getAuth(app);
         const database = getDatabase(app);
 
-        // Get course name from URL
+        // Get course name and price from URL
         const urlParams = new URLSearchParams(window.location.search);
         const courseName = urlParams.get('course:details') || "Unknown Course";
-        let price = parseFloat(document.getElementById("pricer").innerText) || priceStr;
+        let originalPrice = parseFloat(urlParams.get('price:details')) || 0;
+        let currency = "USD";
+        let priceStr = `${originalPrice.toFixed(0)} ${currency}`;
 
-        // Handle form submission
         document.addEventListener("DOMContentLoaded", () => {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    document.getElementById('payment-form').addEventListener('submit', async function(event) {
-                        event.preventDefault();
+            const priceElement = document.getElementById("pricer");
+            const currencyTypeElement = document.getElementById("currency-type");
 
-                        const username = document.getElementById('username').value;
-                        const email = document.getElementById('email').value;
-                        const phone = document.getElementById('phone').value;
-                        const paymentNumber = document.getElementById('payment-number').value;
-                        const paymentMethod = document.getElementById('payment-method').value;
+            priceElement.innerText = priceStr;
 
-                        if (phone.length < 10) {
-                            Swal.fire('', 'Fadlan gali number dhamaystiran', '');
-                            return;
-                        }
+            // Marka nooca lacagta la doorto
+            currencyTypeElement.addEventListener("change", function () {
+                let price = originalPrice;
+                if (this.value === "shilling") {
+                    price = price * 10000; 
+                    currency = "Shilling";
+                } else {
+                    currency = "USD";
+                }
+                priceStr = `${price.toFixed(0)} ${currency}`;
+                priceElement.innerText = priceStr;
+            });
 
-                        const { isConfirmed } = await Swal.fire({
-                            title: 'Ma Hubtaa?',
-                            text: `Ma Hubta inaad iib sato koorsada ${courseName}?`,
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonText: 'Haa',
-                            cancelButtonText: 'Maya'
+            // Dir lacagta
+            document.getElementById('payment-button').addEventListener('click', function () {
+                const method = document.getElementById("payment-method").value;
+                const currencyType = document.getElementById("currency-type").value;
+
+                if (method === "none" || currencyType === "waxba") {
+                    Swal.fire('', 'Fadlan dooro habka lacag bixinta iyo nooca lacagta', '');
+                    return;
+                }
+
+                let price = originalPrice;
+                if (currencyType === "shilling") {
+                    price *= 10000;
+                }
+                let priceAmount = price.toFixed(0);
+
+                let ussdCode = "";
+                if (method === "Zaad") {
+                    ussdCode = currencyType === "usd" ? `*880*634041087*${priceAmount}#` : `*220*634041087*${priceAmount}#`;
+                } else if (method === "Evc") {
+                    ussdCode = currencyType === "usd" ? `*150*634041087*${priceAmount}#` : `*150*634041087*${priceAmount}#`;
+                } else if (method === "Somtel") {
+                    ussdCode = currencyType === "usd" ? `*200*634041087*${priceAmount}#` : `*200*634041087*${priceAmount}#`;
+                } else if (method === "Soltelco") {
+                    ussdCode = currencyType === "usd" ? `*660*634041087*${priceAmount}*0#` : `*770*634041087*${priceAmount}#`;
+                }
+
+                if (ussdCode) {
+                    window.location.href = `tel:${ussdCode}`;
+                }
+            });
+
+            // Handle "Codso" button
+            document.getElementById('request-button').addEventListener('click', async function () {
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const paymentNumber = document.getElementById('payment-number').value;
+                const paymentMethod = document.getElementById('payment-method').value;
+
+                if (phone.length < 10) {
+                    Swal.fire('', 'Fadlan gali number dhamaystiran', '');
+                    return;
+                }
+
+                const { isConfirmed } = await Swal.fire({
+                    title: 'Payment confirmation?',
+                    text: `Ma Hubta inaad iib sato koorsada ${courseName}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Haa',
+                    cancelButtonText: 'Maya'
+                });
+
+                if (isConfirmed) {
+                    const paymentRef = ref(database, `users/${auth.currentUser.uid}/payments/${courseName}`);
+                    const purchaseRef = ref(database, `users/${auth.currentUser.uid}/purchases/${courseName}`);
+
+                    try {
+                        await set(paymentRef, {
+                            userId: auth.currentUser.uid,
+                            courseName: courseName,
+                            username: username,
+                            email: email,
+                            phone: phone,
+                            paymentNumber: paymentNumber,
+                            paymentMethod: paymentMethod,
+                            timestamp: new Date().toISOString()
                         });
 
-                        if (isConfirmed) {
-                            const paymentRef = ref(database, `users/${user.uid}/payments/${courseName}`);
-                            const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+                        await set(purchaseRef, {
+                            userId: auth.currentUser.uid,
+                            courseName: courseName,
+                            purchased: false
+                        });
 
-                            try {
-                                await set(paymentRef, {
-                                    userId: user.uid,
-                                    courseName: courseName,
-                                    username: username,
-                                    email: email,
-                                    phone: phone,
-                                    paymentNumber: paymentNumber,
-                                    paymentMethod: paymentMethod,
-                                    timestamp: new Date().toISOString()
-                                });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Successfully!',
+                            text: 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.',
+                            confirmButtonText: 'Ok'
+                        }).then(() => {
+                            window.history.back();
+                        });
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Khalad!',
+                            text: `Waxaa dhacay khalad: ${error.message}`,
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                }
+            });
 
-                                await set(purchaseRef, {
-                                    userId: user.uid,
-                                    courseName: courseName,
-                                    purchased: false
-                                });
-
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Successfully!',
-                                    text: 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.',
-                                    confirmButtonText: 'Ok'
-                                }).then(() => {
-                                    window.history.back();
-                                });
-                            } catch (error) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Khalad!',
-                                    text: `Waxaa dhacay khalad: ${error.message}`,
-                                    confirmButtonText: 'Ok'
-                                });
-                            }
-                        }
-                    });                
-
-                    // Function to handle the payment method redirection
-                    // Function to handle the payment method redirection
-function dir(event) {
-    event.preventDefault(); // Prevent form submission
-    const dirid = document.getElementById("payment-method").value;
-    const currencyType = document.getElementById("currency-type").value; // Qiimaha lacagta
-    let price = parseFloat(document.getElementById("pricer").innerText) || priceStr;
-    let priceStr = price.toFixed(0); // Qiimaha saxda ah (2 meelood oo jaha)
-
-    // Haddii currencyType uu yahay Shilling, qiimaha la badalo
-    if (currencyType === "shilling") {
-        price = price * 10000;  // 1 USD = 220 Shilling (isticmaal qiimaha saxda ah)
-        priceStr = price.toFixed(0); // Update price with shilling
-    }
-
-    // Haddii habka lacagta Zaad, Evc, Soltelco, ama Somtel
-    if (dirid === "Zaad") {
-        if (currencyType === "usd") {
-            window.location.href = `tel:*880*634041087*${priceStr}#`; // Telesom USD
-        } else if (currencyType === "shilling") {
-            window.location.href = `tel:*220*634041087*${priceStr}#`; // Telesom Shilling
-        }
-    } else if (dirid === "Evc") {
-        if (currencyType === "usd") {
-            window.location.href = `tel:*150*634041087*${priceStr}#`; // EVC USD
-        } else if (currencyType === "shilling") {
-            window.location.href = `tel:*150*634041087*${priceStr}#`; // EVC Shilling
-        }
-    } else if (dirid === "Somtel") {
-        if (currencyType === "usd") {
-            window.location.href = `tel:*200*634041087*${priceStr}#`; // Somtel USD
-        } else if (currencyType === "shilling") {
-            window.location.href = `tel:*200*634041087*${priceStr}#`; // Somtel Shilling
-        }
-    } else if (dirid === "Soltelco") {
-        if (currencyType === "shilling") {
-            window.location.href = `tel:*770*634041087*${priceStr}#`; // Soltelco USD
-        } 
-          else if(currencyType === "usd") {
-             window.location.href = `tel:*660*634041087*${priceStr}*0#`;
-          }
-    } else {
-        Swal.fire('', 'Fadlan dooro Habka lacagta', '');
-    }
-}
-                    
-                    // Bind the payment method redirection to button click
-                    document.getElementById('payment-button').addEventListener('click', dir);
-                } else {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
                     window.location.href = "login.html";
                 }
             });
@@ -161,12 +162,6 @@ function dir(event) {
             background-color: #f4f4f4;
             text-align: center;
             padding: 20px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
         }
 
         .container {
@@ -176,12 +171,6 @@ function dir(event) {
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin: auto;
-            animation: slideIn 1s ease-out;
-        }
-
-        @keyframes slideIn {
-            0% { transform: translateY(-50px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
         }
 
         input, select, button {
@@ -218,14 +207,14 @@ function dir(event) {
 <div class="container">
     <h2>Lacag Bixinta</h2>
     <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
-    <p><strong>Qiimaha:$</strong> <span id="pricer"></span></p>
+    <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
 
     <form id="payment-form">
-        <input type="text" id="username" placeholder="Gali magacaaga" required>  
+        <input type="text" id="username" placeholder="Gali magacaaga" required>
         <input type="email" id="email" placeholder="Gali emailkaaga" required>
         <input type="number" id="phone" placeholder="Gali numberkaaga" required>
         <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
-        
+
         <label>Habka Lacagta</label>
         <select id="payment-method" required>
             <option value="none" disabled selected>Dooro</option>
@@ -234,24 +223,23 @@ function dir(event) {
             <option value="Evc">Evc</option>
             <option value="Somtel">Somtel</option>
         </select>
-        <label>Nooca Lacagta</label>
-<select id="currency-type" required>
-    <option value="waxba" disabled selected>None</option>
-    <option value="usd">USD</option>
-    <option value="shilling">Shilling</option>
-</select>
 
-        <button type="button" id="payment-button">Dir lacagta</button>
-        <button type="submit">Codso</button>
+        <label>Nooca Lacagta</label>
+        <select id="currency-type" required>
+            <option value="waxba" disabled selected>None</option>
+            <option value="usd">USD</option>
+            <option value="shilling">Shilling</option>
+        </select>
+
+        <button type="button" id="payment-button">Dir Lacagta</button>
+        <button type="button" id="request-button">Codso</button>
     </form>
 
     <button onclick="window.history.back()">Back</button>
 </div>
 
 <script>
-    document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course:details') || "Unknown Course";
-    document.getElementById('pricer').innerText = new URLSearchParams(window.location.search).get('price:details') || "Unknown Price";
+        document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course:details') || "Unknown Course";
 </script>
-
 </body>
-    </html>
+                </html>
