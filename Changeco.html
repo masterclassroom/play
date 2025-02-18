@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Pin</title>
+  <link rel="stylesheet" href="piniyoober.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Change your Pincode</h2>
+    <button id="showPasswordChange">Change Pincode</button>
+    <button onclick="window.history.back()">Back</button>
+    
+    <div id="passwordChangeSection" style="display: none;">
+      <input type="password" id="oldPassword" placeholder="Enter your password" />
+      <input type="number" id="newPassword" placeholder="Enter new Pincode" />
+      <button id="updatePasswordButton">Update Pincode</button>
+    </div>
+  </div>
+  <script type="module" src="piniyoober.js"></script>
+</body>
+</html>
