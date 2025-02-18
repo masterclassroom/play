@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         } else {
           const { isConfirmed } = await Swal.fire({
-            title: 'Ma doonaysaa?',
+            title: 'Confirmation?',
             text: `Ma rabtaa koorsada ${courseName}?`,
             icon: 'question',
             showCancelButton: true,
