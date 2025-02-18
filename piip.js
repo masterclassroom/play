@@ -58,13 +58,14 @@ onAuthStateChanged(auth, async (user) => {
         async function checkboxChanged() {
             const userRef = ref(database, `users/${userID}/active`);
             if (checkbox.checked) {
+                Swal.fire('Successfully!', 'Pin enabled Successfully', 'success');
                 await set(userRef, {
                     active:true,
                 });
                 
                 
             } else {
-                Swal.fire("Successfully!", "Pin removed successfully", "success");
+                Swal.fire("Successfully!", "Pin disabled successfully", "success");
                 await set(userRef, {
                     active: null // Set the pin to null in the database
                 });
