@@ -59,7 +59,7 @@
                 const method = document.getElementById("payment-method").value;
                 const currencyType = document.getElementById("currency-type").value;
 
-                if (method === "none" || currencyType === "waxba") {
+                if (method === "none" || currencyType === "none") {
                     Swal.fire('', 'Fadlan dooro habka lacag bixinta iyo nooca lacagta', '');
                     return;
                 }
@@ -93,11 +93,22 @@
                 const phone = document.getElementById('phone').value;
                 const paymentNumber = document.getElementById('payment-number').value;
                 const paymentMethod = document.getElementById('payment-method').value;
+                const currencyType = document.getElementById('currency-type').value;
+
+                 if(!username || !email || !phone) {
+                     Swal.fire('Warning', 'Fadlan buuxi dhamaan foomka', 'warning');
+                     return;
+                 }
 
                 if (phone.length < 10) {
                     Swal.fire('', 'Fadlan gali number dhamaystiran', '');
                     return;
                 }
+                 if(paymentMethod === "none" || currencyType === "none") {
+                     Swal.fire('Warning', 'Fadlan dooro habka lacagta iyo nooca lacagta', 'warning');
+                     return;
+                 }
+                     
 
                 const { isConfirmed } = await Swal.fire({
                     title: 'Payment confirmation?',
@@ -121,6 +132,7 @@
                             phone: phone,
                             paymentNumber: paymentNumber,
                             paymentMethod: paymentMethod,
+                            currencyType: currencyType,
                             timestamp: new Date().toISOString()
                         });
 
@@ -226,7 +238,7 @@
 
         <label>Nooca Lacagta</label>
         <select id="currency-type" required>
-            <option value="waxba" disabled selected>None</option>
+            <option value="none" disabled selected>None</option>
             <option value="usd">USD</option>
             <option value="shilling">Shilling</option>
         </select>
