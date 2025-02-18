@@ -59,7 +59,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
     if (!user.emailVerified) {
       errorMessage.style.display = 'block';
-      errorMessage.innerText = 'Please verify your email before logging in.';
+      errorMessage.innerText = 'Please verify your email.';
       await sendEmailVerification(user);
       return;
     }
