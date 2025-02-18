@@ -60,8 +60,8 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     if (!user.emailVerified) {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Please verify your email.';
-      await sendEmailVerification(user);
       return;
+      await sendEmailVerification(user);
     }
 
     const dbRef = ref(database, `users/${user.uid}`);
