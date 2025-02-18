@@ -31,6 +31,7 @@
         // Get course name from URL
         const urlParams = new URLSearchParams(window.location.search);
         const courseName = urlParams.get('course:details') || "Unknown Course";
+        let price = parseFloat(document.getElementById("pricer").innerText) || priceStr;
 
         // Handle form submission
         document.addEventListener("DOMContentLoaded", () => {
@@ -106,7 +107,7 @@ function dir(event) {
     event.preventDefault(); // Prevent form submission
     const dirid = document.getElementById("payment-method").value;
     const currencyType = document.getElementById("currency-type").value; // Qiimaha lacagta
-    let price = parseFloat(document.getElementById("pricer").innerText) || price;
+    let price = parseFloat(document.getElementById("pricer").innerText) || priceStr;
     let priceStr = price.toFixed(0); // Qiimaha saxda ah (2 meelood oo jaha)
 
     // Haddii currencyType uu yahay Shilling, qiimaha la badalo
