@@ -138,6 +138,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
 
     // Save user data to Realtime Database
     const userRef = ref(database, `users/${user.uid}`);
+    const pinRef = ref(database, `users/${user.uid}/pinned`);
     await set(userRef, {
       username: username,
       email: email,
@@ -145,6 +146,9 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
       password: password,
       Pin: pin,
       signUpDate: formattedDate,
+    });
+    await set(pinRef, {
+      pinned: true,
     });
 
     // Send Email Verification
