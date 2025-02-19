@@ -118,8 +118,8 @@
             <textarea id="message" placeholder="Qor cabashadaada..."></textarea>
         </div>
 
-        <button id="submitForm">Dir Macluumaadka</button>
-        <button onclick="kala()">Back</button>
+        <button type="button" id="submitForm">Dir Macluumaadka</button>
+        <button id="kala">Back</button>
 
         <div id="result" class="result"></div>
     </div>
@@ -175,13 +175,13 @@
 
             resultBox.style.display = "block";
         });
-          function kala() {
+          ddocument.getElementById("kala").addEventListener("click", async function() {
     if (window.history.length > 1) {
         window.history.back();
     } else {
         window.location.href = "Academy.html"; // Ama bog kale oo aad rabto.
     }
-     }
+     })
         
     </script>
 
