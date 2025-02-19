@@ -176,8 +176,12 @@
             resultBox.style.display = "block";
         });
           function kala() {
-              window.history.back();
-          }
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "Academy.html"; // Ama bog kale oo aad rabto.
+    }
+     }
         
     </script>
 
