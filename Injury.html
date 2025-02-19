@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>injury</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            display: none;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Cabashada</h2>
+        
+        <div class="input-group">
+            <label for="username">Magaca Isticmaalaha</label>
+            <input type="text" id="username" placeholder="Geli magaca isticmaalaha">
+        </div>
+
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Geli email-kaaga">
+        </div>
+
+        <div class="input-group">
+            <label for="number">Lambarka Taleefanka</label>
+            <input type="number" id="number" placeholder="Geli lambarka taleefanka">
+        </div>
+
+        <div class="input-group">
+            <label for="county">Dooro Waddankaaga</label>
+            <select id="county">
+                <option value="">-- Doorasho --</option>
+                <option value="Somaliland">Somaliland 🇮🇷</option>
+                <option value="Somalia">Somalia 🇸🇴</option>
+                <option value="Ethiopia">Ethiopia 🇪🇹</option>
+                <option value="Kenya">Kenya 🇰🇪</option>
+                <option value="Djibouti">Djibouti 🇩🇯</option>
+                <option value="Uganda">Uganda 🇺🇬</option>
+                <option value="Tanzania">Tanzania 🇹🇿</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="message">Maxaad ka cabanaysaa?</label>
+            <textarea id="message" placeholder="Qor cabashadaada..."></textarea>
+        </div>
+
+        <button id="submitForm">Dir Macluumaadka</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script type="module">
+        // Firebase config
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtX3c6kXAH-scdEYUrRXsGUGiBngvBPbI",
+            authDomain: "verifye-85218.firebaseapp.com",
+            projectId: "verifye-85218",
+            storageBucket: "verifye-85218.appspot.com",
+            messagingSenderId: "950728130040",
+            appId: "1:950728130040:web:54527d3978151c28dfea0d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        document.getElementById("submitForm").addEventListener("click", async function() {
+            let username = document.getElementById("username").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let number = document.getElementById("number").value.trim();
+            let county = document.getElementById("county").value;
+            let message = document.getElementById("message").value.trim();
+            let resultBox = document.getElementById("result");
+
+            if (username && email && number && county && message) {
+                const userRef = ref(database, `users/${email.replace('.', '_')}`); // Badal '.' si looga fogaado dhibaato database-ka
+
+                try {
+                    await set(userRef, {
+                        username: username,
+                        email: email,
+                        number: number,
+                        county: county,
+                        message: message
+                    });
+
+                    resultBox.textContent = "Macluumaadka waa la diray si guul ah!";
+                    resultBox.className = "result success";
+                } catch (error) {
+                    resultBox.textContent = "Waxaa dhacay qalad: " + error.message;
+                    resultBox.className = "result error";
+                }
+            } else {
+                resultBox.textContent = "Fadlan dhammaan xogta geli! Weli way dhiman tahay!";
+                resultBox.className = "result error";
+            }
+
+            resultBox.style.display = "block";
+        });
+    </script>
+
+</body>
+  </html>
