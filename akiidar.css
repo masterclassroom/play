@@ -148,7 +148,7 @@ footer {
 .swal2-confirm:hover {
   background-color: #4c9a5f;
 }
-.btn-free {
+.btn-unlock {
   background-color: #61c97d;
   color: white;
   padding: 10px 20px;
@@ -160,6 +160,6 @@ footer {
   transition: background-color 0.3s ease;
 }
 
-.btn-free:hover {
+.btn-unlock:hover {
   background-color: grey;
   }
