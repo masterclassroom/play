@@ -89,7 +89,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       // Set the user as logged in
       await set(ref(database, `users/${user.uid}/isLoggedIn`), true);
       // Update the user's password in the database
-      await set(dbRef, {
+      await update(dbRef, {
         password: password // Update the password here
       });
 
