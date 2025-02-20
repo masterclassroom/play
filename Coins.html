@@ -101,7 +101,7 @@
     // Import Firebase Modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     // Firebase Config
     const firebaseConfig = {
@@ -148,7 +148,7 @@
       if (snapshot.exists()) {
         userCoins = snapshot.val();
       } else {
-        userCoins = 0;
+        userCoins = 5;
         await set(coinsRef, userCoins);
       }
 
