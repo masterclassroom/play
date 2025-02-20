@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="so">
 <head>
     <meta charset="UTF-8">
@@ -175,15 +175,16 @@
 
             resultBox.style.display = "block";
         });
-          ddocument.getElementById("kala").addEventListener("click", async function() {
-    if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        window.location.href = "Academy.html"; // Ama bog kale oo aad rabto.
-    }
-     })
+
+        document.getElementById("kala").addEventListener("click", function() {
+            if (window.history.length > 1) {
+                window.history.go(-1);
+            } else {
+                window.location.href = "Academy.html";
+            }
+        });
         
     </script>
 
 </body>
-  </html>
+</html>
