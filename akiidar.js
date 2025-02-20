@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (isConfirmed) {
-              window.location.href = `payment.html?course=${encodeURIComponent(courseName)}&price=${encodeURIComponent(price)}`;
+              window.location.href = `payment.html?course:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(courseName)}&price:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(price)}`;
             }
           }
         } catch (error) {
