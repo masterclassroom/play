@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// DOMContentLoaded to ensure elements exist before adding event listeners
+// DOMContentLoaded event
 document.addEventListener("DOMContentLoaded", () => {
   // Check if user is logged in
   onAuthStateChanged(auth, async (user) => {
@@ -29,53 +29,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("User logged in:", user.email);
-    const userRef = ref(database, `users/${user.uid}/pinned`);
 
+    // Hubinta PIN
+    const pinRef = ref(database, `users/${user.uid}/pinned`);
     try {
-      const snapshot = await get(userRef);
+      const snapshot = await get(pinRef);
       if (snapshot.exists()) {
         window.location.href = 'Pincode.html';
+        return;
       }
     } catch (error) {
-      console.error("Error fetching pin:", error.message);
+      console.error("Error checking PIN:", error.message);
     }
 
-    // Handle purchase buttons inside onAuthStateChanged
-    document.querySelectorAll('.btn-buy').forEach(async (button) => {
+    // Hubi coins-ka user-ka
+    const userCoinsRef = ref(database, `users/${user.uid}/coins`);
+    try {
+      const coinsSnapshot = await get(userCoinsRef);
+      let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
+
+      if (typeof userCoins === 'object') {
+        userCoins = Object.values(userCoins)[0];
+      }
+
+      document.getElementById("user-coins").innerText = userCoins;
+    } catch (error) {
+      console.error("Error fetching coins:", error.message);
+    }
+
+    // Hubi koorsooyinka la iibsaday
+    document.querySelectorAll('.btn-buy, .btn-unlock').forEach(async (button) => {
       const courseName = button.getAttribute('data-course');
       const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
       try {
         const purchaseSnapshot = await get(purchaseRef);
-        if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased === true) {
+        if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased) {
           button.disabled = true;
-          button.innerText = 'Already purchased';
+          button.innerText = 'Already Purchased';
         }
       } catch (error) {
-        console.error(`Error checking purchase status for ${courseName}:`, error.message);
-      }
-    });
-     
-    document.querySelectorAll('.btn-free').forEach(async (button) => {
-      const courseName = button.getAttribute('data-course');
-      const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
-
-      try {
-        const purchaseSnapshot = await get(purchaseRef);
-        if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased === true) {
-          button.disabled = true;
-          button.innerText = 'Already opened';
-        }
-      } catch (error) {
-        console.error(`Error checking purchase status for ${courseName}:`, error.message);
+        console.error(`Error checking purchase for ${courseName}:`, error.message);
       }
     });
 
-    // Handle course purchase
+    // Iibso koorso
     document.querySelectorAll('.btn-buy').forEach((button) => {
       button.addEventListener('click', async (event) => {
         const courseName = event.target.getAttribute('data-course');
-        const price = event.target.getAttribute('price');
+        const price = parseInt(event.target.getAttribute('price'));
         const userRef = ref(database, `users/${user.uid}/payments/${courseName}`);
 
         try {
@@ -83,15 +85,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (snapshot.exists()) {
             Swal.fire({
-              title: '',
-              text: `Mar hore ayaad codsatay koorsada: ${courseName} Fadlan sug inta la xaqiijinayo`,
+              text: `Mar hore ayaad codsatay koorsada: ${courseName}, fadlan sug.`,
               icon: 'info',
               confirmButtonText: 'Ok'
             });
           } else {
             const { isConfirmed } = await Swal.fire({
-              title: 'Confirmation?',
-              text: `Ma rabtaa koorsada ${courseName}?`,
+              title: 'Confirmation',
+              text: `Ma rabtaa inaad iibsatid koorsada ${courseName} oo ah $${price}?`,
               icon: 'question',
               showCancelButton: true,
               confirmButtonText: 'Haa',
@@ -99,12 +100,12 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (isConfirmed) {
-              window.location.href = `payment.html?course:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(courseName)}&price:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(price)}`;
+              window.location.href = `payment.html?course=${encodeURIComponent(courseName)}&price=${encodeURIComponent(price)}`;
             }
           }
         } catch (error) {
           Swal.fire({
-            title: 'Khalad!',
+            title: 'Error!',
             text: `Waxaa dhacay khalad: ${error.message}`,
             icon: 'error',
             confirmButtonText: 'Ok'
@@ -113,39 +114,59 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Handle free courses
-    document.querySelectorAll('.btn-free').forEach((button) => {
+    // Unlock course with coins
+    document.querySelectorAll('.btn-unlock').forEach((button) => {
       button.addEventListener('click', async (event) => {
         const courseName = event.target.getAttribute('data-course');
-        const userRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+        const coursePrice = parseInt(document.querySelector(`#${event.target.closest('.course-card').id} .price`).innerText);
+        const userCoinsRef = ref(database, `users/${user.uid}/coins`);
+        const usrCoinsRef = ref(database, `users/${user.uid}`);
+        const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
         try {
-          const snapshot = await get(userRef);
+          const coinsSnapshot = await get(userCoinsRef);
+          let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
 
-          if (snapshot.exists()) {
-            Swal.fire({
-              title: '',
-              text: `Mar hore ayaad furatay koorsada: ${courseName}.`,
-              icon: 'info',
-              confirmButtonText: 'Ok'
+          if (typeof userCoins === 'object') {
+            userCoins = Object.values(userCoins)[0];
+          }
+
+          if (userCoins >= coursePrice) {
+            const { isConfirmed } = await Swal.fire({
+              title: 'Confirmation',
+              text: `Ma hubtaa inaad iibsatid ${courseName} adigoo isticmaalaya ${coursePrice} coins?`,
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: 'Haa',
+              cancelButtonText: 'Maya'
             });
+
+            if (isConfirmed) {
+              await set(usrCoinsRef, { coins: userCoins - coursePrice });
+              await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
+
+              document.getElementById("user-coins").innerText = userCoins - coursePrice;
+              button.disabled = true;
+              button.innerText = "Already Unlocked";
+
+              Swal.fire({
+                title: 'Success!',
+                text: `${courseName} waa la furay!`,
+                icon: 'success',
+                confirmButtonText: 'Ok'
+              });
+            }
           } else {
             Swal.fire({
-              title: 'Successfully!',
-              text: `Waad furatay koorsada ${courseName}`,
-              icon: 'success',
+              title: 'Insufficient Coins',
+              text: `Waxaad u baahan tahay ${coursePrice} coins, adiguna waxaad haysataa ${userCoins} coins.`,
+              icon: 'error',
               confirmButtonText: 'Ok'
-            });
-
-            await set(userRef, {
-              purchased: true,
-              courseName: courseName,
-              timestamp: new Date().toISOString()
             });
           }
         } catch (error) {
           Swal.fire({
-            title: 'Khalad!',
+            title: 'Error!',
             text: `Waxaa dhacay khalad: ${error.message}`,
             icon: 'error',
             confirmButtonText: 'Ok'
@@ -155,20 +176,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // About Modal
-    const aboutBtn = document.getElementById('about-btn');
-    if (aboutBtn) {
-      aboutBtn.addEventListener('click', () => {
-        Swal.fire({
-          title: 'About Us',
-          text: 'Thanks for using this website!',
-          icon: 'info',
-          confirmButtonText: 'Close'
-        });
+    document.getElementById('about-btn')?.addEventListener('click', () => {
+      Swal.fire({
+        title: 'About Us',
+        text: 'Thanks for using this website!',
+        icon: 'info',
+        confirmButtonText: 'Close'
       });
-    }
+    });
 
     // Logout function
-    const logoutBtn = document.getElementById('logout-btn');
+        const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
         localStorage.removeItem("pinned");
