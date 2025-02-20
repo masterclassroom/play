@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>Claim Coins</title>
+  <style>
+    /* General Styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      color: white;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 350px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    #coinCount {
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    #claimButton {
+      background-color: #ffd700;
+      color: #000;
+      font-weight: bold;
+    }
+
+    #claimButton:hover {
+      background-color: #ffc107;
+    }
+
+    #claimButton:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+
+    .home-btn {
+      background-color: #ff4b5c;
+      color: white;
+    }
+
+    .home-btn:hover {
+      background-color: #e63946;
+    }
+
+    #timerDisplay {
+      margin-top: 10px;
+      font-size: 14px;
+      font-style: italic;
+      color: #ffcc00;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎉 Claim Your Daily Coins 🎉</h2>
+    <div id="coinCount">Coins: 0</div>
+    <button id="claimButton">Claim 10 Coins</button>
+    <p id="timerDisplay"></p>
+    <button class="home-btn" onclick="laabo()">🏠 Home</button>
+  </div>
+
+  <script type="module">
+    // Import Firebase Modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // DOM Elements
+    const coinCountDiv = document.getElementById("coinCount");
+    const claimButton = document.getElementById("claimButton");
+    const timerDisplay = document.getElementById("timerDisplay");
+
+    // Global Variables
+    let userId = null;
+    let userCoins = 0;
+    let claimCooldown = 86400; // 24 hours
+
+    // Auth State Listener
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        userId = user.uid;
+        await loadCoins();
+        await checkCooldown();
+      } else {
+        window.location.href = "login.html"; // Redirect if not authenticated
+      }
+    });
+
+    // Load Coins from Firebase
+    async function loadCoins() {
+      const coinsRef = ref(database, `users/${userId}/coins`);
+      const snapshot = await get(coinsRef);
+
+      if (snapshot.exists()) {
+        userCoins = snapshot.val();
+      } else {
+        userCoins = 0;
+        await set(coinsRef, userCoins);
+      }
+
+      updateCoinDisplay();
+    }
+
+    // Update Coin Display
+    function updateCoinDisplay() {
+      coinCountDiv.textContent = `Coins: ${userCoins}`;
+    }
+
+    // Claim Coins
+    claimButton.addEventListener("click", async () => {
+      userCoins += 10;
+      const coinsRef = ref(database, `users/${userId}/coins`);
+      await set(coinsRef, userCoins);
+      updateCoinDisplay();
+      Swal.fire("🎉 Success!", "You claimed 10 coins!", "success");
+
+      // Save claim time
+      const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
+      const currentTime = Math.floor(Date.now() / 1000);
+      await set(claimTimeRef, currentTime);
+
+      // Start cooldown
+      startCooldown(claimCooldown);
+    });
+
+    // Check cooldown on page load
+    async function checkCooldown() {
+      const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
+      const snapshot = await get(claimTimeRef);
+
+      if (snapshot.exists()) {
+        const lastClaimTime = snapshot.val();
+        const currentTime = Math.floor(Date.now() / 1000);
+        const elapsedTime = currentTime - lastClaimTime;
+
+        if (elapsedTime < claimCooldown) {
+          startCooldown(claimCooldown - elapsedTime);
+        }
+      }
+    }
+
+    // Start cooldown timer
+    function startCooldown(seconds) {
+      claimButton.disabled = true;
+      let remainingTime = seconds;
+      updateTimerDisplay(remainingTime);
+
+      const interval = setInterval(() => {
+        remainingTime--;
+        updateTimerDisplay(remainingTime);
+
+        if (remainingTime <= 0) {
+          clearInterval(interval);
+          claimButton.disabled = false;
+          timerDisplay.textContent = "";
+        }
+      }, 1000);
+    }
+
+    // Update timer display
+    function updateTimerDisplay(seconds) {
+      let hours = Math.floor(seconds / 3600);
+      let minutes = Math.floor((seconds % 3600) / 60);
+      let secs = seconds % 60;
+      timerDisplay.textContent = `⏳ Please wait ${hours}h ${minutes}m ${secs}s`;
+    }
+
+    // Home Button Function
+   
+  </script>
+  <script>
+  function laabo() {
+    window.location.href = "Academy.html";
+  }
+</script>
+</body>
+  </html>
