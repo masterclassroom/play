@@ -29,7 +29,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("User logged in:", user.email);
+// Firebase ref to fetch country
+// Firebase ref to fetch country
+const userRef = ref(database, `users/${user.uid}/country`);
+const claimRef = ref(database, `users/${user.uid}/claim`);
+const veriRef = ref(database, `users/${user.uid}`);
 
+try {
+  const snapshot = await get(claimRef);
+  if (!snapshot.exists()) {
+    const countrySnapshot = await get(userRef);
+    const countryData = countrySnapshot.val();
+    if (countryData === "Somaliland") {
+      // Set coins and claim data for Somaliland users
+      await update(veriRef, {
+        coins: 50,  // Add 1000 coins for Somaliland users
+        claim: "claimed",  // Set claim status
+      });
+    }
+  }
+} catch (error) {
+  console.error("Error fetching country or setting claim:", error.message);
+}
     // Hubinta PIN
     const pinRef = ref(database, `users/${user.uid}/pinned`);
     try {
