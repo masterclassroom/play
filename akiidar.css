@@ -163,3 +163,7 @@ footer {
 .btn-unlock:hover {
   background-color: grey;
   }
+button:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
