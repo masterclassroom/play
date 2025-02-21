@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (snapshot.exists()) {
             Swal.fire({
-              text: `Mar hore ayaad codsatay koorsada: ${courseName}, fadlan sug.`,
+              text: `Mar hore ayaad codsatay koorsada: ${courseName}, fadlan sug inta la Xaqiijinayo`,
               icon: 'info',
               confirmButtonText: 'Ok'
             });
