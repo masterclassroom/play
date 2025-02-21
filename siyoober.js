@@ -139,7 +139,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
             country: country,
             number: number,
             password: password,
-            pin: pin,
+            Pin: pin,
             pinned: true,
             signUpDate: formattedDate,
         });
