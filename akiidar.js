@@ -48,10 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const coinsSnapshot = await get(userCoinsRef);
       let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
 
-      if (typeof userCoins === 'object') {
-        userCoins = Object.values(userCoins)[0];
-      }
-
       document.getElementById("user-coins").innerText = userCoins;
     } catch (error) {
       console.error("Error fetching coins:", error.message);
@@ -119,17 +115,13 @@ document.addEventListener("DOMContentLoaded", () => {
       button.addEventListener('click', async (event) => {
         const courseName = event.target.getAttribute('data-course');
         const coursePrice = parseInt(document.querySelector(`#${event.target.closest('.course-card').id} .price`).innerText);
-        const userCoinsRef = ref(database, `users/${user.uid}/coins`);
-        const usrCoinsRef = ref(database, `users/${user.uid}`);
+        const userCoinsRef = ref(database, `users/${user.uid}`);
+        const usrCoinsRef = ref(database, `users/${user.uid}/coins`);
         const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
         try {
-          const coinsSnapshot = await get(userCoinsRef);
+          const coinsSnapshot = await get(usrCoinsRef);
           let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
-
-          if (typeof userCoins === 'object') {
-            userCoins = Object.values(userCoins)[0];
-          }
 
           if (userCoins >= coursePrice) {
             const { isConfirmed } = await Swal.fire({
@@ -142,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (isConfirmed) {
-              await set(usrCoinsRef, { coins: userCoins - coursePrice });
+              await update(userCoinsRef, { coins: userCoins - coursePrice });
               await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
 
               document.getElementById("user-coins").innerText = userCoins - coursePrice;
@@ -186,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Logout function
-        const logoutBtn = document.getElementById('logout-btn');
+    const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
         localStorage.removeItem("pinned");
