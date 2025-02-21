@@ -9,7 +9,7 @@ body {
 
 /* Header */
 header {
-  background-color: #4CAF50;
+  background-color: #2d3b2f;
   color: white;
   padding: 20px;
   text-align: center;
@@ -67,7 +67,7 @@ nav ul li a:hover {
 footer {
   text-align: center;
   padding: 10px;
-  background-color: #4CAF50;
+  background-color: #2d3b2f;
   color: white;
   position: fixed;
   bottom: 0;
