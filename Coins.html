@@ -85,7 +85,6 @@
       font-style: italic;
       color: #ffcc00;
     }
-
   </style>
 </head>
 <body>
@@ -101,7 +100,7 @@
     // Import Firebase Modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get, set, update} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     // Firebase Config
     const firebaseConfig = {
@@ -128,6 +127,15 @@
     let userId = null;
     let userCoins = 0;
     let claimCooldown = 86400; // 24 hours
+
+    // Disable the claim button for 3 seconds after page load
+    document.addEventListener("DOMContentLoaded", () => {
+      claimButton.disabled = true;
+
+      setTimeout(() => {
+        claimButton.disabled = false; // Enable button after 3 seconds
+      }, 1500); // 3000 milliseconds = 3 seconds
+    });
 
     // Auth State Listener
     onAuthStateChanged(auth, async (user) => {
@@ -220,12 +228,12 @@
     }
 
     // Home Button Function
-   
+    
   </script>
   <script>
   function laabo() {
-    window.location.href = "Academy.html";
-  }
-</script>
+      window.location.href = "Academy.html";
+    }
+  </script>
 </body>
-  </html>
+</html>
