@@ -140,6 +140,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
             number: number,
             password: password,
             pin: pin,
+            pinned: true,
             signUpDate: formattedDate,
         });
 
