@@ -97,6 +97,7 @@
     <select id="coinOption">
       <option value="50">50 coins</option>
       <option value="100">100 coins</option>
+      <option value="1000">1000 coins</option>
     </select>
     
     <button id="claimButton">Thraw</button>
@@ -183,11 +184,11 @@
     // Claim Coins (Random based on selected option)
     claimButton.addEventListener("click", async () => {
       const selectedOption = coinOption.value;
-      const minCoins = selectedOption === "100" ? 50 : 25;
-      const maxCoins = selectedOption === "100" ? 200 : 100;
+      const minCoins = selectedOption === "100" ? 50 : 25 :500;
+      const maxCoins = selectedOption === "100" ? 200 : 100 :2000;
 
       // Only show confirmation if user has enough coins
-      if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "50" && userCoins >= 50)) {
+      if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "50" && userCoins >= 50) || (selectedOption === "1000" && userCoins >= 1000)) {
         // Show confirmation before proceeding
         const result = await Swal.fire({
           title: 'Payment Confirmation',
