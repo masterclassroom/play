@@ -171,7 +171,7 @@
 
     // Claim Coins
     claimButton.addEventListener("click", async () => {
-      userCoins += 10;
+      userCoins += 100;
       const coinsRef = ref(database, `users/${userId}/coins`);
       await set(coinsRef, userCoins);
       updateCoinDisplay();
