@@ -101,6 +101,7 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
+
 #alertBox {
   display: none;
   padding: 15px;
@@ -110,13 +111,69 @@ p a:hover {
   font-size: 14px;
   font-weight: bold;
 }
+
 #alertBox.error {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
+
 #alertBox.success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
+}
+
+/* Styling for captcha box */
+.captcha-box {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.captcha-box label {
+    display: block;
+    font-size: 16px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+#captchaCode {
+    font-size: 18px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #ff66cc, #00aaff);
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 1s ease-out;
+}
+
+#captchaInput {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    outline: none;
+    color: white;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+#captchaInput:focus {
+    border-bottom: 2px solid #00aaff;
+}
+
+/* Animation for captcha */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
