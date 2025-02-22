@@ -168,7 +168,7 @@
       if (snapshot.exists()) {
         userCoins = snapshot.val();
       } else {
-        userCoins = 5;
+        userCoins = 50;
         await set(coinsRef, userCoins);
       }
 
@@ -184,7 +184,7 @@
     claimButton.addEventListener("click", async () => {
       const selectedOption = coinOption.value;
       const minCoins = selectedOption === "100" ? 1 : 1;
-      const maxCoins = selectedOption === "100" ? 200 : 20;
+      const maxCoins = selectedOption === "100" ? 5000 : 500;
 
       // Only show confirmation if user has enough coins
       if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "10" && userCoins >= 10)) {
