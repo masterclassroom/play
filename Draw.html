@@ -95,8 +95,8 @@
     
     <!-- Select option to choose coins -->
     <select id="coinOption">
-      <option value="100">10 coins</option>
-      <option value="1000">100 coins</option>
+      <option value="50">50 coins</option>
+      <option value="100">100 coins</option>
     </select>
     
     <button id="claimButton">Thraw</button>
@@ -183,8 +183,8 @@
     // Claim Coins (Random based on selected option)
     claimButton.addEventListener("click", async () => {
       const selectedOption = coinOption.value;
-      const minCoins = selectedOption === "100" ? 1 : 1;
-      const maxCoins = selectedOption === "100" ? 5000 : 500;
+      const minCoins = selectedOption === "100" ? 50 : 25;
+      const maxCoins = selectedOption === "100" ? 200 : 100;
 
       // Only show confirmation if user has enough coins
       if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "10" && userCoins >= 10)) {
