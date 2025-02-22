@@ -41,11 +41,18 @@ try {
     const countrySnapshot = await get(userRef);
     const countryData = countrySnapshot.val();
     if (countryData === "Somaliland") {
-      Swal.fire('Welcome', 'You claimed a 100 coins for free', 'success',);
+      Swal.fire('Welcome', 'You claimed a 1000 coins for free', 'success',);
       // Set coins and claim data for Somaliland users
       await update(veriRef, {
-        coins: 100,  // Add 1000 coins for Somaliland users
+        coins: 1000,  // Add 1000 coins for Somaliland users
         claim: "claimed",  // Set claim status
+      });
+    }
+    else {
+      Swal.fire('Welcome', 'You claimed 100 coins for free', 'success');
+      await update(veriRef, {
+        coins: 100,
+        claim: "claimed",
       });
     }
   }
