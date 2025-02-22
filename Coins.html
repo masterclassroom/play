@@ -90,7 +90,7 @@
 <body>
   <div class="container">
     <h2>🎉 Claim Your Daily Coins 🎉</h2>
-    <div id="coinCount">Coins: 0</div>
+    <div id="coinCount">Coins:..</div>
     <button id="claimButton">Claim 100 Coins</button>
     <p id="timerDisplay"></p>
     <button class="home-btn" onclick="laabo()">🏠 Home</button>
@@ -131,11 +131,11 @@
 
     // Disable the claim button for 3 seconds after page load
     document.addEventListener("DOMContentLoaded", () => {
-      claimButton.disabled = true;
+      claimButton.style.display = "none";  // Hide the button initially
 
       setTimeout(() => {
-        claimButton.disabled = false; // Enable button after 3 seconds
-      }, 1500); // 3000 milliseconds = 3 seconds
+        claimButton.style.display = "block";  // Show the button after 3 seconds
+      }, 2300); // 3000 milliseconds = 3 seconds
     });
 
     // Auth State Listener
