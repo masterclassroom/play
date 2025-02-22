@@ -175,7 +175,7 @@
       const coinsRef = ref(database, `users/${userId}/coins`);
       await set(coinsRef, userCoins);
       updateCoinDisplay();
-      Swal.fire("🎉 Success!", "You claimed 10 coins!", "success");
+      Swal.fire("🎉 Success!", "You claimed 100 coins!", "success");
 
       // Save claim time
       const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
