@@ -79,20 +79,27 @@
       background-color: #e63946;
     }
 
-    #timerDisplay {
+    select {
+      width: 100%;
+      padding: 10px;
       margin-top: 10px;
-      font-size: 14px;
-      font-style: italic;
-      color: #ffcc00;
+      border-radius: 5px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🎉 Thraw Your Daily Coins 🎉</h2>
-    <div id="coinCount">Coins: 0</div>
-    <button id="claimButton">thraw</button>
-    <p id="timerDisplay"></p>
+    <h2>🎉 Thraw Your Coins 🎉</h2>
+    <div id="coinCount">Coins:..</div>
+    
+    <!-- Select option to choose coins -->
+    <select id="coinOption">
+      <option value="10">10 coins</option>
+      <option value="100">100 coins</option>
+    </select>
+    
+    <button id="claimButton">Thraw</button>
     <button class="home-btn" onclick="laabo()">Claim page</button>
   </div>
 
@@ -100,7 +107,7 @@
     // Import Firebase Modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     // Firebase Config
     const firebaseConfig = {
@@ -121,19 +128,18 @@
     // DOM Elements
     const coinCountDiv = document.getElementById("coinCount");
     const claimButton = document.getElementById("claimButton");
-    const timerDisplay = document.getElementById("timerDisplay");
+    const coinOption = document.getElementById("coinOption");
 
     // Global Variables
     let userId = null;
     let userCoins = 0;
-    let claimCooldown = 86400; // 24 hours
 
     // Disable the claim button for 1.5 seconds after page load
     document.addEventListener("DOMContentLoaded", () => {
       claimButton.disabled = true;
       setTimeout(() => {
         claimButton.disabled = false;
-      }, 1500);
+      }, 2000);
     });
 
     // Auth State Listener
@@ -141,7 +147,14 @@
       if (user) {
         userId = user.uid;
         await loadCoins();
-        await checkCooldown();
+        // Listen to live updates for coins
+        const coinsRef = ref(database, `users/${userId}/coins`);
+        onValue(coinsRef, (snapshot) => {
+          if (snapshot.exists()) {
+            userCoins = snapshot.val();
+            updateCoinDisplay(); // Update display live when coins change
+          }
+        });
       } else {
         window.location.href = "login.html"; // Redirect if not authenticated
       }
@@ -167,85 +180,61 @@
       coinCountDiv.textContent = `Coins: ${userCoins}`;
     }
 
-    // Claim Coins (Random between 1 and 100)
+    // Claim Coins (Random based on selected option)
     claimButton.addEventListener("click", async () => {
-      // Show loading effect
-      Swal.fire({
-        title: "Finding your reward...",
-        html: "Spinning 🎰...",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        timer: 2000,
-        didOpen: () => {
-          Swal.showLoading();
+      const selectedOption = coinOption.value;
+      const minCoins = selectedOption === "100" ? 1 : 1;
+      const maxCoins = selectedOption === "100" ? 200 : 20;
+
+      // Only show confirmation if user has enough coins
+      if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "10" && userCoins >= 10)) {
+        // Show confirmation before proceeding
+        const result = await Swal.fire({
+          title: 'Payment Confirmation',
+          text: `Ma hubtaa inaad tuurto ${selectedOption} coins? Waxaad heli doontaa ${minCoins} ilaa ${maxCoins} coins.`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Haa, tuuro',
+          cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+          // Deduct coins based on the selected option
+          userCoins -= selectedOption;
+          const coinsRef = ref(database, `users/${userId}/coins`);
+          await set(coinsRef, userCoins);
+          updateCoinDisplay();
+
+          // Show loading effect
+          Swal.fire({
+            title: "Finding your reward...",
+            html: "Spinning 🎰...",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            timer: 2000,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Wait 2 seconds for effect
+          await new Promise(resolve => setTimeout(resolve, 2000));
+
+          // Generate random coins based on the selected option
+          let randomCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
+
+          // Update coins
+          userCoins += randomCoins;
+          await set(coinsRef, userCoins);
+          updateCoinDisplay();
+
+          // Show success message
+          Swal.fire("🎉 Success!", `You Win ${randomCoins} coins!`, "success");
         }
-      });
-
-      // Wait 2 seconds for effect
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Generate random coins (1 - 100)
-      let randomCoins = Math.floor(Math.random() * 20) + 1;
-
-      // Update coins
-      userCoins += randomCoins;
-      const coinsRef = ref(database, `users/${userId}/coins`);
-      await set(coinsRef, userCoins);
-      updateCoinDisplay();
-
-      // Show success message
-      Swal.fire("🎉 Success!", `You Win ${randomCoins} coins!`, "success");
-
-      // Save claim time
-      const claimTimeRef = ref(database, `users/${userId}/lastDrawTime`);
-      const currentTime = Math.floor(Date.now() / 1000);
-      await set(claimTimeRef, currentTime);
-
-      // Start cooldown
-      startCooldown(claimCooldown);
-    });
-
-    // Check cooldown on page load
-    async function checkCooldown() {
-      const claimTimeRef = ref(database, `users/${userId}/lastDrawTime`);
-      const snapshot = await get(claimTimeRef);
-
-      if (snapshot.exists()) {
-        const lastClaimTime = snapshot.val();
-        const currentTime = Math.floor(Date.now() / 1000);
-        const elapsedTime = currentTime - lastClaimTime;
-
-        if (elapsedTime < claimCooldown) {
-          startCooldown(claimCooldown - elapsedTime);
-        }
+      } else {
+        Swal.fire("Not enough coins", `You need at least ${selectedOption} coins to thraw!`, "error");
       }
-    }
-
-    // Start cooldown timer
-    function startCooldown(seconds) {
-      claimButton.disabled = true;
-      let remainingTime = seconds;
-      updateTimerDisplay(remainingTime);
-
-      const interval = setInterval(() => {
-        remainingTime--;
-        updateTimerDisplay(remainingTime);
-
-        if (remainingTime <= 0) {
-          clearInterval(interval);
-          claimButton.disabled = false;
-          timerDisplay.textContent = "";
-        }
-      }, 1000);
-    }
-
-    // Update timer display
-    function updateTimerDisplay(seconds) {
-      let hours = Math.floor(seconds / 3600);
-      let minutes = Math.floor((seconds % 3600) / 60);
-      let secs = seconds % 60;
-      timerDisplay.textContent = `⏳ Please wait ${hours}h ${minutes}m ${secs}s`;
-    }
+    });
   </script>
   <script>
     function laabo() {
