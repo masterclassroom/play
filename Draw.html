@@ -187,7 +187,7 @@
       const maxCoins = selectedOption === "100" ? 200 : 100;
 
       // Only show confirmation if user has enough coins
-      if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "10" && userCoins >= 10)) {
+      if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "50" && userCoins >= 50)) {
         // Show confirmation before proceeding
         const result = await Swal.fire({
           title: 'Payment Confirmation',
