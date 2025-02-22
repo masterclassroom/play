@@ -18,6 +18,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
+// Function to generate a random captcha code
+function generateCaptcha() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let captchaCode = '';
+  for (let i = 0; i < 9; i++) {
+    captchaCode += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  document.getElementById('captchaCode').textContent = captchaCode;
+  return captchaCode;
+}
+
 // Show alert message
 function showAlert(message, type) {
   const alertBox = document.getElementById('alertBox');
@@ -28,37 +39,35 @@ function showAlert(message, type) {
   setTimeout(() => {
     alertBox.style.display = 'none';
     alertBox.className = ''; // Clear classes
-  }, 5000);
+  }, 3000);
 }
+
+// Generate captcha when the page loads
+let captchaCode = generateCaptcha();
 
 // Handle Forgot Password
 document.getElementById('forgotPasswordBtn').addEventListener('click', async (e) => {
   e.preventDefault();
   const email = document.getElementById('reset').value;
+  const captchaInput = document.getElementById('captchaInput').value;
 
+  // Check if email or captcha input is empty
   if (!email) {
     showAlert('Please enter your email to reset your password.', 'error');
     return;
   }
 
+  if (captchaInput !== captchaCode) {
+    showAlert('Captcha code is incorrect.', 'error');
+    captchaCode = generateCaptcha(); // Regenerate captcha if it's wrong
+    return;
+  }
+
   try {
-    const dbRef = ref(database, 'users');
-    const snapshot = await get(dbRef);
-
-    if (snapshot.exists()) {
-      const users = snapshot.val();
-      const emailExists = Object.values(users).some(user => user.email === email);
-
-      if (!emailExists) {
-        showAlert('This email not registered.', 'error');
-        return;
-      }
-
-      await sendPasswordResetEmail(auth, email);
-      showAlert('Successfully sent check your email to reset.', 'success');
-    } else {
-      showAlert('Database is empty. Please sign up.', 'error');
-    }
+    // Send password reset email directly without checking snapshot
+    await sendPasswordResetEmail(auth, email);
+    showAlert('Successfully sent, check your email to reset your password.', 'success');
+  captchaCode = generateCaptcha();
   } catch (error) {
     showAlert(error.message, 'error');
   }
