@@ -168,7 +168,7 @@
       if (snapshot.exists()) {
         userCoins = snapshot.val();
       } else {
-        userCoins = 50;
+        userCoins = 10;
         await set(coinsRef, userCoins);
       }
 
