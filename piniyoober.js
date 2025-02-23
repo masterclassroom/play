@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getAuth, reauthenticateWithCredential, EmailAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -24,31 +24,42 @@ const passwordChangeSection = document.getElementById("passwordChangeSection");
 const oldPasswordInput = document.getElementById("oldPassword");
 const newPasswordInput = document.getElementById("newPassword");
 const updatePasswordButton = document.getElementById("updatePasswordButton");
-const messageDiv = document.createElement("div"); // Message Div
-messageDiv.style.marginTop = "10px";
-messageDiv.style.padding = "10px";
-messageDiv.style.borderRadius = "5px";
-messageDiv.style.display = "none";
-passwordChangeSection.appendChild(messageDiv);
+const coinsBalanceText = document.getElementById("coinsBalance");
 
 // Function to show messages
 function showMessage(text, isSuccess) {
-  messageDiv.textContent = text;
-  messageDiv.style.display = "block";
-  messageDiv.style.color = isSuccess ? "green" : "red";
-  messageDiv.style.border = isSuccess ? "2px solid green" : "2px solid red";
-  setTimeout(() => {
-    messageDiv.style.display = "none";
-  }, 3000);
+  Swal.fire({
+    title: isSuccess ? "Success" : "Error",
+    text: text,
+    icon: isSuccess ? "success" : "error",
+    timer: 3000,
+    showConfirmButton: true
+  });
 }
 
 // Check User Auth State
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    alert("You must be logged in to access this page. Redirecting to login...");
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // Get user coins balance
+    const userRef = ref(database, `users/${user.uid}/coins`);
+    const snapshot = await get(userRef);
+    
+    if (snapshot.exists()) {
+      coinsBalanceText.textContent = snapshot.val();
+    } else {
+      coinsBalanceText.textContent = "0";
+    }
+  } else {
     setTimeout(() => {
-      window.location.href = "login.html"; // Replace with your login page
-    }, 2000);
+      Swal.fire({
+        title: "Not Logged In",
+        text: "You must be logged in to access this page.",
+        icon: "warning",
+        confirmButtonText: "Go to Login"
+      }).then(() => {
+        window.location.href = "login.html";
+      });
+    }, 1000);
   }
 });
 
@@ -57,7 +68,7 @@ showPasswordChangeButton.addEventListener("click", () => {
   passwordChangeSection.style.display = "block";
 });
 
-// Update Password
+// Update Pincode
 updatePasswordButton.addEventListener("click", async () => {
   const oldPassword = oldPasswordInput.value.trim();
   const Newpin = newPasswordInput.value.trim();
@@ -66,10 +77,10 @@ updatePasswordButton.addEventListener("click", async () => {
     showMessage("Please fill in both fields.", false);
     return;
   }
-   if(Newpin.length > 4 || Newpin.length < 4) {
-     showMessage("Please choose 4 digit code", false);
-     return;
-   }
+  if (Newpin.length !== 4) {
+    showMessage("Please choose a 4-digit code.", false);
+    return;
+  }
 
   const user = auth.currentUser;
   if (!user) {
@@ -78,21 +89,38 @@ updatePasswordButton.addEventListener("click", async () => {
   }
 
   try {
-    // Step 1: Reauthenticate the user with old password
+    // Reauthenticate user
     const credential = EmailAuthProvider.credential(user.email, oldPassword);
     await reauthenticateWithCredential(user, credential);
 
-    // Step 3: Update Password in Real-Time Database
-    const userRef = ref(database, `users/${user.uid}/Pin`);
-    await set(userRef, Newpin);
-
-    // Show success message
-    showMessage("Your Pincode has been updated successfully!", true);
+    // Get user coins balance
+    const userRef = ref(database, `users/${user.uid}`);
+    const snapshot = await get(userRef);
     
+    if (!snapshot.exists()) {
+      showMessage("User data not found!", false);
+      return;
+    }
+
+    const userData = snapshot.val();
+    const userCoins = userData.coins || 0;
+
+    if (userCoins < 2000) {
+      showMessage("Not enough coins you need 2000 coins to change pincode!", false);
+      return;
+    }
+
+    await set(ref(database, `users/${user.uid}/Pin`), Newpin);
+    await set(ref(database, `users/${user.uid}/coins`), userCoins - 2000);
+
+    coinsBalanceText.textContent = userCoins - 2000;
+
+    showMessage("Your Pincode has been updated successfully!", true);
+
     setTimeout(() => {
       window.location.replace("Academy.html");
     }, 3000);
   } catch (error) {
-    showMessage('Incorrect password', false);
+    showMessage("Incorrect password or an error occurred.", false);
   }
 });
