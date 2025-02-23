@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module">
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -58,9 +57,10 @@
             document.getElementById('payment-button').addEventListener('click', function () {
                 const method = document.getElementById("payment-method").value;
                 const currencyType = document.getElementById("currency-type").value;
+                const messageElement = document.getElementById("messages");
 
                 if (method === "none" || currencyType === "none") {
-                    Swal.fire('', 'Fadlan dooro habka lacag bixinta iyo nooca lacagta', '');
+                    messageElement.textContent = 'Fadlan dooro habka lacag bixinta iyo nooca lacagta';
                     return;
                 }
 
@@ -94,21 +94,21 @@
                 const paymentNumber = document.getElementById('payment-number').value;
                 const paymentMethod = document.getElementById('payment-method').value;
                 const currencyType = document.getElementById('currency-type').value;
+                const messageElement = document.getElementById("messages");
 
                  if(!username || !email || !phone) {
-                     Swal.fire('Warning', 'Fadlan buuxi dhamaan foomka', 'warning');
+                     messageElement.textContent = 'Fadlan buuxi dhamaan foomka';
                      return;
                  }
 
                 if (phone.length < 10) {
-                    Swal.fire('', 'Fadlan gali number dhamaystiran', '');
+                    messageElement.textContent = 'Fadlan gali number dhamaystiran';
                     return;
                 }
                  if(paymentMethod === "none" || currencyType === "none") {
-                     Swal.fire('Warning', 'Fadlan dooro habka lacagta iyo nooca lacagta', 'warning');
+                     messageElement.textContent = 'Fadlan dooro habka lacagta iyo nooca lacagta';
                      return;
                  }
-                     
 
                 const { isConfirmed } = await Swal.fire({
                     title: 'Payment confirmation?',
@@ -142,21 +142,9 @@
                             purchased: false
                         });
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Successfully!',
-                            text: 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.',
-                            confirmButtonText: 'Ok'
-                        }).then(() => {
-                            window.history.back();
-                        });
+                        messageElement.textContent = 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.';
                     } catch (error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Khalad!',
-                            text: `Waxaa dhacay khalad: ${error.message}`,
-                            confirmButtonText: 'Ok'
-                        });
+                        messageElement.textContent = `Waxaa dhacay khalad: ${error.message}`;
                     }
                 }
             });
@@ -170,47 +158,109 @@
     </script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Roboto', sans-serif;
+            background: #4bc8db; /* Background midab leh */
+            color: #333;
             text-align: center;
-            padding: 20px;
+            padding: 50px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
 
         .container {
             max-width: 400px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #bad4d0;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             margin: auto;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        h2 {
+            color: #ff7e5f;
+            font-size: 26px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: bounceIn 1.5s ease-in-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translateY(-30px); opacity: 0; }
+            60% { transform: translateY(10px); opacity: 1; }
+            100% { transform: translateY(0); }
         }
 
         input, select, button {
             width: 100%;
             margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
+            padding: 15px;
+            border: 2px solid #ff7e5f;
             border-radius: 10px;
-        }
-
-        button {
-            background: #041dc2;
-            color: white;
             font-size: 16px;
-            cursor: pointer;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
-        button:hover {
-            background: #041dc9;
+        input:focus, select:focus {
+            border-color: #feb47b;
+            box-shadow: 0 0 10px rgba(255, 111, 58, 0.6);
         }
 
         select {
-            background-color: #f8f9fa;
-            font-size: 16px;
+            background-color: #f0f0f0;
         }
 
-        h2 {
-            color: #28a745;
+        select:hover {
+            background-color: #e9e9e9;
+        }
+
+        button {
+            background: #ff7e5f;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            background: #feb47b;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        label {
+            font-size: 18px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .payment-methods {
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .swal2-popup {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        #messages {
+            margin-top: 20px;
+            font-size: 18px;
+            color: black;
         }
     </style>
 </head>
@@ -247,11 +297,13 @@
         <button type="button" id="request-button">Codso</button>
     </form>
 
+    <p id="messages"></p>
+
     <button onclick="window.history.back()">Back</button>
 </div>
 
 <script>
-        document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course:detailshtmlhex1290pllknmagdhssg') || "Unknown Course";
+    document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course:detailshtmlhex1290pllknmagdhssg') || "Unknown Course";
 </script>
 </body>
-                </html>
+    </html>
