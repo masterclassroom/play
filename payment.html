@@ -158,117 +158,92 @@
         });
     </script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #4bc8db; /* Background midab leh */
-            color: #333;
-            text-align: center;
-            padding: 50px;
-            animation: fadeIn 2s ease-in-out;
-        }
+    body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
 
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+    width: 90%;
+    max-width: 400px;
+    margin: 50px auto;
+    backdrop-filter: blur(10px);
+}
 
-        .container {
-            max-width: 400px;
-            background: #bad4d0;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin: auto;
-            animation: slideIn 1s ease-in-out;
-        }
+h2 {
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
 
-        @keyframes slideIn {
-            0% { transform: translateY(-30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
+p {
+    font-size: 18px;
+    margin: 10px 0;
+}
 
-        h2 {
-            color: #ff7e5f;
-            font-size: 26px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            animation: bounceIn 1.5s ease-in-out;
-        }
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+}
 
-        @keyframes bounceIn {
-            0% { transform: translateY(-30px); opacity: 0; }
-            60% { transform: translateY(10px); opacity: 1; }
-            100% { transform: translateY(0); }
-        }
+input:focus, select:focus {
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
 
-        input, select, button {
-            width: 100%;
-            margin: 10px 0;
-            padding: 15px;
-            border: 2px solid #ff7e5f;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #ff416c, #ff4b2b);
+    color: white;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+}
 
-        input:focus, select:focus {
-            border-color: #feb47b;
-            box-shadow: 0 0 10px rgba(255, 111, 58, 0.6);
-        }
+button:hover {
+    background: linear-gradient(90deg, #ff4b2b, #ff416c);
+    box-shadow: 0px 0px 15px rgba(255, 69, 0, 0.7);
+    transform: scale(1.05);
+}
 
-        select {
-            background-color: #f0f0f0;
-        }
+#messages {
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: yellow;
+}
 
-        select:hover {
-            background-color: #e9e9e9;
-        }
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+    }
+}</style>
 
-        button {
-            background: #ff7e5f;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        button:hover {
-            background: #feb47b;
-            transform: scale(1.05);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        label {
-            font-size: 18px;
-            font-weight: 500;
-            color: #555;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .payment-methods {
-            animation: fadeIn 2s ease-in-out;
-        }
-
-        .swal2-popup {
-            animation: fadeIn 1.5s ease-in-out;
-        }
-
-        #messages {
-            margin-top: 20px;
-            font-size: 18px;
-            color: black;
-        }
-    </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Lacag Bixinta</h2>
+    <h2>payment</h2>
     <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
     <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
 
