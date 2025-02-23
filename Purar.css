@@ -1,83 +1,194 @@
-/* Aasaaska guud ee bogga */
+/* General Styles */
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f4f4;
-  color: #333;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #4e8df1, #2a3f85); /* Gradient blue background */
+  color: #fff;
   margin: 0;
   padding: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Changed to flex-start for the courses to appear at the top */
+  height: 100vh;
 }
 
-/* Header */
 header {
-  background-color: #2d3b2f;
-  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  width: 100%;
   padding: 20px;
   text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 header h1 {
+  font-size: 32px;
+  color: #f4c542;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   margin: 0;
+  animation: fadeIn 1s ease-in-out;
 }
 
-/* Navigation */
-nav ul {
-  list-style: none;
+header nav ul {
+  list-style-type: none;
   padding: 0;
 }
 
-nav ul li {
-  display: inline;
-  margin-right: 20px;
+header nav ul li {
+  display: inline-block;
+  margin: 10px;
 }
 
-nav ul li a {
-  color: white;
+header nav ul li a {
   text-decoration: none;
+  color: #fff;
+  font-size: 18px;
   font-weight: bold;
-  transition: color 0.3s;
-}
-
-nav ul li a:hover {
-  color: #ddd;
-}
-
-/* Section - Purchased Courses */
-.purchased-courses {
-  padding: 20px;
-  background-color: white;
+  padding: 10px 20px;
   border-radius: 5px;
-  margin: 20px;
+  background-color: #4e8df1;
+  transition: background 0.3s ease;
 }
 
-.purchased-courses ul {
-  list-style: none;
+header nav ul li a:hover {
+  background-color: #f4c542;
+  color: #2a3f85;
+}
+
+.purchased-courses {
+  margin-top: 100px;
+  width: 90%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#purchased-courses-list {
+  list-style-type: none;
   padding: 0;
+  margin-top: 50px; /* Added margin to give space between header and courses */
 }
 
-.purchased-courses ul li {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+#purchased-courses-list li {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 18px;
+  animation: slideIn 1s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.purchased-courses ul li:last-child {
-  border-bottom: none;
+#purchased-courses-list li button {
+  background: #f4c542;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
 }
 
-/* Footer */
+#purchased-courses-list li button:hover {
+  background: #c8a600;
+}
+
+#purchased-courses-list li button:active {
+  transform: translateY(2px);
+}
+
 footer {
-  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
   padding: 10px;
-  background-color: #2d3b2f;
-  color: white;
+  width: 100%;
+  text-align: center;
   position: fixed;
   bottom: 0;
+  left: 0;
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for header text */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation for course list items */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media Queries for mobile responsiveness */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 28px;
+  }
+
+  header nav ul li a {
+    font-size: 16px;
+  }
+
+  .purchased-courses {
+    width: 90%;
+  }
+
+  #purchased-courses-list li {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 24px;
+  }
+
+  header nav ul li a {
+    font-size: 14px;
+  }
+
+  #purchased-courses-list li {
+    font-size: 14px;
+  }
+}
+button {
+  background: #f542c5;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: 0.3s;
   width: 100%;
 }
 
-.goto {
-  background: aliceblue;
-  color: black;
-  width:150px;
-  height: 30px;
-  border-radius: 1px;
+button:hover {
+  background: #f542c5;
 }
