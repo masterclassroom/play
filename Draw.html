@@ -95,9 +95,12 @@
     
     <!-- Select option to choose coins -->
     <select id="coinOption">
+      <option value="0">Free</option>
       <option value="50">50 coins</option>
-      <option value="100">100 coins</option>
+      <option value="100" selected>100 coins</option>
       <option value="1000">1000 coins</option>
+      <option value="10000">10000 coins</option>
+      <option value="100000">100000 coins</option>
     </select>
     
     <button id="claimButton">Thraw</button>
@@ -181,61 +184,80 @@
       coinCountDiv.textContent = `Coins: ${userCoins}`;
     }
 
-    // Claim Coins (Random based on selected option)
-    claimButton.addEventListener("click", async () => {
-      const selectedOption = coinOption.value;
-      const minCoins = selectedOption === "100" ? 50 : (selectedOption === "50" ? 25 : 500);
-      const maxCoins = selectedOption === "100" ? 200 : (selectedOption === "50" ? 100 : 2000);
-
-      // Only show confirmation if user has enough coins
-      if ((selectedOption === "100" && userCoins >= 100) || (selectedOption === "50" && userCoins >= 50) || (selectedOption === "1000" && userCoins >= 1000)) {
-        // Show confirmation before proceeding
-        const result = await Swal.fire({
-          title: 'Payment Confirmation',
-          text: `Ma hubtaa inaad tuurto ${selectedOption} coins? Waxaad heli doontaa ${minCoins} ilaa ${maxCoins} coins.`,
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'Haa, tuuro',
-          cancelButtonText: 'Cancel'
-        });
-
-        if (result.isConfirmed) {
-          // Deduct coins based on the selected option
-          userCoins -= selectedOption;
-          const coinsRef = ref(database, `users/${userId}/coins`);
-          await set(coinsRef, userCoins);
-          updateCoinDisplay();
-
-          // Show loading effect
-          Swal.fire({
-            title: "Finding your reward...",
-            html: "Spinning 🎰...",
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            timer: 2000,
-            didOpen: () => {
-              Swal.showLoading();
-            }
-          });
-
-          // Wait 2 seconds for effect
-          await new Promise(resolve => setTimeout(resolve, 2000));
-
-          // Generate random coins based on the selected option
-          let randomCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
-
-          // Update coins
-          userCoins += randomCoins;
-          await set(coinsRef, userCoins);
-          updateCoinDisplay();
-
-          // Show success message
-          Swal.fire("🎉 Success!", `You Win ${randomCoins} coins!`, "success");
-        }
-      } else {
-        Swal.fire("Not enough coins", `You need at least ${selectedOption} coins to thraw!`, "error");
-      }
+// Claim Coins (Random based on selected option)
+claimButton.addEventListener("click", async () => {
+  const selectedOption = coinOption.value;
+  
+  let minCoins, maxCoins;
+  
+  if (selectedOption === "50") {
+    minCoins = 25;
+    maxCoins = 100;
+  } else if (selectedOption === "100") {
+    minCoins = 50;
+    maxCoins = 200;
+  } else if (selectedOption === "1000") {
+    minCoins = 500;
+    maxCoins = 2000;
+  } else if (selectedOption === "10000") { 
+    minCoins = 5000; // Ikhtiyaarka cusub
+    maxCoins = 20000; 
+  }
+  else if(selectedOption === "100000") {
+    minCoins = 75000;
+    maxCoins = 20000;
+  }
+   else if(selectedOption === "0") {
+     minCoins = 1;
+     maxCoins = 10;
+   }
+  // Xaqiiji in user-ku uu leeyahay coins ku filan
+  if (userCoins >= parseInt(selectedOption)) {
+    const result = await Swal.fire({
+      title: 'Payment Confirmation',
+      text: `Ma hubtaa inaad tuurto ${selectedOption} coins? Waxaad heli doontaa ${minCoins} ilaa ${maxCoins} coins.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Haa, tuuro',
+      cancelButtonText: 'Cancel'
     });
+
+    if (result.isConfirmed) {
+      // Dhimista coins
+      userCoins -= parseInt(selectedOption);
+      const coinsRef = ref(database, `users/${userId}/coins`);
+      await set(coinsRef, userCoins);
+      updateCoinDisplay();
+
+      // Loading effect
+      Swal.fire({
+        title: "Finding your reward...",
+        html: "Spinning 🎰...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        timer: 2000,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Laga helo coins random
+      let randomCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
+
+      // Update user coins
+      userCoins += randomCoins;
+      await set(coinsRef, userCoins);
+      updateCoinDisplay();
+
+      // Show success message
+      Swal.fire("🎉 Success!", `You Win ${randomCoins} coins!`, "success");
+    }
+  } else {
+    Swal.fire("Not enough coins", `You need at least ${selectedOption} coins to thraw!`, "error");
+  }
+});
   </script>
   <script>
     function laabo() {
