@@ -1,39 +1,82 @@
+/* General Styles */
 body {
   font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f4f4f4;
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  color: #fff;
+  text-align: center;
+  padding: 20px;
 }
 
 .container {
-  background: white;
+  background: rgba(0, 0, 0, 0.8);
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 400px;
+  margin: auto;
 }
 
+/* Header */
+h2 {
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+/* Coins Display */
+p {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+#coinsBalance {
+  font-weight: bold;
+  color: #00ffcc;
+}
+
+/* Input Fields */
 input {
-  margin: 10px 0;
+  width: 100%;
   padding: 10px;
-  width: 80%;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-button {
-  padding: 10px 20px;
-  margin: 10px;
-  background-color: #3209d6;
-  color: white;
+  margin: 10px 0;
   border: none;
   border-radius: 5px;
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 5px #00ffcc;
+}
+
+/* Buttons */
+button {
+  background: #0072ff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 10px 0;
   cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: 0.3s;
+  width: 100%;
 }
 
 button:hover {
-  background-color: #2808b5;
+  background: #005bb5;
 }
+
+/* Show Password Change Section */
+#passwordChangeSection {
+  margin-top: 15px;
+  padding: 10px;
+  border-top: 1px solid #fff;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .container {
+    width: 95%;
+  }
+  }
