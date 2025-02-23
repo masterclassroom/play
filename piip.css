@@ -1,45 +1,165 @@
+/* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #8e2de2, #4a00e0); /* Vibrant Purple Gradient */
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  text-align: center;
+  padding: 20px;
 }
+
 #userInfo {
-    background-color: #fff;
-    padding: 20px;
-    width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+  background: rgba(255, 255, 255, 0.1); /* Transparent white background */
+  padding: 40px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 2s ease-in-out;
+  backdrop-filter: blur(5px);
 }
+
 h2 {
-    color: #333;
+  font-size: 36px;
+  font-weight: bold;
+  color: #f4c542; /* Gold */
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  animation: slideIn 1s ease-in-out;
 }
-p {
-    font-size: 18px;
-    color: #555;
+
+/* Slide-in Animation for Header */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
-#backButton, #edit {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+
+/* Profile Text */
+#userInfo p {
+  font-size: 20px;
+  margin: 15px 0;
+  font-weight: 500;
+  letter-spacing: 1px;
+  animation: fadeInText 1.5s ease-in-out;
 }
-#backButton:hover, #edit:hover {
-    background-color: #0056b3;
+
+/* Fade-in Animation for Profile Text */
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-#myCheckbox {
-    border-radius: 500px;
-    cursor: pointer;
-    width: 5%;
-    height: 20px;
-}   
+
+/* Checkbox Style */
+input[type="checkbox"] {
+  margin: 15px 0;
+  transform: scale(1.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+  background: #f4c542;
+  border-color: #f4c542;
+}
+
+/* Buttons */
+button {
+  background: #f4c542; /* Gold */
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  margin: 15px 0;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 12px;
+  width: 250px;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 20px rgba(196, 166, 0, 0.4);
+  text-transform: uppercase;
+}
+
+button:hover {
+  background: #c8a600; /* Darker Gold */
+  transform: translateY(-4px);
+  box-shadow: 0px 6px 25px rgba(196, 166, 0, 0.6);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Back Button Styling */
+#backButton {
+  background: transparent;
+  color: #f4c542;
+  border: 2px solid #f4c542;
+}
+
+#backButton:hover {
+  background: #f4c542;
+  color: white;
+}
+
+#edit {
+  background: #4a00e0;
+  color: white;
+  border: 2px solid #4a00e0;
+}
+
+#edit:hover {
+  background: #8e2de2;
+  color: white;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Fade-in Animation for Buttons */
+@keyframes fadeInButtons {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+button {
+  animation: fadeInButtons 2s ease-in-out;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  #userInfo {
+    padding: 30px;
+    width: 100%;
+    box-shadow: none;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+  button {
+    width: 100%;
+    margin: 10px 0;
+  }
+    }
