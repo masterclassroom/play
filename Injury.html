@@ -3,79 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>injury</title>
+    <title>Cabashada</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #00c6ff, #0072ff); /* Buluug qurux badan oo leh gradient */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            color: #fff; /* Text midab cad */
         }
+
         .container {
-            background: white;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.9); /* Background cad oo qafiif ah */
+            padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             width: 350px;
             text-align: center;
+            animation: fadeIn 1.5s ease-out;
         }
+
         h2 {
             color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+            animation: slideDown 1s ease-out;
         }
+
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: left;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            color: #333;
         }
+
         input, textarea, select {
-            width: 100%;
-            padding: 10px;
+            width: 94%;
+            padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            margin-top: 5px;
+            transition: border 0.3s ease;
         }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #0072ff; /* Buluug iftiiminaya marka la click gareeyo */
+        }
+
         textarea {
-            height: 100px;
+            height: 200px;
             resize: none;
         }
+
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
+            padding: 15px;
+            background-color: #0072ff; /* Buluug qurux badan */
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 18px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        #kala {
+            background-color: #f44336; /* Red button for Back */
+        }
+
+        #kala:hover {
+            background-color: #d32f2f;
+        }
+
         .result {
-            margin-top: 15px;
+            margin-top: 20px;
             padding: 10px;
             font-size: 16px;
             font-weight: bold;
             display: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            text-align: center;
         }
+
         .success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        /* Animation for the container */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animation for the heading */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media Queries for Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+            
+            input, textarea, select, button {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -102,7 +178,7 @@
         <div class="input-group">
             <label for="county">Dooro Waddankaaga</label>
             <select id="county">
-                <option value="">-- Doorasho --</option>
+                <option value="" disabled selected="">-- Doorasho --</option>
                 <option value="Somaliland">Somaliland 🇮🇷</option>
                 <option value="Somalia">Somalia 🇸🇴</option>
                 <option value="Ethiopia">Ethiopia 🇪🇹</option>
@@ -151,6 +227,13 @@
             let resultBox = document.getElementById("result");
 
             if (username && email && number && county && message) {
+                if (message.length < 10) {
+                    resultBox.textContent = 'Fadlan qor ugu yaraan 10 xaraf message-ka';
+                    resultBox.className = 'result error';
+                    resultBox.style.display = "block";
+                    return;
+                }
+
                 const userRef = ref(database, `users/${email.replace('.', '_')}`); // Badal '.' si looga fogaado dhibaato database-ka
 
                 try {
@@ -183,8 +266,7 @@
                 window.location.href = "Academy.html";
             }
         });
-        
     </script>
 
 </body>
-</html>
+                </html>
