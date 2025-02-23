@@ -6,93 +6,174 @@
     <title>FAQ</title>
     <style>
         body {
-    font-family: Arial, sans-serif;
-     background: #9ccee6;            
-}
+            font-family: Arial, sans-serif;
+            background: #9ccee6;            
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         .faq-container {
             max-width: 600px;
             margin: auto;
+            padding: 20px;
+            animation: fadeIn 2s ease-out;
         }
+
+        h1 {
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 28px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            animation: slideIn 1.5s ease-out;
+        }
+
         .faq-question {
             background-color: #f1f1f1;
             padding: 10px;
             border: none;
-            margin:10px;
+            margin: 10px 0;
             width: 100%;
             text-align: left;
             font-size: 16px;
             cursor: pointer;
             border-bottom: 1px solid #ccc;
+            transition: all 0.3s ease;
+            border-radius: 5px;
         }
-          .btn-backer {
-            background-color: black;
+
+        .faq-question:hover {
+            background-color: #00c6ff;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-backer {
+            background-color: #333;
             padding: 10px;
             border: none;
-            margin:10px;
-            width: 10%;
-            text-align: left;
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
             font-size: 16px;
             cursor: pointer;
-            border-bottom: 1px solid #ccc;
             color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
         }
+
+        .btn-backer:hover {
+            background-color: #555;
+        }
+
         .faq-answer {
             display: none;
             padding: 10px;
             background-color: grey;
             color: white;
             border-left: 3px solid #007bff;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            animation: fadeInAnswer 1s ease-out;
         }
-      .h1  {
-          background: grey;
-      }
+
+        .faq-answer a {
+            color: #00c6ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInAnswer {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
     </style>
 </head>
 <body>
-    <h1 class="h1">Halkan ayaad ka helaysa dhamaan jawaabahaaga</h1>
 
-<div class="faq-container">
-    <button class="faq-question">1. Ma ku daawan karaa koorsadda taleefankayga gacanta?</button>
-    <div class="faq-answer">
-        <p>Haa, dhammaan koorsooyinka ku jira websitekan waxaad ku daawan kartaa taleefankaaga gacanta ama kumbuyuutarkaaga.</p>
+    <h1>Halkan ayaad ka helaysa dhamaan jawaabahaaga</h1>
+
+    <div class="faq-container">
+        <button class="faq-question">1. Ma ku daawan karaa koorsadda taleefankayga gacanta?</button>
+        <div class="faq-answer">
+            <p>Haa, dhammaan koorsooyinka ku jira websitekan waxaad ku daawan kartaa taleefankaaga gacanta ama kumbuyuutarkaaga.</p>
+        </div>
+
+        <button class="faq-question">2. Waa maxay siyaabaha lacag bixinta ee lagu bixiyo?</button>
+        <div class="faq-answer">
+            <p>Lacagta waxaa lagu bixin karaa iyadoo la adeegsanayo kartida bangiyada, PayPal, ama adeegyo kale Sida Evc ama Zaad iwm.</p>
+        </div>
+
+        <button class="faq-question">3. Side u isticmaala koorso aan iibsaday?</button>
+        <div class="faq-answer">
+            <p>Si aad u isticmaasho koorsooyinkaaga gal qaybta purchased course ama halkan .</p>
+            <a href="purchased.html">Halkan</a>
+        </div>
+
+        <button class="faq-question">4. Koorsada haddan iibsado ma live mise waa mar kaliya?</button>
+        <div class="faq-answer">
+            <p>May, dhammaan koorsooyinka ku jira websitekan waa kuwa hore loo sii duubay markastana waad daawan kartaa.</p>
+        </div>
+
+        <button class="faq-question">5. Side ayaan koorso u iibsadaa?</button>
+        <div class="faq-answer">
+            <p>Taabo badhanka iibso ee koorsada aad doonayso ka dib buuxi foomka.</p>
+            <p>Digniin: Foomka ilaa aad wada buuxiso ha taaban badhanka codso.</p>
+        </div>
+
+        <button onclick="backer()" class="btn-backer">Back</button>
     </div>
 
-    <button class="faq-question">2. Waa maxay siyaabaha lacag bixinta ee lagu bixiyo?</button>
-    <div class="faq-answer">
-        <p>Lacagta waxaa lagu bixin karaa iyadoo la adeegsanayo kartida bangiyada, PayPal, ama adeegyo kale Sida Evc ama Zaad iwm.</p>
-    </div>
-  <button class="faq-question">3. Side u isticmaala koorso aan iibsaday?</button>
-    <div class="faq-answer">
-        <p>Si aad u isticmaasho koorsooyinkaaga gal qaybta purchased course ama halkan .</p>
-        <a href="purchased.html">Halkan</a>
-    </div>
-  <button class="faq-question">4. koorsada haddan iibsado ma live mise waa mar kaliya?</button>
-    <div class="faq-answer">
-        <p>may dhamaan koorsooyinka ku jira websitekan waa kuwa hore loo sii duubay markastana waad daawan karta.</p>
-    </div>
-    <button class="faq-question">5. Side ayaan koorso u iibsadaa?</button>
-    <div class="faq-answer">
-        <p>Taabo badhanka iibso ee koorsada aad doonayso ka dib buuxi foomka</p>
-        <p>digniin foomka ilaa aad wada buuxiso ha taaban badhanka codso</p>
-    </div>
-    <button onclick="backer()" class=btn-backer>Back</button>
-</div>
-
-<script>
-    document.querySelectorAll(".faq-question").forEach(button => {
-        button.addEventListener("click", function() {
-            const answer = this.nextElementSibling;
-            if (answer.style.display === "block") {
-                answer.style.display = "none";
-            } else {
-                answer.style.display = "block";
-            }
+    <script>
+        document.querySelectorAll(".faq-question").forEach(button => {
+            button.addEventListener("click", function() {
+                const answer = this.nextElementSibling;
+                if (answer.style.display === "block") {
+                    answer.style.display = "none";
+                } else {
+                    answer.style.display = "block";
+                }
+            });
         });
-    });
+
         function backer() {
             window.history.back();
         }
-</script>
+    </script>
 
 </body>
-</html>
+    </html>
