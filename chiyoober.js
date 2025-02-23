@@ -96,6 +96,6 @@ updatePasswordButton.addEventListener("click", async () => {
       window.location.replace("Academy.html");
     }, 2000);
   } catch (error) {
-    showMessage(error.message, false);
+    showMessage("Incorrect old password", false);
   }
 });
