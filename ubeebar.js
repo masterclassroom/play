@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -24,14 +24,29 @@ const usernameChangeSection = document.getElementById("usernameChangeSection");
 const newUsernameInput = document.getElementById("newUsername");
 const updateUsernameButton = document.getElementById("updateUsernameButton");
 const messageBox = document.getElementById("message");
+const coinsCount = document.getElementById("coinsCount");
+
+let userCoins = 0;
 
 // Check User Auth State
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    showMessage("You must be logged in to access this page. Redirecting to login...", "error");
+    showMessage("You must be logged in to access this page.", "error");
     setTimeout(() => {
       window.location.href = "login.html"; 
     }, 2000);
+    return;
+  }
+
+  // Retrieve user coins
+  const coinsRef = ref(database, `users/${user.uid}/coins`);
+  const snapshot = await get(coinsRef);
+  if (snapshot.exists()) {
+    userCoins = snapshot.val();
+    coinsCount.textContent = userCoins;
+  } else {
+    userCoins = 0;
+    coinsCount.textContent = "0";
   }
 });
 
@@ -54,6 +69,11 @@ updateUsernameButton.addEventListener("click", async () => {
     return;
   }
 
+  if (userCoins < 2000) {
+    showMessage("Not enough coins! You need 2000 coins to change your username.", "error");
+    return;
+  }
+
   const user = auth.currentUser;
   if (!user) {
     showMessage("You must be logged in to update your username.", "error");
@@ -62,8 +82,18 @@ updateUsernameButton.addEventListener("click", async () => {
 
   try {
     const userRef = ref(database, `users/${user.uid}/username`);
+    const coinsRef = ref(database, `users/${user.uid}/coins`);
+
+    // Update Username
     await set(userRef, newUsername);
-    showMessage("Your username has been updated successfully.", "success");
+
+    // Deduct 2000 coins
+    await set(coinsRef, userCoins - 2000);
+    
+    showMessage("Your username has been updated successfully!", "success");
+    setTimeout(() => {
+      window.location.replace("Academy.html");
+    }, 3000);
   } catch (error) {
     showMessage(error.message, "error");
   }
@@ -77,5 +107,5 @@ function showMessage(text, type) {
 
   setTimeout(() => {
     messageBox.classList.add("hidden");
-  }, 3000);
-                }
+  }, 5000);
+    }
