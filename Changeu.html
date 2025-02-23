@@ -8,15 +8,16 @@
 </head>
 <body>
   <div class="container">
-    <h2>Change your username</h2>
+    <h2>Change your Username</h2>
     <button id="showUsernameChange">Change Username</button>
     <button onclick="window.history.back()">Back</button>
     
     <div id="usernameChangeSection" class="hidden">
+      <p id="coinsInfo">Your coins: <span id="coinsCount">Loading...</span></p>
       <input type="text" id="newUsername" placeholder="Enter new username" />
       <button id="updateUsernameButton">Update Username</button>
       <p id="message" class="hidden"></p>
-    </div>
+      </div>
   </div>
   <script type="module" src="ubeebar.js"></script>
 </body>
