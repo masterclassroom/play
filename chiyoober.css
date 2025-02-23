@@ -1,39 +1,126 @@
+/* General Styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #f8cdda, #1e3c72); /* Soft Pink to Deep Blue Gradient */
+  color: #333;
+  text-align: center;
+  padding: 20px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   height: 100vh;
   margin: 0;
-  background-color: #f4f4f4;
 }
 
+/* Container */
 .container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  background: rgba(255, 255, 255, 0.95); /* Soft white background with slight transparency */
+  padding: 40px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 1.2s ease-in-out;
 }
 
+/* Header */
+h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #f4c542; /* Gold */
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Fields */
 input {
-  margin: 10px 0;
-  padding: 10px;
-  width: 80%;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  width: 94%;
+  padding: 15px;
+  margin: 12px 0;
+  border: 2px solid #f4c542; /* Gold border */
+  border-radius: 10px;
+  font-size: 16px;
+  text-align: center;
+  background: #faf3e0; /* Soft Cream */
+  transition: all 0.3s ease;
 }
 
+input:focus {
+  border-color: #c8a600; /* Darker Gold */
+  background-color: #fff5cc; /* Lighter Cream */
+  box-shadow: 0px 0px 10px rgba(196, 166, 0, 0.5);
+  outline: none;
+  transform: translateY(-4px);
+}
+
+/* Buttons */
 button {
-  padding: 10px 20px;
-  margin: 10px;
-  background-color: #3209d6;
+  background: #f4c542; /* Gold */
   color: white;
   border: none;
-  border-radius: 5px;
+  padding: 15px;
+  margin: 12px 0;
   cursor: pointer;
+  font-size: 18px;
+  border-radius: 10px;
+  width: 50%;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 10px rgba(196, 166, 0, 0.4);
 }
 
 button:hover {
-  background-color: #2808b5;
+  background: #c8a600; /* Darker Gold */
+  transform: translateY(-4px);
+  box-shadow: 0px 6px 15px rgba(196, 166, 0, 0.6);
 }
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Hidden Section */
+.hidden {
+  display: none;
+}
+
+/* Message Box */
+#message {
+  margin-top: 10px;
+  padding: 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 16px;
+}
+
+#message.success {
+  color: green;
+  border: 2px solid green;
+  background-color: #d4edda;
+}
+
+#message.error {
+  color: red;
+  border: 2px solid red;
+  background-color: #f8d7da;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover Effects for Buttons */
+button:active {
+  transform: translateY(1px);
+}
+/* Add styles for the show/hide password button */
