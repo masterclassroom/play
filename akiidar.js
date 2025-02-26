@@ -152,7 +152,7 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
 
             Swal.fire({
               title: 'You win!',
-              text: `Koorsada ${courseName} waad la furay!`,
+              text: `Koorsada ${courseName} waa la furay!`,
               icon: 'success',
               confirmButtonText: 'Ok'
             });
