@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <title>Thraw Coins</title>
+  <title>Buy Coins</title>
   <style>
     /* General Styling */
     * {
@@ -90,175 +90,33 @@
 </head>
 <body>
   <div class="container">
-    <h2>🎉 Thraw Your Coins 🎉</h2>
-    <div id="coinCount">Coins:..</div>
-    
+    <h2> Buy coins </h2>
     <!-- Select option to choose coins -->
-    <select id="coinOption">
-      <option value="0">Free</option>
-      <option value="50">50 coins</option>
-      <option value="100" selected>100 coins</option>
-      <option value="1000">1000 coins</option>
-      <option value="10000">10000 coins</option>
-      <option value="100000">100000 coins</option>
+    <select id="Buy">
+      <option coin="520" value="1">520 coins/ $1</option>
+      <option coin="1040" value="2" selected>1040 coins/$2</option>
+      <option  coin="2080" value="4">2080 coins/ $4</option>
+      <option coin="5060" value="8">5060 coins/ $8</option>
+      <option coin="10120" value="16">10120 coins/ $16</option>
     </select>
     
-    <button id="claimButton">Thraw</button>
+    <button id="claimButton"onclick="Buyer()">Buy</button>
     <button class="home-btn" onclick="laabo()">Claim page</button>
   </div>
 
-  <script type="module">
-    // Import Firebase Modules
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-      authDomain: "exam-81b90.firebaseapp.com",
-      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-      projectId: "exam-81b90",
-      storageBucket: "exam-81b90.appspot.com",
-      messagingSenderId: "461178422237",
-      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const database = getDatabase(app);
-
-    // DOM Elements
-    const coinCountDiv = document.getElementById("coinCount");
-    const claimButton = document.getElementById("claimButton");
-    const coinOption = document.getElementById("coinOption");
-
-    // Global Variables
-    let userId = null;
-    let userCoins = 0;
-
-    // Disable the claim button for 1.5 seconds after page load
-    document.addEventListener("DOMContentLoaded", () => {
-      claimButton.disabled = true;
-      setTimeout(() => {
-        claimButton.disabled = false;
-      }, 2000);
-    });
-
-    // Auth State Listener
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        userId = user.uid;
-        await loadCoins();
-        // Listen to live updates for coins
-        const coinsRef = ref(database, `users/${userId}/coins`);
-        onValue(coinsRef, (snapshot) => {
-          if (snapshot.exists()) {
-            userCoins = snapshot.val();
-            updateCoinDisplay(); // Update display live when coins change
-          }
-        });
-      } else {
-        window.location.href = "login.html"; // Redirect if not authenticated
-      }
-    });
-
-    // Load Coins from Firebase
-    async function loadCoins() {
-      const coinsRef = ref(database, `users/${userId}/coins`);
-      const snapshot = await get(coinsRef);
-
-      if (snapshot.exists()) {
-        userCoins = snapshot.val();
-      } else {
-        userCoins = 10;
-        await set(coinsRef, userCoins);
-      }
-
-      updateCoinDisplay();
-    }
-
-    // Update Coin Display
-    function updateCoinDisplay() {
-      coinCountDiv.textContent = `Coins: ${userCoins}`;
-    }
-
-// Claim Coins (Random based on selected option)
-claimButton.addEventListener("click", async () => {
-  const selectedOption = coinOption.value;
+  <script>
+      function Buyer() {
+        const select = document.getElementById("Buy");
+const coin = select.options[select.selectedIndex].getAttribute("coin");
+        const buy = document.getElementById("Buy").value;
+        window.location.href = `payment.html?price:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(buy)}&coin:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(coin)}`;
   
-  let minCoins, maxCoins;
+      }
   
-  if (selectedOption === "50") {
-    minCoins = 25;
-    maxCoins = 100;
-  } else if (selectedOption === "100") {
-    minCoins = 50;
-    maxCoins = 200;
-  } else if (selectedOption === "1000") {
-    minCoins = 500;
-    maxCoins = 2000;
-  } else if (selectedOption === "10000") { 
-    minCoins = 5000; // Ikhtiyaarka cusub
-    maxCoins = 20000; 
-  }
-  else if(selectedOption === "100000") {
-    minCoins = 75000;
-    maxCoins = 200000;
-  }
-   else if(selectedOption === "0") {
-     minCoins = 1;
-     maxCoins = 10;
-   }
-  // Xaqiiji in user-ku uu leeyahay coins ku filan
-  if (userCoins >= parseInt(selectedOption)) {
-    const result = await Swal.fire({
-      title: 'Payment Confirmation',
-      text: `Ma hubtaa inaad tuurto ${selectedOption} coins? Waxaad heli doontaa ${minCoins} ilaa ${maxCoins} coins.`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Haa, tuuro',
-      cancelButtonText: 'Cancel'
-    });
-
-    if (result.isConfirmed) {
-      // Dhimista coins
-      userCoins -= parseInt(selectedOption);
-      const coinsRef = ref(database, `users/${userId}/coins`);
-      await set(coinsRef, userCoins);
-      updateCoinDisplay();
-
-      // Loading effect
-      Swal.fire({
-        title: "Finding your reward...",
-        html: "Spinning 🎰...",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        timer: 2000,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Laga helo coins random
-      let randomCoins = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
-
-      // Update user coins
-      userCoins += randomCoins;
-      await set(coinsRef, userCoins);
-      updateCoinDisplay();
-
-      // Show success message
-      Swal.fire("🎉 Success!", `You Win ${randomCoins} coins!`, "success");
-    }
-  } else {
-    Swal.fire("Not enough coins", `You need at least ${selectedOption} coins to thraw!`, "error");
-  }
-});
+  
+    
   </script>
+    
   <script>
     function laabo() {
       window.location.href = "Coins.html";
