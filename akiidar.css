@@ -98,6 +98,7 @@ button {
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+  margin: 2%;
   transition: background 0.3s;
 }
 
@@ -111,13 +112,13 @@ button {
   background: gray;
 }
 
-.btn-unlock {
-  background: #28a745;
+.btn-unlock100 {
+  background: #e84fe3;
   color: white;
   width: 50%;
 }
 
-.btn-unlock:hover {
+.btn-unlock100:hover {
   background: gray;
 }
 
@@ -134,3 +135,17 @@ footer {
  button:disabled {
    background: gray;
  }
+.btn-unlock900 {
+  background: #e84fe3;
+  color: white;
+  width: 50%;
+}
+
+.btn-unlock900:hover {
+  background: gray;
+}
+.btn-logout {
+   background: red;
+  color: white;
+  width: 100px;
+}
