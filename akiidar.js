@@ -29,37 +29,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("User logged in:", user.email);
-// Firebase ref to fetch country
-// Firebase ref to fetch country
-const userRef = ref(database, `users/${user.uid}/country`);
-const claimRef = ref(database, `users/${user.uid}/claim`);
-const veriRef = ref(database, `users/${user.uid}`);
+    
+  const userRef = ref(database, `users/${user.uid}/country`);
+    const claimRef = ref(database, `users/${user.uid}/claim`);
+    const veriRef = ref(database, `users/${user.uid}`);
 
-try {
-  const snapshot = await get(claimRef);
-  if (!snapshot.exists()) {
-    const countrySnapshot = await get(userRef);
-    const countryData = countrySnapshot.val();
-    if (countryData === "Somaliland") {
-      Swal.fire('Welcome', 'You claimed a 1000 coins for free', 'success',);
-      // Set coins and claim data for Somaliland users
-      await update(veriRef, {
-        coins: 1000,  // Add 1000 coins for Somaliland users
-        claim: "claimed",  // Set claim status
-      });
+    try {
+      const snapshot = await get(claimRef);
+      if (!snapshot.exists()) {
+        const countrySnapshot = await get(userRef);
+        const countryData = countrySnapshot.val();
+        if (countryData === "Somaliland") {
+          Swal.fire('Welcome', 'You claimed a 500 coins for free', 'success');
+          await update(veriRef, { coins: 500, claim: "claimed" });
+        } else {
+          Swal.fire('Welcome', 'You claimed 100 coins for free', 'success');
+          await update(veriRef, { coins: 90, claim: "claimed" });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching country or setting claim:", error.message);
     }
-    else {
-      Swal.fire('Welcome', 'You claimed 100 coins for free', 'success');
-      await update(veriRef, {
-        coins: 100,
-        claim: "claimed",
-      });
+
+    const paySuccRef = ref(database, `users/${user.uid}/payments/pur`);
+    const paydeRef = ref(database, `users/${user.uid}/payments`);
+    const payCoinsRef = ref(database, `users/${user.uid}/payments/coins`);
+    const verief = ref(database, `users/${user.uid}`);
+    try {
+      const paySuccSnapshot = await get(paySuccRef);
+      if (paySuccSnapshot.exists() && paySuccSnapshot.val() === "t") {
+        const coinsSnapshot = await get(payCoinsRef);
+        if (coinsSnapshot.exists()) {
+          const sho = coinsSnapshot.val();
+          const userCoinsSnapshot = await get(ref(database, `users/${user.uid}/coins`));
+          const userCoins = userCoinsSnapshot.exists() ? userCoinsSnapshot.val() : 0;
+
+          Swal.fire('Payment successfully!', `Your purchased ${sho} coins completed`, 'success');
+          await update(verief, { coins: Number(userCoins) + Number(sho) });
+          await set(paydeRef, { 
+            de: null
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching payment details:", error.message);
     }
-  }
-} catch (error) {
-  console.error("Error fetching country or setting claim:", error.message);
-}
-    // Hubinta PIN
+
     const pinRef = ref(database, `users/${user.uid}/pinned`);
     try {
       const snapshot = await get(pinRef);
@@ -71,32 +86,15 @@ try {
       console.error("Error checking PIN:", error.message);
     }
 
-    // Hubi coins-ka user-ka
     const userCoinsRef = ref(database, `users/${user.uid}/coins`);
     try {
       const coinsSnapshot = await get(userCoinsRef);
-      let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
-
+      const userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
       document.getElementById("user-coins").innerText = userCoins;
     } catch (error) {
       console.error("Error fetching coins:", error.message);
     }
-
-    // Hubi koorsooyinka la iibsaday
-    document.querySelectorAll('.btn-unlock100, .btn-unlock900').forEach(async (button) => {
-      const courseName = button.getAttribute('data-course');
-      const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
-
-      try {
-        const purchaseSnapshot = await get(purchaseRef);
-        if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased) {
-          button.disabled = true;
-          button.innerText = 'Already unlocked';
-        }
-      } catch (error) {
-        console.error(`Error checking purchase for ${courseName}:`, error.message);
-      }
-    });
+    
 
     // Iibso koorso
     // Function for unlocking with 100 coins
