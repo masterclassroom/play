@@ -83,7 +83,7 @@ try {
     }
 
     // Hubi koorsooyinka la iibsaday
-    document.querySelectorAll('.btn-buy, .btn-unlock').forEach(async (button) => {
+    document.querySelectorAll('.btn-unlock100, .btn-unlock900').forEach(async (button) => {
       const courseName = button.getAttribute('data-course');
       const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
@@ -91,7 +91,7 @@ try {
         const purchaseSnapshot = await get(purchaseRef);
         if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased) {
           button.disabled = true;
-          button.innerText = 'Already Purchased';
+          button.innerText = 'Already unlocked';
         }
       } catch (error) {
         console.error(`Error checking purchase for ${courseName}:`, error.message);
@@ -99,103 +99,185 @@ try {
     });
 
     // Iibso koorso
-    document.querySelectorAll('.btn-buy').forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        const courseName = event.target.getAttribute('data-course');
-        const price = parseInt(event.target.getAttribute('price'));
-        const userRef = ref(database, `users/${user.uid}/payments/${courseName}`);
+    // Function for unlocking with 100 coins
+document.querySelectorAll('.btn-unlock100').forEach((button) => {
+  button.addEventListener('click', async (event) => {
+    const courseName = event.target.getAttribute('data-course');
+    const qiime = parseInt(event.target.getAttribute('qiime'));
+    const userCoinsRef = ref(database, `users/${user.uid}/coins`);
+    const usrCoinsRef = ref(database, `users/${user.uid}`);
+    const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
 
-        try {
-          const snapshot = await get(userRef);
+    try {
+      // Hel coins-ka user-ka
+      const coinsSnapshot = await get(userCoinsRef);
+      let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
 
-          if (snapshot.exists()) {
+      if (userCoins >= qiime) {
+        const { isConfirmed } = await Swal.fire({
+          title: 'Confirmation',
+          text: `Ma hubtaa inaad tuurato ${qiime} coins?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Haa',
+          cancelButtonText: 'Maya'
+        });
+
+        if (!isConfirmed) return;
+        document.getElementById("user-coins").innerText = userCoins - qiime;
+
+        Swal.fire({
+          title: 'Finding your reward...',
+          html: '<b>Processing...</b>',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        setTimeout(async () => {
+          let success = false;
+          let rewardCoins = 0;
+          let randomChance = Math.random(); // Number between 0 and 1
+
+          // 5% fursad guul marka 100 coins la isticmaalo
+          success = randomChance < 0.05;
+          rewardCoins = success ? 0 : Math.floor(Math.random() * 100) + 1;
+
+          if (success) {
+            await update(usrCoinsRef, { coins: userCoins - qiime });
+            await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
+            button.disabled = true;
+            button.innerText = "Already Unlocked";
+
             Swal.fire({
-              text: `Mar hore ayaad codsatay koorsada: ${courseName}, fadlan sug inta la Xaqiijinayo`,
+              title: 'You win!',
+              text: `Koorsada ${courseName} waad la furay!`,
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            await update(usrCoinsRef, { coins: userCoins - qiime + rewardCoins });
+            document.getElementById("user-coins").innerText = userCoins - qiime + rewardCoins;
+            
+            Swal.fire({
+              title: 'Try Again!',
+              text: `Waxaad lumisay ${qiime} coins, laakiin waxaad heshay ${rewardCoins} coins.`,
               icon: 'info',
               confirmButtonText: 'Ok'
             });
-          } else {
-            const { isConfirmed } = await Swal.fire({
-              title: 'Confirmation',
-              text: `Ma rabtaa inaad iibsatid koorsada ${courseName} oo ah $${price}?`,
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonText: 'Haa',
-              cancelButtonText: 'Maya'
-            });
-
-            if (isConfirmed) {
-              window.location.href = `payment.html?course:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(courseName)}&price:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(price)}`;
-            }
           }
-        } catch (error) {
-          Swal.fire({
-            title: 'Error!',
-            text: `Waxaa dhacay khalad: ${error.message}`,
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
+        }, 3000); // 3-second delay for animation
+      } else {
+        Swal.fire({
+          title: 'Insufficient Coins',
+          text: `Waxaad u baahan tahay ${qiime} coins, adiguna waxaad haysataa ${userCoins} coins.`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: `Waxaa dhacay khalad: ${error.message}`,
+        icon: 'error',
+        confirmButtonText: 'Ok'
       });
-    });
+    }
+  });
+});
 
-    // Unlock course with coins
-    document.querySelectorAll('.btn-unlock').forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        const courseName = event.target.getAttribute('data-course');
-        const coursePrice = parseInt(document.querySelector(`#${event.target.closest('.course-card').id} .price`).innerText);
-        const userCoinsRef = ref(database, `users/${user.uid}`);
-        const usrCoinsRef = ref(database, `users/${user.uid}/coins`);
-        const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+// Function for unlocking with 900 coins
+document.querySelectorAll('.btn-unlock900').forEach((button) => {
+  button.addEventListener('click', async (event) => {
+    const courseName = event.target.getAttribute('data-course');
+    const qiime = parseInt(event.target.getAttribute('qiime'));
+    const userCoinsRef = ref(database, `users/${user.uid}/coins`);
+    const usrCoinsRef = ref(database, `users/${user.uid}`);
+    const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+    try {
+      // Hel coins-ka user-ka
+      const coinsSnapshot = await get(userCoinsRef);
+      let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
 
-        try {
-          const coinsSnapshot = await get(usrCoinsRef);
-          let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
+      if (userCoins >= qiime) {
+        const { isConfirmed } = await Swal.fire({
+          title: 'Confirmation',
+          text: `Ma hubtaa inaad tuurato ${qiime} coins?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Haa',
+          cancelButtonText: 'Maya'
+        });
 
-          if (userCoins >= coursePrice) {
-            const { isConfirmed } = await Swal.fire({
-              title: 'Confirmation',
-              text: `Ma hubtaa inaad iibsatid ${courseName} adigoo isticmaalaya ${coursePrice} coins?`,
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonText: 'Haa',
-              cancelButtonText: 'Maya'
-            });
+        if (!isConfirmed) return;
+        document.getElementById("user-coins").innerText = userCoins - qiime;
 
-            if (isConfirmed) {
-              await update(userCoinsRef, { coins: userCoins - coursePrice });
-              await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
+        Swal.fire({
+          title: 'Finding your reward...',
+          html: '<b>Processing...</b>',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
 
-              document.getElementById("user-coins").innerText = userCoins - coursePrice;
-              button.disabled = true;
-              button.innerText = "Already Unlocked";
+        setTimeout(async () => {
+          let success = false;
+          let rewardCoins = 0;
+          let randomChance = Math.random(); // Number between 0 and 1
 
-              Swal.fire({
-                title: 'Success!',
-                text: `${courseName} waa la furay!`,
-                icon: 'success',
-                confirmButtonText: 'Ok'
-              });
-            }
-          } else {
+          // 50% fursad guul marka 900 coins la isticmaalo
+          success = randomChance < 0.5;
+          rewardCoins = success ? 0 : Math.floor(Math.random() * 900) + 1;
+
+          if (success) {
+            await update(usrCoinsRef, { coins: userCoins - qiime });
+            await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
+            
+            button.disabled = true;
+            button.innerText = "Already Unlocked";
+
             Swal.fire({
-              title: 'Insufficient Coins',
-              text: `Waxaad u baahan tahay ${coursePrice} coins, adiguna waxaad haysataa ${userCoins} coins.`,
-              icon: 'error',
+              title: 'You win!',
+              text: `Koorsada ${courseName} waa la furay!`,
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            await update(usrCoinsRef, { coins: userCoins - qiime + rewardCoins });
+
+            document.getElementById("user-coins").innerText = userCoins - qiime + rewardCoins;
+
+            Swal.fire({
+              title: 'Try Again!',
+              text: `Waxaad lumisay ${qiime} coins, laakiin waxaad heshay ${rewardCoins} coins.`,
+              icon: 'info',
               confirmButtonText: 'Ok'
             });
           }
-        } catch (error) {
-          Swal.fire({
-            title: 'Error!',
-            text: `Waxaa dhacay khalad: ${error.message}`,
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
+        }, 3000); // 3-second delay for animation
+      } else {
+        Swal.fire({
+          title: 'Insufficient Coins',
+          text: `Waxaad u baahan tahay ${qiime} coins, adiguna waxaad haysataa ${userCoins} coins.`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: `Waxaa dhacay khalad: ${error.message}`,
+        icon: 'error',
+        confirmButtonText: 'Ok'
       });
-    });
-
+    }
+  });
+});
+    
+    // Unlock course with coins
+    
     // About Modal
     document.getElementById('about-btn')?.addEventListener('click', () => {
       Swal.fire({
