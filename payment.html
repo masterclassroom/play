@@ -95,8 +95,10 @@
                 const paymentNumber = document.getElementById('payment-number').value;
                 const paymentMethod = document.getElementById('payment-method').value;
                 const currencyType = document.getElementById('currency-type').value;
+                const prices = document.getElementById("pricer").innerText;
+                const Coon = document.getElementById("coin").innerText;
                 const messageElement = document.getElementById("messages");
-
+                
                  if(!username || !email || !phone) {
                      messageElement.textContent = 'Fadlan buuxi dhamaan foomka';
                      return;
@@ -121,27 +123,22 @@
                 });
 
                 if (isConfirmed) {
-                    const paymentRef = ref(database, `users/${auth.currentUser.uid}/payments/${courseName}`);
-                    const purchaseRef = ref(database, `users/${auth.currentUser.uid}/purchases/${courseName}`);
-
+                    const paymentRef = ref(database, `users/${auth.currentUser.uid}/payments`);
+                    
                     try {
                         await set(paymentRef, {
-                            userId: auth.currentUser.uid,
-                            courseName: courseName,
+                            userId: auth.currentUser.uid,                         
                             username: username,
                             email: email,
                             phone: phone,
                             paymentNumber: paymentNumber,
                             paymentMethod: paymentMethod,
                             currencyType: currencyType,
+                            qiimaha: prices,
+                            coins: Coon,
+                            pur: false,
                             timestamp: new Date().toISOString()
-                        });
-
-                        await set(purchaseRef, {
-                            userId: auth.currentUser.uid,
-                            courseName: courseName,
-                            purchased: false
-                        });
+                        });                     
 
                         messageElement.textContent = 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.';
                     } catch (error) {
@@ -244,8 +241,8 @@ button:hover {
 
 <div class="container">
     <h2>payment</h2>
-    <p><strong>Koorsada:</strong> <span id="course-name"></span></p>
     <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
+    <p><strong>Coins:</strong> <span id="coin"></span></p>
 
     <form id="payment-form">
         <input type="text" id="username" placeholder="Gali magacaaga" required>
@@ -279,7 +276,7 @@ button:hover {
 </div>
 
 <script>
-    document.getElementById('course-name').innerText = new URLSearchParams(window.location.search).get('course:detailshtmlhex1290pllknmagdhssg') || "Unknown Course";
+    document.getElementById('coin').innerText = new URLSearchParams(window.location.search).get('coin:detailshtmlhex1290pllknmagdhssg') || "Unknown Coins";
 </script>
 </body>
     </html>
