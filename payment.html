@@ -115,7 +115,7 @@
 
                 const { isConfirmed } = await Swal.fire({
                     title: 'Payment confirmation?',
-                    text: `Ma Hubta inaad iib sato koorsada ${courseName}?`,
+                    text: `Ma Hubta inaad codsato ${Coon} coins oo qiimihiisu yahay ${prices}`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Haa',
@@ -136,7 +136,7 @@
                             currencyType: currencyType,
                             qiimaha: prices,
                             coins: Coon,
-                            pur: false,
+                            pur: "false",
                             timestamp: new Date().toISOString()
                         });                     
 
