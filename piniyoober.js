@@ -105,15 +105,15 @@ updatePasswordButton.addEventListener("click", async () => {
     const userData = snapshot.val();
     const userCoins = userData.coins || 0;
 
-    if (userCoins < 2000) {
-      showMessage("Not enough coins you need 2000 coins to change pincode!", false);
+    if (userCoins < 100) {
+      showMessage("Not enough coins you need 100 coins to change pincode!", false);
       return;
     }
 
     await set(ref(database, `users/${user.uid}/Pin`), Newpin);
-    await set(ref(database, `users/${user.uid}/coins`), userCoins - 2000);
+    await set(ref(database, `users/${user.uid}/coins`), userCoins - 100);
 
-    coinsBalanceText.textContent = userCoins - 2000;
+    coinsBalanceText.textContent = userCoins - 100;
 
     showMessage("Your Pincode has been updated successfully!", true);
 
