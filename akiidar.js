@@ -94,6 +94,20 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Error fetching coins:", error.message);
     }
+    document.querySelectorAll('.btn-unlock100, .btn-unlock900').forEach(async (button) => {
+      const courseName = button.getAttribute('data-course');
+      const purchaseRef = ref(database, `users/${user.uid}/purchases/${courseName}`);
+
+      try {
+        const purchaseSnapshot = await get(purchaseRef);
+        if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased) {
+          button.disabled = true;
+          button.innerText = 'Already unlocked';
+        }
+      } catch (error) {
+        console.error(`Error checking purchase for ${courseName}:`, error.message);
+      }
+    });
     
 
     // Iibso koorso
