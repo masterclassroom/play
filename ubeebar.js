@@ -69,8 +69,8 @@ updateUsernameButton.addEventListener("click", async () => {
     return;
   }
 
-  if (userCoins < 2000) {
-    showMessage("Not enough coins! You need 2000 coins to change your username.", "error");
+  if (userCoins < 100) {
+    showMessage("Not enough coins! You need 100 coins to change your username.", "error");
     return;
   }
 
@@ -88,7 +88,7 @@ updateUsernameButton.addEventListener("click", async () => {
     await set(userRef, newUsername);
 
     // Deduct 2000 coins
-    await set(coinsRef, userCoins - 2000);
+    await set(coinsRef, userCoins - 100);
     
     showMessage("Your username has been updated successfully!", "success");
     setTimeout(() => {
