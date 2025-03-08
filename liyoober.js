@@ -102,7 +102,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
       alert(`Login Successful! You have ${loginAttempts} logins left this month.`);
       setTimeout(() => {
-        window.location.href = "Pincode.html";
+        window.location.href = "Academy.html";
       }, 1000);
     } else {
       errorMessage.style.display = 'block';
