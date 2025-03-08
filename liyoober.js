@@ -18,6 +18,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
+// Function to get current date as YYYY-MM
+function getCurrentMonth() {
+  return new Date().toISOString().substring(0, 7); // Example: "2025-03"
+}
+
 // Handle Login
 document.getElementById('loginBtn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
@@ -25,10 +30,9 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   const errorMessage = document.getElementById('error-message');
   const succesMessage = document.getElementById('succes-message');
 
-  // Clear previous error messages
+  // Clear previous messages
   errorMessage.style.display = 'none';
   errorMessage.innerText = '';
-  
   succesMessage.style.display = 'none';
   succesMessage.innerText = '';
 
@@ -46,7 +50,6 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     return;
   }
 
-  // Password length validation
   if (password.length < 6) {
     errorMessage.style.display = 'block';
     errorMessage.innerText = 'Password must be at least 6 characters long.';
@@ -61,11 +64,13 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Please verify your email.';
       return;
-      await sendEmailVerification(user);
     }
 
-    const dbRef = ref(database, `users/${user.uid}`);
-    const snapshot = await get(dbRef);
+    const userRef = ref(database, `users/${user.uid}`);
+    const snapshot = await get(userRef);
+
+    const currentMonth = getCurrentMonth();
+    let loginAttempts = 10;
 
     if (snapshot.exists()) {
       const userData = snapshot.val();
@@ -76,23 +81,26 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         return;
       }
 
-      // Check if another user is already logged in
-      const loggedInRef = ref(database, `users/${user.uid}/isLoggedIn`);
-      const loggedInSnapshot = await get(loggedInRef);
+      if (userData.lastLoginMonth && userData.lastLoginMonth === currentMonth) {
+        loginAttempts = userData.loginAttempts ?? 10;
+      } else {
+        loginAttempts = 10; // Reset login attempts for the new month
+      }
 
-      if (loggedInSnapshot.exists() && loggedInSnapshot.val() === true) {
+      if (loginAttempts <= 0) {
         errorMessage.style.display = 'block';
-        errorMessage.innerText = 'Another user is using this account.';
+        errorMessage.innerText = 'You have reached your login limit for this month. Please wait for the next month.';
         return;
       }
 
-      // Set the user as logged in
-      await set(ref(database, `users/${user.uid}/isLoggedIn`), true);
-      // Update the user's password in the database
-      await update(dbRef, {
-        password: password // Update the password here
+      loginAttempts--; // Decrease attempts
+      await update(userRef, {
+        loginAttempts: loginAttempts,
+        lastLoginMonth: currentMonth,
+        isLoggedIn: true
       });
 
+      alert(`Login Successful! You have ${loginAttempts} logins left this month.`);
       setTimeout(() => {
         window.location.href = "Pincode.html";
       }, 1000);
@@ -104,12 +112,12 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     if (error.code === 'auth/wrong-password') {
       errorMessage.style.display = 'block';
       errorMessage.innerText = 'Incorrect password. Please try again.';
-    } else if (error.code === 'auth/user-not-found') {
+    } else if (error.code === 'auth/user-disabled') {
       errorMessage.style.display = 'block';
-      errorMessage.innerText = 'No account found with this email.';
+      errorMessage.innerText = 'This account has been blocked.';
     } else {
       errorMessage.style.display = 'block';
-      errorMessage.innerText = 'Invalid email or password please try again.';
+      errorMessage.innerText = 'Invalid email or password. Please try again.';
     }
   }
 });
