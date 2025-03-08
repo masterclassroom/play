@@ -101,7 +101,7 @@
     </select>
     
     <button id="claimButton"onclick="Buyer()">Buy</button>
-    <button class="home-btn" onclick="laabo()">Claim page</button>
+    <button class="home-btn" onclick="laabo()">Back</button>
   </div>
 
   <script>
@@ -119,7 +119,7 @@ const coin = select.options[select.selectedIndex].getAttribute("coin");
     
   <script>
     function laabo() {
-      window.location.href = "Coins.html";
+      window.history.back();
     }
   </script>
 </body>
