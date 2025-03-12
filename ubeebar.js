@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -24,8 +24,7 @@ const usernameChangeSection = document.getElementById("usernameChangeSection");
 const newUsernameInput = document.getElementById("newUsername");
 const updateUsernameButton = document.getElementById("updateUsernameButton");
 const messageBox = document.getElementById("message");
-const coinsCount = document.getElementById("coinsCount").innerText;
-
+const coinsCount = document.getElementById("coinsCount");
 
 let userCoins = 0;
 
@@ -89,11 +88,9 @@ updateUsernameButton.addEventListener("click", async () => {
     await set(userRef, newUsername);
 
     // Deduct 10 coins
-    
-    // Deduct 10 coins
-userCoins -= 10;
-coinsCount.innerText = userCoins;
-await set(coinsRef, userCoins);
+    userCoins -= 10;
+    coinsCount.innerText = userCoins;
+    await set(coinsRef, userCoins);
     
     showMessage("Your username has been updated successfully!", "success");
     setTimeout(() => {
@@ -113,4 +110,4 @@ function showMessage(text, type) {
   setTimeout(() => {
     messageBox.classList.add("hidden");
   }, 5000);
-    }
+      }
