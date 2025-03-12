@@ -105,21 +105,21 @@ updatePasswordButton.addEventListener("click", async () => {
     const userData = snapshot.val();
     const userCoins = userData.coins || 0;
 
-    if (userCoins < 100) {
-      showMessage("Not enough coins you need 100 coins to change pincode!", false);
+    if (userCoins < 10) {
+      showMessage("Not enough coins you need 10 coins to change pincode!", false);
       return;
     }
 
     await set(ref(database, `users/${user.uid}/Pin`), Newpin);
-    await set(ref(database, `users/${user.uid}/coins`), userCoins - 100);
+    await set(ref(database, `users/${user.uid}/coins`), userCoins - 10);
 
-    coinsBalanceText.textContent = userCoins - 100;
+    coinsBalanceText.textContent = userCoins - 10;
 
     showMessage("Your Pincode has been updated successfully!", true);
 
     setTimeout(() => {
       window.location.replace("Academy.html");
-    }, 3000);
+    }, 2500);
   } catch (error) {
     showMessage("Incorrect password or an error occurred.", false);
   }
