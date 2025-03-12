@@ -25,6 +25,8 @@ const newUsernameInput = document.getElementById("newUsername");
 const updateUsernameButton = document.getElementById("updateUsernameButton");
 const messageBox = document.getElementById("message");
 const coinsCount = document.getElementById("coinsCount");
+const coinBal = document.getElementById("coinsCount").innerText;
+
 
 let userCoins = 0;
 
@@ -89,6 +91,7 @@ updateUsernameButton.addEventListener("click", async () => {
 
     // Deduct 2000 coins
     await set(coinsRef, userCoins - 10);
+    coinBal.innerText = userCoins - 10;
     
     showMessage("Your username has been updated successfully!", "success");
     setTimeout(() => {
