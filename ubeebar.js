@@ -89,8 +89,11 @@ updateUsernameButton.addEventListener("click", async () => {
     await set(userRef, newUsername);
 
     // Deduct 10 coins
-    coinsCount.innerText = coinCount - 10;
-    await update(coinsRef, userCoins - 10);
+    
+    // Deduct 10 coins
+userCoins -= 10;
+coinsCount.innerText = userCoins;
+await set(coinsRef, userCoins);
     
     showMessage("Your username has been updated successfully!", "success");
     setTimeout(() => {
