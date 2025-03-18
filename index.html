@@ -64,6 +64,12 @@
                 transform: translateY(0);
             }
         }
+        .language-selector {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
         section {
             margin: 20px;
             padding: 20px;
@@ -83,22 +89,28 @@
 
     <header>
         <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
-        Home page
+        <span id="home-title">Bogga Hore</span>
+        
+        <select class="language-selector" id="languageSelector" onchange="changeLanguage()">
+            <option value="so">Somali</option>
+            <option value="en">English</option>
+        </select>
+
         <div class="menu-container" id="menu">
-            <a href="signup.html">Is Diiwaan Gali</a>
-            <a href="login.html">Gal Akoonkaaga</a>
-            <a href="dashboard.html">Mar Hore Ayaan Galay</a>
-            <a href="Injury.html">Contact Us</a>
+            <a href="signup.html" id="signup-link">Is Diiwaan Gali</a>
+            <a href="login.html" id="login-link">Gal Akoonkaaga</a>
+            <a href="dashboard.html" id="dashboard-link">Mar Hore Ayaan Galay</a>
+            <a href="contact.html" id="contact-link">Nala Soo Xiriir</a>
         </div>
     </header>
 
     <section>
-        <h2>Ku Soo Dhawoow</h2>
-        <p>Websitekan waxa aad ku baran karta koorsooyin tayo leh sida (Siraha muuqaal samaynta), (Soo dajinta PES 25 mobile kasta), iyo (Sirta eFootball 25).</p>
+        <h2 id="welcome-title">Ku Soo Dhawoow</h2>
+        <p id="welcome-text">Websitekan waxa aad ku baran karta koorsooyin tayo leh sida (Siraha muuqaal samaynta), (Soo dajinta PES 25 mobile kasta), iyo (Sirta eFootball 25).</p>
     </section>
 
     <footer>
-        &copy; 2025 Boys Academy. Dhammaan Xuquuqaha Waa La Keydiyay.
+        &copy; 2025 Boys Academy. <span id="rights-text">Dhammaan Xuquuqaha Waa La Keydiyay.</span>
     </footer>
 
     <script>
@@ -110,7 +122,43 @@
                 menu.style.display = "none";
             }
         }
+
+        function changeLanguage() {
+            var lang = document.getElementById("languageSelector").value;
+            
+            var translations = {
+                "so": {
+                    "home-title": "Bogga Hore",
+                    "signup-link": "Is Diiwaan Gali",
+                    "login-link": "Gal Akoonkaaga",
+                    "dashboard-link": "Mar Hore Ayaan Galay",
+                    "contact-link": "Nala Soo Xiriir",
+                    "welcome-title": "Ku Soo Dhawoow",
+                    "welcome-text": "Websitekan waxa aad ku baran karta koorsooyin tayo leh sida (Siraha muuqaal samaynta), (Soo dajinta PES 25 mobile kasta), iyo (Sirta eFootball 25).",
+                    "rights-text": "Dhammaan Xuquuqaha Waa La Keydiyay."
+                },
+                "en": {
+                    "home-title": "Home Page",
+                    "signup-link": "Sign Up",
+                    "login-link": "Login",
+                    "dashboard-link": "Already Logged In",
+                    "contact-link": "Contact Us",
+                    "welcome-title": "Welcome",
+                    "welcome-text": "On this website, you can learn quality courses such as (Secrets of video making), (Downloading PES 25 for any mobile), and (eFootball 25 secrets).",
+                    "rights-text": "All Rights Reserved."
+                }
+            };
+
+            document.getElementById("home-title").textContent = translations[lang]["home-title"];
+            document.getElementById("signup-link").textContent = translations[lang]["signup-link"];
+            document.getElementById("login-link").textContent = translations[lang]["login-link"];
+            document.getElementById("dashboard-link").textContent = translations[lang]["dashboard-link"];
+            document.getElementById("contact-link").textContent = translations[lang]["contact-link"];
+            document.getElementById("welcome-title").textContent = translations[lang]["welcome-title"];
+            document.getElementById("welcome-text").textContent = translations[lang]["welcome-text"];
+            document.getElementById("rights-text").textContent = translations[lang]["rights-text"];
+        }
     </script>
 
 </body>
-  </html>
+</html>
