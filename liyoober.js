@@ -175,7 +175,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
             alert(translations[currentLanguage].successfulLogin.replace('{attempts}', loginAttempts));
             setTimeout(() => {
-                window.location.href = "Academy.html";
+                window.location.href = "dashboard.html";
             }, 1000);
         } else {
             errorMessage.style.display = 'block';
