@@ -61,7 +61,7 @@ document.getElementById('jecker').addEventListener('click', async () => {
         if (savedPin === code) {
             Swal.fire('Successfully!', 'Pin is correct!', 'success').then(async () => {
                 await set(logRef, { pinned: null });
-                window.location.href = "Academy.html";
+                window.location.href = "dashboard.html";
             });
         } else {
             Swal.fire('Error', 'Incorrect pin!', 'error'); // Pin code khalad ah
