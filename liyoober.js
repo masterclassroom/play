@@ -3,6 +3,7 @@ const translations = {
     en: {
         loginTitle: 'Login account',
         loginBtn: 'Login',
+        langu: 'choose your language',
         emailLabel: 'Email',
         registerLink: 'Register',
         passwordLabel: 'Password',
@@ -27,6 +28,7 @@ const translations = {
     so: {
         loginTitle: 'Galitaanka akaawnta',
         loginBtn: 'Gal',
+        langu: 'Dooro luuqada',
         emailLabel: 'Email',
         registerLink: 'Diwaangali',
         passwordLabel: 'Erayga Sirta',
@@ -69,7 +71,8 @@ function translatePage() {
     document.getElementById('contact-link').innerText = translations[currentLanguage].contactLinkText;
     document.getElementById('injury-text').innerText = translations[currentLanguage].injuryText;
     document.getElementById('injury-link').innerText = translations[currentLanguage].injuryLinkText;
-    document.getElementById('loginBtn').innerText = translations[currentLanguage].loginBtn;}
+    document.getElementById('loginBtn').innerText = translations[currentLanguage].loginBtn;
+    document.getElementById('langu').innerText = translations[currentLanguage].langu;}
 // Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
