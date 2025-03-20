@@ -167,6 +167,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
                 errorMessage.style.display = 'block';
                 errorMessage.innerText = translations[currentLanguage].loginLimitReached;
                 return;
+                window.location.href = `?:reachedleveluser` + email;
             }
 
             loginAttempts--; // Decrease attempts
