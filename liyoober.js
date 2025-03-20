@@ -164,12 +164,20 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
             }
 
             if (loginAttempts <= 0) {
-                errorMessage.style.display = 'block';
-                errorMessage.innerText = translations[currentLanguage].loginLimitReached;
-                return;
-                window.location.href = `?:reachedleveluser` + email;
-            }
+    errorMessage.style.display = 'block';
+    errorMessage.innerText = translations[currentLanguage].loginLimitReached;
 
+    // Hel URL-ka hadda jira
+    let currentUrl = new URL(window.location.href);
+
+    // Ku dar qoraalka cusub
+    currentUrl.searchParams.set('reachedleveluser', email);
+
+    // Bedel URL-ka iyada oo aan reload dhicin
+    window.history.pushState({}, '', currentUrl);
+
+    return;
+}
             loginAttempts--; // Decrease attempts
             await update(userRef, {
                 loginAttempts: loginAttempts,
