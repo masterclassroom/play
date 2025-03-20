@@ -163,20 +163,22 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
                 loginAttempts = 10; // Reset login attempts for the new month
             }
 
-            if (loginAttempts <= 0) {
+             if (loginAttempts <= 0) {
     errorMessage.style.display = 'block';
     errorMessage.innerText = translations[currentLanguage].loginLimitReached;
 
     // Hel URL-ka hadda jira
-    let currentUrl = new URL(window.location.href);
+    let currentUrl = window.location.href;
+
+    // Go'aami haddii URL-ku horey u leeyahay '?'
+    let separator = currentUrl.includes('?') ? '&' : '?';
 
     // Ku dar qoraalka cusub
-    currentUrl.searchParams.set('reachedleveluser', email);
+    let newUrl = currentUrl + separator + 'reachedleveluser=' + email;
 
-    // Bedel URL-ka iyada oo aan reload dhicin
-    window.history.pushState({}, '', currentUrl);
-
-    return;
+    // Bedel URL-ka iyadoo aan reload dhicin
+    window.history.replaceState({}, '', newUrl);
+     return;            
 }
             loginAttempts--; // Decrease attempts
             await update(userRef, {
@@ -202,7 +204,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
             errorMessage.innerText = translations[currentLanguage].blockedAccount;
         } else {
             errorMessage.style.display = 'block';
-            errorMessage.innerText = translations[currentLanguage].noAccountFound;
+            errorMessage.innerText = `${errorMessage}` + translations[currentLanguage].noAccountFound;
         }
     }
 });
