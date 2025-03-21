@@ -174,7 +174,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     let separator = currentUrl.includes('?') ? '&' : '?';
 
     // Ku dar qoraalka cusub
-    let newUrl = currentUrl + separator + 'reachedleveluser=' + email;
+    let newUrl = currentUrl + separator + 'reachedleveluser=eiE96U4cTC6S3tV';
 
     // Bedel URL-ka iyadoo aan reload dhicin
     window.history.replaceState({}, '', newUrl);
