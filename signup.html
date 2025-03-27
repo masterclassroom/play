@@ -3,65 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title data-lang="registration">Registration</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="siyoober.css">
 </head>
 <body>
     <div class="container">
         <div class="signup-box">
-            <h2>Registration</h2>
+            <h2 data-lang="registration">Registration</h2>
             <div id="error-message" class="error-message" style="display: none;"></div>
-    <div id="succes-message" class="succes-message" style="display: none;"></div>
+            <div id="succes-message" class="succes-message" style="display: none;"></div>
+
             <form>
-              <div class="input-box">
-    <label for="country"></label>
-    <select id="country" required>
-        <option value="" disabled selected>Choose your country</option>
-        <option value="Somaliland">Somaliland</option>
-        <option value="Somalia">Somalia</option>
-        <option value="Kenya">Kenya</option>
-        <option value="Ethiopia">Ethiopia</option>
-        <option value="Uganda">Uganda</option>
-        <option value="Djibouti">Djibouti</option>
-    </select>
-</div>
+                <div class="input-box">
+                        <select id="country" required>
+                        <option value="" disabled selected data-lang="choose_country">Choose your country</option>
+                        <option value="Somaliland">Somaliland</option>
+                        <option value="Somalia">Somalia</option>
+                        <option value="Kenya">Kenya</option>
+                        <option value="Ethiopia">Ethiopia</option>
+                        <option value="Uganda">Uganda</option>
+                        <option value="Djibouti">Djibouti</option>
+                    </select>
+                </div>
+
                 <div class="input-box">
                     <input type="text" id="username" required>
-                    <label>Username</label>
-                    <span class="icon"></span>
+                    <label data-lang="username">Username</label>
                 </div>
+
                 <div class="input-box">
                     <input type="email" id="email" required>
-                    <label>Email</label>
-                    <span class="icon"></span>
+                    <label data-lang="email">Email</label>
                 </div>
+
                 <div class="input-box">
                     <input type="number" id="number" required>
-                    <label>Phone Number</label>
-                    <span class="icon"></span>
+                    <label data-lang="phone">Phone Number</label>
                 </div>
+
                 <div class="input-box">
                     <input type="password" id="password" required>
-                    <label>password</label>
-                    <span class="icon"></span>
+                    <label data-lang="password">Password</label>
                 </div>
+
                 <div class="input-box">
                     <input type="number" id="pincode" required>
-                    <label>Pin code</label>
-                    <span class="icon"></span>
+                    <label data-lang="pin_code">Pin Code</label>
                 </div>
-              
-                <button id="signUpBtn" type="button">Sign Up</button>
-                <p>Already have an account? <a href="login.html">Login</a></p>
+
+                <button id="signUpBtn" type="button" data-lang="sign_up">Sign Up</button>
+
+                <p>
+                    <span data-lang="already_account">Already have an account?</span>
+                    <a href="login.html" data-lang="login">Login</a>
+                </p>
             </form>
         </div>
+
         <div class="welcome-box">
-            <h2>WELCOME!</h2>
-            <p>If you experience any problems, please contact us.</p>
-            <a href="https://wa.me/252672146979" target="_blank">contact</a>
+            <h2 data-lang="welcome">WELCOME!</h2>
+            <p data-lang="contact">If you experience any problems, please contact us.</p>
+            <a href="https://wa.me/252672146979" target="_blank" data-lang="contacts">Contact</a>
+
+            <br><br>
+            <label for="language" data-lang="choose_language">Choose Language:</label>
+            <select id="language">
+                <option value="en">English</option>
+                <option value="so">Somali</option>
+            </select>
         </div>
     </div>
+
     <script type="module" src="siyoober.js"></script>
 </body>
-    </html>
+</html>
