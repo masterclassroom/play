@@ -193,3 +193,18 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
+select {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    outline: none;
+    color: white;
+    font-size: 16px;
+    transition: 0.3s;
+}
+select:focus {
+    border-color: #03cafc;
+    box-shadow: 0 0 8px #00ffaa;
+}
