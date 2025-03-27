@@ -3,30 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reissue password</title>
+    <title data-lang="reissue_password">Reissue Password</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="fiyoober.css">
 </head>
 <body>
     <div class="container">
         <div class="forgot-box">
-            <h2>Reissue password</h2>
+            <h2 data-lang="reissue_password">Reissue Password</h2>
             <div id="alertBox"></div>
             <form id="resetForm">
                 <div class="input-box">
                     <input type="email" id="reset" required>
-                    <label>Email</label>
-                    <span class="icon"></span>
+                    <label data-lang="email">Email</label>
                 </div>
                 <div class="captcha-box">
-                    <label for="captchaCode">Captcha: <span id="captchaCode"></span></label>
+                    <label for="captchaCode">
+                        <span data-lang="captcha">Captcha:</span>
+                        <span id="captchaCode"></span>
+                    </label>
                     <input type="text" id="captchaInput" required>
                 </div>
-                <button id="forgotPasswordBtn" type="button" class="send-btn">Send reset</button>
-                <button onclick="window.history.back()">Back</button>
+                <button id="forgotPasswordBtn" type="button" class="send-btn" data-lang="send_reset">Send Reset</button>
+                <button type="button" onclick="window.history.back()" data-lang="back">Back</button>
             </form>
+
+            <br>
+            <label for="language" data-lang="choose_language">Choose Language:</label>
+            <select id="language">
+                <option value="en">English</option>
+                <option value="so">Somali</option>
+            </select>
         </div>
     </div>
     <script type="module" src="fiyoober.js"></script>
 </body>
-        </html>
+    </html>
