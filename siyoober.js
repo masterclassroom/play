@@ -24,144 +24,168 @@ const countrySelect = document.getElementById("country");
 const numberInput = document.getElementById("number");
 
 countrySelect.addEventListener("change", function () {
-    const selectedCountry = countrySelect.value;
-
-    if (selectedCountry === "Somalia") {
-        numberInput.value = "252";
-    } else if (selectedCountry === "Somaliland") {
-        numberInput.value = "252";
-    } else if (selectedCountry === "Kenya") {
-        numberInput.value = "254";
-    } else if (selectedCountry === "Ethiopia") {
-        numberInput.value = "251";
-    } else if (selectedCountry === "Uganda") {
-        numberInput.value = "256";
-    } else if (selectedCountry === "Djibouti") {
-        numberInput.value = "253";
-    } else {
-        numberInput.value = "";
-    }
+    const countryCodes = {
+        "Somalia": "252",
+        "Somaliland": "252",
+        "Kenya": "254",
+        "Ethiopia": "251",
+        "Uganda": "256",
+        "Djibouti": "253"
+    };
+    numberInput.value = countryCodes[this.value] || "";
 });
 
 // Handle Sign Up
 document.getElementById('signUpBtn').addEventListener('click', async () => {
-    const username = document.getElementById("username").value;
-    const email = document.getElementById('email').value;
-    const country = document.getElementById("country").value
-    const number = numberInput.value;
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById('email').value.trim();
+    const country = document.getElementById("country").value;
+    const number = numberInput.value.trim();
     const password = document.getElementById('password').value;
     const pin = document.getElementById('pincode').value;
     const errorMessage = document.getElementById('error-message');
-    const succesMessage = document.getElementById('succes-message');
+    const successMessage = document.getElementById('succes-message');
 
-    // Clear previous error messages
+    // Clear previous messages
     errorMessage.style.display = 'none';
     errorMessage.innerText = '';
-    succesMessage.style.display = 'none';
-    succesMessage.innerText = '';
+    successMessage.style.display = 'none';
+    successMessage.innerText = '';
 
     try {
-         if (!country || country=== "") {
-             errorMessage.style.display = 'block';
-             errorMessage.innerText = 'Please choose country';
-             return;
-         }
-        // Validate inputs
-        if (!username || username.length > 25) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Invalid username';
-            return;
-        }
-        if (!isValidEmail(email)) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Invalid email address';
-            return;
-        }
-        if (!number || number.length < 10) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Phone number is required';
-            return;
-        }
-        if (!pin || pin.length !== 4) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Pin must be 4 digits';
-            return;
-        }
-        if (password.length < 8) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Password must be at least 8 characters long';
-            return;
-        }
+        if (!country) return showError("choose_country");
+        if (!username || username.length > 25) return showError("error_invalid_username");
+        if (!isValidEmail(email)) return showError("error_invalid_email");
+        if (!number || number.length < 10) return showError("error_phone_required");
+        if (!pin || pin.length !== 4) return showError("error_pin");
+        if (password.length < 8) return showError("error_password_length");
 
         // Check if email or phone number is already registered
-        const emailRef = ref(database, `users/`);
-        const snapshot = await get(emailRef);
+        const snapshot = await get(ref(database, `users/`));
 
-        let emailExists = false;
-        let numberExists = false;
-        let usernameExists = false;
-
-        snapshot.forEach((childSnapshot) => {
-            if (childSnapshot.val().email === email) emailExists = true;
-            if (childSnapshot.val().number === number) numberExists = true;
-            if (childSnapshot.val().username === username) usernameExists = true;
+        let emailExists = false, numberExists = false, usernameExists = false;
+        snapshot.forEach(childSnapshot => {
+            const userData = childSnapshot.val();
+            if (userData.email === email) emailExists = true;
+            if (userData.number === number) numberExists = true;
+            if (userData.username === username) usernameExists = true;
         });
 
-        if (emailExists) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Email already registered';
-            return;
-        }
-        if (numberExists) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Phone number already registered';
-            return;
-        }
-        if (usernameExists) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = 'Username is taken';
-            return;
-        }
+        if (emailExists) return showError("error_email_exists");
+        if (numberExists) return showError("error_phone_exists");
+        if (usernameExists) return showError("error_username_exists");
 
         // Create User
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Get current date and time
-        const now = new Date();
-        const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-
         // Save user data to Realtime Database
         const userRef = ref(database, `users/${user.uid}`);
         await set(userRef, {
-            username: username,
-            email: email,
-            country: country,
-            number: number,
-            password: password,
-            Pin: pin,
-            pinned: true,
-            signUpDate: formattedDate,
+            username, email, country, number, password, Pin: pin, pinned: true,
+            signUpDate: new Date().toISOString()
         });
 
         // Send Email Verification
         await sendEmailVerification(user);
 
         // Success message and redirect
-        succesMessage.style.display = 'block';
-        succesMessage.innerText = 'Account created successfully';
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2500);
+        showSuccess("success_account_created");
+        setTimeout(() => { window.location.href = "login.html"; }, 2000);
 
     } catch (error) {
-        errorMessage.style.display = 'block';
-        errorMessage.innerText = error.message;
+        showError(error.message);
     }
 });
 
 // Validate email format function
 function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-      }
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Function to show error message
+function showError(key) {
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.style.display = 'block';
+    errorMessage.innerText = translations[currentLanguage][key] || key;
+}
+
+// Function to show success message
+function showSuccess(key) {
+    const successMessage = document.getElementById('succes-message');
+    successMessage.style.display = 'block';
+    successMessage.innerText = translations[currentLanguage][key] || key;
+}
+
+// Translations object
+const translations = {
+    en: {
+        registration: "Registration",
+        sign_up: "Sign Up",
+        already_account: "Already have an account?",
+        login: "Login",
+        choose_country: "Please choose your country",
+        username: "Username",
+        choose_language: "Choose language",
+        email: "Email",
+        phone: "Phone Number",
+        password: "Password",
+        pin_code: "Pin Code",
+        welcome: "WELCOME!",
+        contact: "If you experience any problems, please contact us",
+        error_invalid_username: "Invalid username",
+        error_invalid_email: "Invalid email address",
+        error_phone_required: "Phone number is required",
+        error_pin: "Pin must be 4 digits",
+        error_password_length: "Password must be at least 8 characters long",
+        error_email_exists: "Email already registered",
+        error_phone_exists: "Phone number already registered",
+        error_username_exists: "Username is taken",
+        success_account_created: "Account created successfully"
+    },
+    so: {
+        registration: "Diiwaangelin",
+        sign_up: "Diiwaangeli",
+        already_account: "Horey ma u leedahay xisaab?",
+        login: "Soo gal",
+        choose_country: "Fadlan dooro waddankaaga",
+        username: "Magaca Isticmaalaha",
+        choose_language: "Doooro luuqada",
+        email: "Email",
+        phone: "Lambarka Telefoonka",
+        password: "Furaha Sirta",
+        pin_code: "Koodhka Sirta",
+        welcome: "SOO DHAWOOW!",
+        contact: "Haddi aad cilad dareento nala soo xiriir",
+        error_invalid_username: "Magaca isticmaalaha sax ma aha",
+        error_invalid_email: "Cinwaanka email-ka sax ma aha",
+        error_phone_required: "Lambarka telefoonka waa lagama maarmaan",
+        error_pin: "Koodhka waa inuu noqdaa 4 lambar",
+        error_password_length: "Furaha sirta waa inuu ka badanyahay 8 xaraf",
+        error_email_exists: "Email horey loo diiwaangeliyey",
+        error_phone_exists: "Lambarka telefoonka horey loo diiwaangeliyey",
+        error_username_exists: "Magaca isticmaalaha waa la isticmaalay",
+        success_account_created: "Akaawnka waa lagu guuleystay"
+    }
+};
+
+// Language switcher
+const languageSelect = document.getElementById("language");
+let currentLanguage = "en";
+
+languageSelect.addEventListener("change", function () {
+    currentLanguage = this.value;
+    switchLanguage(currentLanguage);
+});
+
+function switchLanguage(lang) {
+    document.querySelectorAll("[data-lang]").forEach(element => {
+        const key = element.getAttribute("data-lang");
+        if (translations[lang][key]) {
+            element.innerHTML = translations[lang][key];
+        }
+    });
+}
+
+// Default language
+switchLanguage(currentLanguage);
