@@ -19,7 +19,7 @@ const translations = {
         shortPassword: 'Password must be at least 6 characters long.',
         emailNotVerified: 'Please verify your email.',
         disabledAccount: 'This account has been disabled. Please contact support.',
-        noAccountFound: 'No account found with this email.',
+        noAccountFound: 'incorrect email or password .',
         incorrectPassword: 'Incorrect password. Please try again.',
         blockedAccount: 'This account has been blocked.',
         loginLimitReached: 'You have reached your login limit for this month. Please wait for the next month.',
@@ -44,7 +44,7 @@ const translations = {
         shortPassword: 'Erayga sirta ah wuxuu u baahan yahay ugu yaraan 6 xaraf.',
         emailNotVerified: 'Fadlan xaqiiji emailkaaga.',
         disabledAccount: 'Akaawntigan waa la hakiyey. Fadlan la xiriir taageerada.',
-        noAccountFound: 'Akaawntan lama helin emailkan.',
+        noAccountFound: 'email ama furaha aya khaldan.',
         incorrectPassword: 'Erayga sirta ah waa qalad. Fadlan isku day mar kale.',
         blockedAccount: 'Akaawntigan waa la xayiray.',
         loginLimitReached: 'Waxaad gaartay xadka gelitaanka ee bishan. Fadlan sug bilaha soo socda.',
@@ -174,7 +174,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     let separator = currentUrl.includes('?') ? '&' : '?';
 
     // Ku dar qoraalka cusub
-    let newUrl = currentUrl + separator + 'reachedleveluser=eiE96U4cTC6S3tV';
+    let newUrl = currentUrl + separator + 'reachedleveluser=eiE96U4cTC663636S3tV';
 
     // Bedel URL-ka iyadoo aan reload dhicin
     window.history.replaceState({}, '', newUrl);
@@ -204,7 +204,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
             errorMessage.innerText = translations[currentLanguage].blockedAccount;
         } else {
             errorMessage.style.display = 'block';
-            errorMessage.innerText = `${errorMessage}` + translations[currentLanguage].noAccountFound;
+            errorMessage.innerText = translations[currentLanguage].noAccountFound;
         }
     }
 });
