@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-// ✅ Firebase Config
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
   authDomain: "exam-81b90.firebaseapp.com",
@@ -13,62 +13,127 @@ const firebaseConfig = {
   appId: "1:461178422237:web:8433ab42b524b0a17bac34"
 };
 
-// ✅ Initialize Firebase
+// Init
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 
-// ✅ Hubi haddii user uu login sameeyay
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("User is logged in:", user.email);
-    } else {
-        console.log("No user is logged in.");
-        Swal.fire('Error', 'You must be logged in first!', 'error');
+// Elements
+const inputs = document.querySelectorAll(".pin-input");
+const alertBox = document.getElementById("alertBox");
+let currentUser = null;
+
+// Show message
+function showAlert(message, type) {
+  alertBox.style.display = "block";
+  alertBox.innerText = message;
+  alertBox.className = type === "success" ? "success" : "error";
+}
+
+// Clear message
+function clearAlert() {
+  alertBox.style.display = "none";
+  alertBox.innerText = "";
+  alertBox.className = "";
+}
+
+// Auto-focus & Validation
+inputs.forEach((input, index) => {
+  input.setAttribute("type", "number");
+  input.setAttribute("maxlength", "1");
+
+  input.addEventListener("input", () => {
+  const value = input.value;
+
+  // Allow only one digit
+  if (value.length > 1) {
+    input.value = "";
+    showAlert("Only one number allowed in each box!", "error");
+    return;
+  }
+
+  if (isNaN(value)) {
+    input.value = "";
+    showAlert("Only numbers are allowed!", "error");
+    return;
+  }
+
+  // Check ALL previous inputs
+  for (let i = 0; i < index; i++) {
+    if (inputs[i].value === "") {
+      input.value = ""; // Clear the current input
+      inputs[i].focus(); // Focus the first empty one before this
+      showAlert(`Please fill the box before this one!`, "error");
+      return;
     }
+  }
+
+  clearAlert();
+
+  // Auto move to next
+  if (value && index < inputs.length - 1) {
+    inputs[index + 1].focus();
+  }
 });
 
-// ✅ Marka button la riixo, hubi pin code
-document.getElementById('jecker').addEventListener('click', async () => {
-    try {
-        const user = auth.currentUser; // Isticmaalaha hadda jira
-        if (!user) {
-            Swal.fire('Error', 'You must be logged in first!', 'error');
-            return;
-        }
-
-        const logRef = ref(database, `users/${user.uid}/pinned`);
-        const code = document.getElementById("pincode").value.trim(); // Hel pincode la geliyay
-
-        if (!code) {
-            Swal.fire('Error', 'Please enter a pin code!', 'warning');
-            return;
-        }
-
-        const userRef = ref(database, `users/${user.uid}`); // Xogta user-ka
-        const snapshot = await get(userRef);
-
-        if (!snapshot.exists()) {
-            Swal.fire('Error', 'User data not found!', 'error');
-            return;
-        }
-
-        const userData = snapshot.val();
-        const savedPin = userData.Pin; // Hel Pin code-ka kaydsan
-
-        console.log("Stored Pin:", savedPin); // Log-ka arag si aad u xaqiijiso
-
-        if (savedPin === code) {
-            Swal.fire('Successfully!', 'Pin is correct!', 'success').then(async () => {
-                await set(logRef, { pinned: null });
-                window.location.href = "dashboard.html";
-            });
-        } else {
-            Swal.fire('Error', 'Incorrect pin!', 'error'); // Pin code khalad ah
-        }
-
-    } catch (error) {
-        console.error("An error occurred:", error);
-        Swal.fire('Error', 'Something went wrong. Please try again later.', 'error'); // Khalad guud
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace") {
+      input.value = "";
+      if (index > 0) inputs[index - 1].focus();
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      inputs[index - 1].focus();
+    } else if (e.key === "ArrowRight" && index < inputs.length - 1) {
+      inputs[index + 1].focus();
     }
+  });
+});
+
+// Auth check
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    showAlert("Logged in as: " + user.email, "success");
+  } else {
+    showAlert("You must be logged in first!", "error");
+  }
+});
+
+// Check PIN
+document.getElementById("jecker").addEventListener("click", async () => {
+  if (!currentUser) {
+    showAlert("You must be logged in first!", "error");
+    return;
+  }
+
+  const pin = Array.from(inputs).map(i => i.value).join("");
+
+  if (pin.length !== inputs.length) {
+    showAlert("Please enter full pin code!", "error");
+    return;
+  }
+
+  try {
+    const userRef = ref(database, `users/${currentUser.uid}`);
+    const snapshot = await get(userRef);
+
+    if (!snapshot.exists()) {
+      showAlert("User data not found!", "error");
+      return;
+    }
+
+    const savedPin = snapshot.val().Pin;
+
+    if (pin === savedPin) {
+      showAlert("Pin is correct! Redirecting...", "success");
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1500);
+    } else {
+      showAlert("Incorrect pin!", "error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    showAlert("Something went wrong!", "error");
+  }
 });
