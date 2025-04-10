@@ -118,7 +118,7 @@ updatePasswordButton.addEventListener("click", async () => {
     showMessage("Your Pincode has been updated successfully!", true);
 
     setTimeout(() => {
-      window.location.replace("Academy.html");
+      window.location.replace("dashboard.html");
     }, 2500);
   } catch (error) {
     showMessage("Incorrect password or an error occurred.", false);
