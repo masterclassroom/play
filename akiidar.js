@@ -30,7 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("User logged in:", user.email);
     
-  const userRef = ref(database, `users/${user.uid}/country`);
+
+
+    const pinRef = ref(database, `users/${user.uid}/pinned`);
+    try {
+      const snapshot = await get(pinRef);
+      if (snapshot.exists()) {
+        window.location.href = 'Pincode.html';
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking PIN:", error.message);
+    }
+    const userRef = ref(database, `users/${user.uid}/country`);
     const claimRef = ref(database, `users/${user.uid}/claim`);
     const veriRef = ref(database, `users/${user.uid}`);
 
@@ -73,18 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (error) {
       console.error("Error fetching payment details:", error.message);
-    }
-
-    const pinRef = ref(database, `users/${user.uid}/pinned`);
-    try {
-      const snapshot = await get(pinRef);
-      if (snapshot.exists()) {
-        window.location.href = 'Pincode.html';
-        return;
-      }
-    } catch (error) {
-      console.error("Error checking PIN:", error.message);
-    }
+                                          }
 
     const userCoinsRef = ref(database, `users/${user.uid}/coins`);
     try {
