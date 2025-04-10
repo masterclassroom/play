@@ -83,15 +83,27 @@
 </body>
   </html>
 <script>
-        function toggleMenu() {
-            var menu = document.getElementById("menu");
-            if (menu.style.display === "block") {
-                menu.style.display = "none";
-            } else {
-                menu.style.display = "block";
-            }
-        }
-    </script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    const isVisible = menu.classList.contains("show");
+
+    if (isVisible) {
+      menu.classList.remove("show");
+    } else {
+      menu.classList.add("show");
+    }
+  }
+
+  // Xiro marka la taabto meel banaan
+  document.addEventListener("click", function (event) {
+    const menu = document.getElementById("menu");
+    const button = document.querySelector(".menu-button");
+
+    if (!menu.contains(event.target) && !button.contains(event.target)) {
+      menu.classList.remove("show");
+    }
+  });
+</script>
 <style>
         * {
             margin: 0;
@@ -121,20 +133,26 @@
         }
 
         .menu {
-            display: none;
-            position: absolute;
-            top: 50px;
-            left: 0;
-            background: white;
-            width: 250px;
-            box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-        }
+  display: block;
+  position: absolute;
+  top: 50px;
+  left: -260px;
+  background: black;
+  width: 250px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  transition: left 1s ease;
+  z-index: 999;
+}
+
+.menu.show {
+  left: 10px;
+}
 
         .menu a {
             display: block;
             padding: 12px;
-            color: #333;
+            color: white;
             text-decoration: none;
             border-bottom: 1px solid #ddd;
         }
