@@ -114,7 +114,7 @@ document.getElementById("jecker").addEventListener("click", async () => {
 
   try {
     const userRef = ref(database, `users/${currentUser.uid}`);
-    const pinRef = ref(database, `users/${user.uid}/pinned`);
+    const pinRef = ref(database, `users/${currentUser.uid}/pinned`);
     const snapshot = await get(userRef);
 
     if (!snapshot.exists()) {
@@ -125,9 +125,7 @@ document.getElementById("jecker").addEventListener("click", async () => {
     const savedPin = snapshot.val().Pin;
 
     if (pin === savedPin) {
-      await set(pinRef, {
-        pinned: null,
-      });
+      await update(pinRef, { pinned: null });
       showAlert("Pin is correct! Redirecting...", "success");
       setTimeout(() => {
         window.location.href = "dashboard.html";
@@ -138,6 +136,6 @@ document.getElementById("jecker").addEventListener("click", async () => {
 
   } catch (err) {
     console.error(err);
-    showAlert("Something went wrong!", "error");
+    showAlert("Something went wrong! Please try again.", "error");
   }
 });
