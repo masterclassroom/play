@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 // Firebase config
@@ -125,7 +125,7 @@ document.getElementById("jecker").addEventListener("click", async () => {
     const savedPin = snapshot.val().Pin;
 
     if (pin === savedPin) {
-      await update(pinRef, { pinned: null });
+      await set(pinRef, { pinned: null });
       showAlert("Pin is correct! Redirecting...", "success");
       setTimeout(() => {
         window.location.href = "dashboard.html";
