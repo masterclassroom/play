@@ -1,135 +1,104 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #220044, #00aaff);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  background: linear-gradient(135deg, #220044, #00aaff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .container {
-    width: 400px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
-    padding: 30px;
-    text-align: center;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
+  padding: 30px;
+  text-align: center;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .forgot-box h2 {
-    margin-bottom: 15px;
-    font-weight: 600;
-    letter-spacing: 1px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
-.forgot-box p {
-    margin-bottom: 20px;
-    font-size: 14px;
-    opacity: 0.8;
+/* OTP PIN INPUTS */
+.otp-box {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 25px 0;
 }
 
-.input-box {
-    position: relative;
-    margin-bottom: 20px;
+.pin-input {
+  width: 55px;
+  height: 55px;
+  font-size: 26px;
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
+  outline: none;
+  transition: 0.3s ease;
 }
 
-.input-box input {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 5px;
-    outline: none;
-    color: white;
-    font-size: 16px;
-    transition: 0.3s;
+.pin-input:focus {
+  border-color: #00ffaa;
+  box-shadow: 0 0 10px #00ffaa;
 }
 
-.input-box input:focus {
-    border-color: #00aaff;
-    box-shadow: 0 0 8px #00aaff;
-}
-
-.input-box label {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #aaa;
-    font-size: 14px;
-    transition: 0.3s;
-    pointer-events: none;
-}
-
-.input-box input:focus ~ label,
-.input-box input:valid ~ label {
-    top: -5px;
-    left: 10px;
-    font-size: 12px;
-    color: #00aaff;
-}
-
+/* Login button */
 button {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #00aaff, #0077ff);
-    border: none;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
-    font-weight: 500;
-    box-shadow: 0 4px 6px rgba(0, 170, 255, 0.4);
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #00aaff, #0077ff);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgba(0, 170, 255, 0.4);
 }
 
 button:hover {
-    background: linear-gradient(135deg, #00ddcc, #0055ff);
-    box-shadow: 0 6px 12px rgba(0, 170, 255, 0.6);
-    transform: translateY(-2px);
+  background: linear-gradient(135deg, #00ddcc, #0055ff);
+  box-shadow: 0 6px 12px rgba(0, 170, 255, 0.6);
+  transform: translateY(-2px);
 }
 
-p a {
-    display: block;
-    margin-top: 15px;
-    color: #00aaff;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-p a:hover {
-    text-decoration: underline;
-}
-
+/* Alert box */
 #alertBox {
-    display: none;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
+  display: none;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 #alertBox.error {
-    background-color: rgba(255, 0, 0, 0.1);
-    color: #ff4d4d;
-    border: 1px solid #ff4d4d;
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff4d4d;
+  border: 1px solid #ff4d4d;
 }
 
 #alertBox.success {
-    background-color: rgba(0, 255, 170, 0.1);
-    color: #00ffaa;
-    border: 1px solid #00ffaa;
-}
+  background-color: rgba(0, 255, 170, 0.1);
+  color: #00ffaa;
+  border: 1px solid #00ffaa;
+    }
