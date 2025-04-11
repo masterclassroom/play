@@ -84,25 +84,27 @@
   </html>
 <script>
   function toggleMenu() {
-    const menu = document.getElementById("menu");
-    const isVisible = menu.classList.contains("show");
+  const menu = document.getElementById("menu");
+  const button = document.querySelector(".menu-button");
+  const isVisible = menu.classList.contains("show");
 
-    if (isVisible) {
-      menu.classList.remove("show");
-    } else {
-      menu.classList.add("show");
-    }
+  if (isVisible) {
+    menu.classList.remove("show");
+    button.innerHTML = "☰"; // dib ugu celi 3-da xariiq
+  } else {
+    menu.classList.add("show");
+    button.innerHTML = "×"; // badal calaamada marka menu furmo
   }
+}
+document.addEventListener("click", function (event) {
+  const menu = document.getElementById("menu");
+  const button = document.querySelector(".menu-button");
 
-  // Xiro marka la taabto meel banaan
-  document.addEventListener("click", function (event) {
-    const menu = document.getElementById("menu");
-    const button = document.querySelector(".menu-button");
-
-    if (!menu.contains(event.target) && !button.contains(event.target)) {
-      menu.classList.remove("show");
-    }
-  });
+  if (!menu.contains(event.target) && !button.contains(event.target)) {
+    menu.classList.remove("show");
+    button.innerHTML = "☰"; // marka meel banaan la taabto, ku celi 3-da xariiq
+  }
+});
 </script>
 <style>
         * {
