@@ -69,8 +69,8 @@ updateUsernameButton.addEventListener("click", async () => {
     return;
   }
 
-  if (userCoins < 10) {
-    showMessage("Not enough coins! You need 10 coins to change your username.", "error");
+  if (userCoins < 1) {
+    showMessage("Not enough coins! You need 1 coins to change your username.", "error");
     return;
   }
 
@@ -88,13 +88,13 @@ updateUsernameButton.addEventListener("click", async () => {
     await set(userRef, newUsername);
 
     // Deduct 10 coins
-    userCoins -= 10;
+    userCoins -= 1;
     coinsCount.innerText = userCoins;
     await set(coinsRef, userCoins);
     
     showMessage("Your username has been updated successfully!", "success");
     setTimeout(() => {
-      window.location.replace("Academy.html");
+      window.location.replace("dashboard.html");
     }, 3000);
   } catch (error) {
     showMessage(error.message, "error");
