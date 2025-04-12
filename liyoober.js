@@ -98,6 +98,14 @@ const database = getDatabase(app);
 function getCurrentMonth() {
     return new Date().toISOString().substring(0, 7); // Example: "2025-03"
 }
+// Hubinta haddii isticmaalaha uu galo
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        alert("all ready logged in");
+        // Haddii uu galo, u gudbi bogga gudaha
+        window.location.href = "dashboard.html";  // URL gudaha
+    } 
+});
 
 // Handle Login
 document.getElementById('loginBtn').addEventListener('click', async () => {
