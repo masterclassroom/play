@@ -93,7 +93,7 @@ updatePasswordButton.addEventListener("click", async () => {
     showMessage("Your password has been updated successfully!", true);
     
     setTimeout(() => {
-      window.location.replace("Academy.html");
+      window.location.replace("dashboard.html");
     }, 2000);
   } catch (error) {
     showMessage("Incorrect old password", false);
