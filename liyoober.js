@@ -99,12 +99,11 @@ function getCurrentMonth() {
     return new Date().toISOString().substring(0, 7); // Example: "2025-03"
 }
 // Hubinta haddii isticmaalaha uu galo
-firebase.auth().onAuthStateChanged(function(user) {
+onAuthStateChanged(auth, (user) => {
     if (user) {
-        alert("all ready logged in");
-        // Haddii uu galo, u gudbi bogga gudaha
+        alert("All ready logged in");
         window.location.href = "dashboard.html";  // URL gudaha
-    } 
+    }
 });
 
 // Handle Login
