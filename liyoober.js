@@ -19,7 +19,7 @@ const translations = {
         shortPassword: 'Password must be at least 6 characters long.',
         emailNotVerified: 'Please verify your email.',
         disabledAccount: 'This account has been disabled. Please contact support.',
-        noAccountFound: 'incorrect email or password .',
+        noAccountFound: 'incorrect email or password.',
         incorrectPassword: 'Incorrect password. Please try again.',
         blockedAccount: 'This account has been blocked.',
         loginLimitReached: 'You have reached your login limit for this month. Please wait for the next month.',
@@ -54,13 +54,14 @@ const translations = {
 
 let currentLanguage = 'en'; // default to English
 
+// Language switcher event listener
 document.getElementById('languageSelector').addEventListener('change', (event) => {
     currentLanguage = event.target.value;
     translatePage();
 });
 
+// Translation function
 function translatePage() {
-    // Apply translations to page elements
     document.getElementById('login-title').innerText = translations[currentLanguage].loginTitle;
     document.getElementById('email-label').innerText = translations[currentLanguage].emailLabel;
     document.getElementById('password-label').innerText = translations[currentLanguage].passwordLabel;
@@ -72,7 +73,9 @@ function translatePage() {
     document.getElementById('injury-text').innerText = translations[currentLanguage].injuryText;
     document.getElementById('injury-link').innerText = translations[currentLanguage].injuryLinkText;
     document.getElementById('loginBtn').innerText = translations[currentLanguage].loginBtn;
-    document.getElementById('langu').innerText = translations[currentLanguage].langu;}
+    document.getElementById('langu').innerText = translations[currentLanguage].langu;
+}
+
 // Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
@@ -98,11 +101,11 @@ const database = getDatabase(app);
 function getCurrentMonth() {
     return new Date().toISOString().substring(0, 7); // Example: "2025-03"
 }
-// Hubinta haddii isticmaalaha uu galo
+
+// Check if user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        alert("All ready logged in");
-        window.location.href = "dashboard.html";  // URL gudaha
+        window.location.href = "dashboard.html"; // Redirect to dashboard if logged in
     }
 });
 
@@ -170,23 +173,17 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
                 loginAttempts = 10; // Reset login attempts for the new month
             }
 
-             if (loginAttempts <= 0) {
-    errorMessage.style.display = 'block';
-    errorMessage.innerText = translations[currentLanguage].loginLimitReached;
+            if (loginAttempts <= 0) {
+                errorMessage.style.display = 'block';
+                errorMessage.innerText = translations[currentLanguage].loginLimitReached;
 
-    // Hel URL-ka hadda jira
-    let currentUrl = window.location.href;
+                let currentUrl = window.location.href;
+                let separator = currentUrl.includes('?') ? '&' : '?';
+                let newUrl = currentUrl + separator + 'reachedleveluser=eiE96U4cTC663636S3tV';
+                window.history.replaceState({}, '', newUrl);
+                return;
+            }
 
-    // Go'aami haddii URL-ku horey u leeyahay '?'
-    let separator = currentUrl.includes('?') ? '&' : '?';
-
-    // Ku dar qoraalka cusub
-    let newUrl = currentUrl + separator + 'reachedleveluser=eiE96U4cTC663636S3tV';
-
-    // Bedel URL-ka iyadoo aan reload dhicin
-    window.history.replaceState({}, '', newUrl);
-     return;            
-}
             loginAttempts--; // Decrease attempts
             await update(userRef, {
                 loginAttempts: loginAttempts,
@@ -196,7 +193,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
             alert(translations[currentLanguage].successfulLogin.replace('{attempts}', loginAttempts));
             setTimeout(() => {
-                window.location.href = "dashboard.html";
+                window.location.href = "dashboard.html"; // Redirect to dashboard
             }, 1000);
         } else {
             errorMessage.style.display = 'block';
