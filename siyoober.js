@@ -19,10 +19,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Wadamada iyo country code-kooda
+// Country codes
 const countrySelect = document.getElementById("country");
 const numberInput = document.getElementById("number");
-
 countrySelect.addEventListener("change", function () {
     const countryCodes = {
         "Somalia": "252",
@@ -46,7 +45,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
     const errorMessage = document.getElementById('error-message');
     const successMessage = document.getElementById('succes-message');
 
-    // Clear previous messages
+    // Clear messages
     errorMessage.style.display = 'none';
     errorMessage.innerText = '';
     successMessage.style.display = 'none';
@@ -60,9 +59,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
         if (!pin || pin.length !== 4) return showError("error_pin");
         if (password.length < 8) return showError("error_password_length");
 
-        // Check if email or phone number is already registered
         const snapshot = await get(ref(database, `users/`));
-
         let emailExists = false, numberExists = false, usernameExists = false;
         snapshot.forEach(childSnapshot => {
             const userData = childSnapshot.val();
@@ -75,52 +72,72 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
         if (numberExists) return showError("error_phone_exists");
         if (usernameExists) return showError("error_username_exists");
 
-        // Create User
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Save user data to Realtime Database
-        const userRef = ref(database, `users/${user.uid}`);
-        await set(userRef, {
-            username, email, country, number, password, Pin: pin, pinned: true,
+        await set(ref(database, `users/${user.uid}`), {
+            username, email, country, number, Pin: pin, pinned: true,
             signUpDate: new Date().toISOString()
         });
 
-        // Send Email Verification
         await sendEmailVerification(user);
 
-        // Success message and redirect
         showSuccess("success_account_created");
-        setTimeout(() => { window.location.href = "login.html"; }, 2000);
+
+        if (localStorage.getItem("1")) {
+            localStorage.setItem("2", "true");
+        } else {
+            localStorage.setItem("1", "true");
+        }
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 2000);
 
     } catch (error) {
-        showError(error.message);
+        showErrorMessage(error);
     }
 });
 
-// Validate email format function
+// Email format validator
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// Function to show error message
+// Show error message
 function showError(key) {
     const errorMessage = document.getElementById('error-message');
     errorMessage.style.display = 'block';
     errorMessage.innerText = translations[currentLanguage][key] || key;
 }
 
-// Function to show success message
+// Show success message
 function showSuccess(key) {
     const successMessage = document.getElementById('succes-message');
     successMessage.style.display = 'block';
     successMessage.innerText = translations[currentLanguage][key] || key;
 }
 
-// Translations object
+// Firebase error handler
+function showErrorMessage(error) {
+    const key = firebaseErrorToTranslationKey(error.code);
+    showError(key || error.message);
+}
+
+function firebaseErrorToTranslationKey(code) {
+    const map = {
+        "auth/email-already-in-use": "error_email_exists",
+        "auth/invalid-email": "error_invalid_email",
+        "auth/weak-password": "error_password_length"
+    };
+    return map[code];
+}
+
+// Translations
 const translations = {
     en: {
         registration: "Registration",
+        limited_reached: "You reached the limit of account creation",
         sign_up: "Sign Up",
         already_account: "Already have an account?",
         login: "Login",
@@ -145,6 +162,7 @@ const translations = {
     },
     so: {
         registration: "Diiwaangelin",
+        limited_reached: "Waxaad gaadhay xadka samaynta akoonyada",
         sign_up: "Diiwaangeli",
         already_account: "Horey ma u leedahay xisaab?",
         login: "Soo gal",
@@ -171,7 +189,7 @@ const translations = {
 
 // Language switcher
 const languageSelect = document.getElementById("language");
-let currentLanguage = "en";
+let currentLanguage = "so";
 
 languageSelect.addEventListener("change", function () {
     currentLanguage = this.value;
@@ -187,5 +205,14 @@ function switchLanguage(lang) {
     });
 }
 
-// Default language
+// Default language and account limit checker
 switchLanguage(currentLanguage);
+checkLimit();
+
+function checkLimit() {
+    const signUpBtn = document.getElementById("signUpBtn");
+    if (localStorage.getItem("2")) {
+        showError("limited_reached");
+        signUpBtn.disabled = true;
+    }
+                                                      }
