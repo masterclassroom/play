@@ -96,6 +96,13 @@ button {
     transition: 0.3s;
     font-weight: 500;
 }
+button:disabled {
+    background: whitesmoke;
+    color: black;
+}
+button:disabled:hover {
+    background: grey;
+}
 
 button:hover {
     background: linear-gradient(135deg, #00ddcc, #0055ff);
