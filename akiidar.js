@@ -140,7 +140,7 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
         document.getElementById("user-coins").innerText = userCoins - qiime;
 
         Swal.fire({
-          title: 'Finding your reward...',
+          title: 'Matching random reward...',
           html: '<b>Processing...</b>',
           allowOutsideClick: false,
           didOpen: () => {
@@ -242,7 +242,7 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
 
         // Show success message
         Swal.fire({
-          title: 'Success!',
+          title: 'Successfully!',
           text: `Koorsada ${courseName} waa la furay si guul ah!`,
           icon: 'success',
           confirmButtonText: 'Ok'
