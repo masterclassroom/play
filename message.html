@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Message Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #ece9e6, #ffffff);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .message-container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .message-container h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .message-box {
+      padding: 15px;
+      background-color: #f1f1f1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      min-height: 200px;
+      font-size: 16px;
+      color: #444;
+      word-wrap: break-word;
+    }
+
+    .btn-mark {
+      padding: 10px 20px;
+      margin: 5px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-mark:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="message-container">
+    <h2>Live Messages</h2>
+    <div id="messageBox" class="message-box">Loading message...</div>
+    <button id="markReadBtn" class="btn-mark">Mark as Read</button>
+    <button id="checkNewBtn" class="btn-mark">Check New Messages</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+      measurementId: "G-KKDNZBZLPG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getDatabase();
+
+    const messageBox = document.getElementById("messageBox");
+    const markReadBtn = document.getElementById("markReadBtn");
+    const checkNewBtn = document.getElementById("checkNewBtn");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html"; // Haddii uusan login, u dir login
+        return;
+      }
+
+      const messageRef = ref(db, "message");
+      const readedRef = ref(db, "users/" + user.uid + "/readed");
+
+      onValue(messageRef, (snapshot) => {
+        const message = snapshot.val();
+
+        onValue(readedRef, (readSnap) => {
+          const readed = readSnap.val();
+
+          if (readed === true) {
+            messageBox.innerText = "No new messages.";
+            markReadBtn.style.display = "none";
+            checkNewBtn.style.display = "inline-block";
+          } else {
+            messageBox.innerText = message || "No message";
+            markReadBtn.style.display = "inline-block";
+            checkNewBtn.style.display = "none";
+          }
+        });
+      });
+
+      markReadBtn.addEventListener("click", () => {
+        set(readedRef, true);
+        messageBox.innerText = "No new messages.";
+        markReadBtn.style.display = "none";
+        checkNewBtn.style.display = "inline-block";
+      });
+
+      checkNewBtn.addEventListener("click", () => {
+        set(readedRef, false);
+        checkNewBtn.style.display = "none";
+        markReadBtn.style.display = "inline-block";
+      });
+    });
+  </script>
+
+</body>
+      </html>
