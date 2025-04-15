@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faahfaahin Koorsada</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.7s ease-in-out;
+    }
+    h2 {
+      color: #333;
+    }
+    h4, p {
+      margin-bottom: 10px;
+    }
+    .back-btn {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #1e90ff;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    .back-btn:hover {
+      background-color: #006fd6;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="course-name">Koorsada...</h2>
+    <p id="teacher"></p>
+    <h4 id="type"></h4>
+    <h4 id="time"></h4>
+    <h4 id="price"></h4>
+
+    <a href="dashboard.html" class="back-btn">← Ku Laabo</a>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const course = urlParams.get("course");
+    const teacher = urlParams.get("teacher");
+    const type = urlParams.get("type");
+    const time = urlParams.get("time");
+    const price = urlParams.get("price");
+
+    document.getElementById("course-name").innerText = course || "Koorsada...";
+    document.getElementById("teacher").innerText = "Macallin: " + (teacher || "Lama helin");
+    document.getElementById("type").innerText = "Nooca koorsada: " + (type || "Lama sheegin");
+    document.getElementById("time").innerText = "Waqtiga: " + (time || "Ma jiro");
+    document.getElementById("price").innerText = "Qiimaha: " + (price || "0") + " coins";
+  </script>
+</body>
+</html>
