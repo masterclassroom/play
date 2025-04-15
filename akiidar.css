@@ -137,7 +137,7 @@ footer {
   padding: 15px;
   background: linear-gradient(135deg, #0077b6, #00b4d8);
   color: white;
-  position: relative;
+  position: absolute;
   bottom: 0;
   width: 100%;
 }
