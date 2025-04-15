@@ -42,33 +42,41 @@
 
     <!-- Course 1 -->
     <div class="course-card" id="course1">
-      <h3>Siraha Muqaal Samaynta</h3>
-      <p>Macallin: Maxamed</p>
-      <h4>Course/video</h4>
-      <h4>Hours: 1:17</h4>
+      <h3>Koorsada:Siraha Muqaal Samaynta</h3>
       <!-- Unlock Buttons for Course 1 -->
       <button class="btn-unlock100" data-course="Siraha Muqaal Samaynta" qiime="100">Thraw</button>
-      <button class="btn-unlock900" data-course="Siraha Muqaal Samaynta" qiime="900">Unlock</button>
+      <button class="btn-unlock900" data-course="Siraha Muqaal Samaynta" qiime="2500">Unlock</button>
+       <button class="course-data" data-course="Siraha Muaaal Samaynta"
+        data-teacher="Maxamed"
+        data-type="Video"
+        data-time="1 hours and 17 minutes"
+        data-price="3000">☰</button>
     </div>
 
     <!-- Course 2 -->
     <div class="course-card" id="course2">
-      <h3>Soo Dajinta Pes 25 Mobile Kasta</h3>
-      <p>Macallin: Maxamed</p>
-      <h4>Course/Text</h4>    
+      <h3>Koorsada:Soo Dajinta Pes 25 Mobile Kasta</h3>
       <!-- Unlock Buttons for Course 2 -->
       <button class="btn-unlock100" data-course="Soo Dajinta Pes 25 Mobile Kasta" qiime="100">Thraw</button>
       <button class="btn-unlock900" data-course="Soo Dajinta Pes 25 Mobile Kasta" qiime="900">Unlock</button>
+       <button class="course-data" data-course="Soo Dajinta Pes 25 Mobile Kasta"
+        data-teacher="Maxamed"
+        data-type="text"
+        data-time="No time"
+        data-price="1800">☰</button>
     </div>
 
     <!-- Course 3 -->
     <div class="course-card" id="course3">
-      <h3>Sirta Efootball 25</h3>
-      <p>Macallin: Maxamed</p>
-      <h4>Course/Text</h4>
+      <h3>Koorsada:Sirta Efootball 25</h3>
       <!-- Unlock Buttons for Course 3 -->
       <button class="btn-unlock100" data-course="Sirta Efootball 25" qiime="100">Thraw</button>
-      <button class="btn-unlock900" data-course="Sirta Efootball 25" qiime="900">Unlock</button>
+      <button class="btn-unlock900" data-course="Sirta Efootball 25" qiime="1800">Unlock</button>
+      <button class="course-data" data-course="Sirta Efootball 25"
+        data-teacher="Maxamed"
+        data-type="text"
+        data-time="No time"
+        data-price="1800">☰</button>
     </div>
   </section>
 
@@ -102,4 +110,16 @@ document.addEventListener("click", function (event) {
     button.innerHTML = "☰"; // marka meel banaan la taabto, ku celi 3-da xariiq
   }
 });
+document.querySelectorAll(".course-data").forEach(button => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.course;
+        const teacher = button.dataset.teacher;
+        const type = button.dataset.type;
+        const time = button.dataset.time;
+        const price = button.dataset.price;
+
+        const query = `details.html?course=${encodeURIComponent(name)}&teacher=${encodeURIComponent(teacher)}&type=${type}&time=${time}&price=${price}`;
+        window.location.href = query;
+      });
+    });
 </script>
