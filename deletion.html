@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Account</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Delete Account</h2>
+    <label>
+      <input type="checkbox" id="confirm-check" />
+      I want to delete my account
+    </label>
+    <input type="password" id="password" placeholder="Enter your password">
+    <input type="number" id="pin" placeholder="Enter your PIN">
+    <button id="delete-btn">Request Deletion</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Check if user is logged in
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    document.getElementById("delete-btn").addEventListener("click", async () => {
+      const checkbox = document.getElementById("confirm-check");
+      const password = document.getElementById("password").value.trim();
+      const pin = document.getElementById("pin").value.trim();
+
+      const user = auth.currentUser;
+
+      if (!checkbox.checked) {
+        alert("Fadlan sax checkbox-ka si aad u xaqiijiso.");
+        return;
+      }
+
+      if (!password || !pin) {
+        alert("Fadlan geli password iyo PIN.");
+        return;
+      }
+
+      try {
+        // Hubi PIN
+        const pinRef = ref(database, `users/${user.uid}/Pin`);
+        const snapshot = await get(pinRef);
+        if (!snapshot.exists() || snapshot.val() !== pin) {
+          alert("PIN waa qalad.");
+          return;
+        }
+
+        // Hubi password (reauthenticate)
+        const credential = EmailAuthProvider.credential(user.email, password);
+        await reauthenticateWithCredential(user, credential);
+
+        // Show confirmation
+        const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga?");
+        if (confirmDelete) {
+          const delRef = ref(database, `users/${user.uid}`);
+          await update(delRef, {
+            account_deletion: false
+          });
+          alert("Codsiga tirtirka account-ka waa la diray.");
+        }
+
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+  </script>
+</body>
+  </html>
