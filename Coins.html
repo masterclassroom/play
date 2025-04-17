@@ -92,7 +92,7 @@
   <div class="container">
     <h2>🎉 Claim Your Daily Coins 🎉</h2>
     <div id="coinCount">Coins:..</div>
-    <button id="claimButton">Claim 100 Coins</button>
+    <button id="claimButton">Claim Coins</button>
     <p id="timerDisplay"></p>
     <button class="home-btn" onclick="laabo()">🏠 Home</button>
     <button class="home-btn" onclick="Thraw()">Buy a coins</button>
@@ -172,11 +172,11 @@
 
     // Claim Coins
     claimButton.addEventListener("click", async () => {
-      userCoins += 100;
+      userCoins += 10;
       const coinsRef = ref(database, `users/${userId}/coins`);
       await set(coinsRef, userCoins);
       updateCoinDisplay();
-      Swal.fire("🎉 Success!", "You claimed 100 coins!", "success");
+      Swal.fire("🎉 Success!", "You claimed 10 coins!", "success");
 
       // Save claim time
       const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
