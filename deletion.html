@@ -4,39 +4,93 @@
   <meta charset="UTF-8">
   <title>Delete Account Request</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
-    }
-    .container {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    .countdown {
-      margin-top: 15px;
-      color: red;
-      font-weight: bold;
-    }
-    .cancel-btn {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      margin-top: 10px;
-    }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ece9e6, #ffffff);
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .container {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 26px;
+    font-weight: bold;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #555;
+    margin: 15px 0;
+  }
+  input[type="password"],
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+  input[type="password"]:focus,
+  input[type="number"]:focus {
+    border-color: #4a90e2;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #357ab7;
+  }
+  .cancel-btn {
+    background-color: #ff5e57;
+    margin-top: 15px;
+  }
+  .cancel-btn:hover {
+    background-color: #e0443e;
+  }
+  .countdown {
+    margin-top: 20px;
+    color: #e63946;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .back-btn {
+    background: transparent;
+    color: #4a90e2;
+    font-weight: bold;
+    margin-top: 20px;
+    border: 2px solid #4a90e2;
+  }
+  .back-btn:hover {
+    background: #4a90e2;
+    color: white;
+  }
   </style>
 </head>
 <body>
