@@ -171,21 +171,23 @@
     }
 
     // Claim Coins
-    claimButton.addEventListener("click", async () => {
-      userCoins += 10;
-      const coinsRef = ref(database, `users/${userId}/coins`);
-      await set(coinsRef, userCoins);
-      updateCoinDisplay();
-      Swal.fire("🎉 Success!", "You claimed 10 coins!", "success");
+    // Claim Coins
+claimButton.addEventListener("click", async () => {
+  const randomCoins = Math.floor(Math.random() * 100) + 1; // 1 ilaa 100 random
+  userCoins += randomCoins;
+  const coinsRef = ref(database, `users/${userId}/coins`);
+  await set(coinsRef, userCoins);
+  updateCoinDisplay();
+  Swal.fire("🎉 Success!", `You claimed ${randomCoins} coins!`, "success");
 
-      // Save claim time
-      const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
-      const currentTime = Math.floor(Date.now() / 1000);
-      await set(claimTimeRef, currentTime);
+  // Save claim time
+  const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
+  const currentTime = Math.floor(Date.now() / 1000);
+  await set(claimTimeRef, currentTime);
 
-      // Start cooldown
-      startCooldown(claimCooldown);
-    });
+  // Start cooldown
+  startCooldown(claimCooldown);
+});
 
     // Check cooldown on page load
     async function checkCooldown() {
