@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Delete Account</title>
+  <title>Delete Account Request</title>
   <style>
     body {
       font-family: sans-serif;
@@ -26,6 +26,17 @@
       display: block;
       margin-top: 10px;
     }
+    .countdown {
+      margin-top: 15px;
+      color: red;
+      font-weight: bold;
+    }
+    .cancel-btn {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -38,12 +49,18 @@
     <input type="password" id="password" placeholder="Enter your password">
     <input type="number" id="pin" placeholder="Enter your PIN">
     <button id="delete-btn">Request Deletion</button>
+
+    <div id="countdown-section" style="display:none;">
+      <p class="countdown" id="countdown-text"></p>
+      <button class="cancel-btn" id="cancel-btn">Cancel Request</button>
+    </div>
   </div>
+  <script type="module" src="delete.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, update, get, remove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
@@ -56,14 +73,20 @@
     };
 
     const app = initializeApp(firebaseConfig);
-
     const auth = getAuth(app);
     const database = getDatabase(app);
 
-    // Check if user is logged in
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
       if (!user) {
         window.location.href = "login.html";
+        return;
+      }
+
+      const userRef = ref(database, `users/${user.uid}`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists() && snapshot.val().lastdelete) {
+        document.getElementById("countdown-section").style.display = "block";
+        startCountdown(snapshot.val().lastdelete, user.uid);
       }
     });
 
@@ -71,21 +94,18 @@
       const checkbox = document.getElementById("confirm-check");
       const password = document.getElementById("password").value.trim();
       const pin = document.getElementById("pin").value.trim();
-
       const user = auth.currentUser;
 
       if (!checkbox.checked) {
         alert("Fadlan sax checkbox-ka si aad u xaqiijiso.");
         return;
       }
-
       if (!password || !pin) {
         alert("Fadlan geli password iyo PIN.");
         return;
       }
 
       try {
-        // Hubi PIN
         const pinRef = ref(database, `users/${user.uid}/Pin`);
         const snapshot = await get(pinRef);
         if (!snapshot.exists() || snapshot.val() !== pin) {
@@ -93,24 +113,48 @@
           return;
         }
 
-        // Hubi password (reauthenticate)
         const credential = EmailAuthProvider.credential(user.email, password);
         await reauthenticateWithCredential(user, credential);
 
-        // Show confirmation
-        const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga?");
+        const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga 24 saac kadib?");
         if (confirmDelete) {
-          const delRef = ref(database, `users/${user.uid}`);
-          await update(delRef, {
-            account_deletion: false
-          });
+          const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
+          const userRef = ref(database, `users/${user.uid}`);
+          await update(userRef, { lastdelete: deleteTime });
           alert("Codsiga tirtirka account-ka waa la diray.");
+          window.location.reload();
         }
-
       } catch (error) {
         alert("Error: " + error.message);
       }
     });
+
+    function startCountdown(deleteTimestamp, uid) {
+      const countdownText = document.getElementById("countdown-text");
+      const interval = setInterval(() => {
+        const now = Date.now();
+        const distance = deleteTimestamp - now;
+
+        if (distance <= 0) {
+          clearInterval(interval);
+          countdownText.innerText = "Account-kaaga waa la tirtiray.";
+          return;
+        }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownText.innerText = `Account-kaaga waxaa la tirtiri doonaa ${hours} saac, ${minutes} daqiiqo, ${seconds} ilbidhiqsi kadib.`;
+      }, 1000);
+
+      document.getElementById("cancel-btn").addEventListener("click", async () => {
+        const userRef = ref(database, `users/${uid}/lastdelete`);
+        await remove(userRef);
+        alert("Codsiga tirtirka account-ka waa la baajiyey.");
+        window.location.reload();
+      });
+    }
   </script>
 </body>
-  </html>
+</html>
