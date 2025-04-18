@@ -4,49 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Faahfaahin Koorsada</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 20px;
+  <link rel="icon" href="logo.png" type="image/png">
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  .container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: popFade 0.8s ease forwards;
+    transform-origin: center;
+    text-align: center;
+  }
+  h2 {
+    color: #222;
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+  h4, p {
+    margin-bottom: 12px;
+    color: #555;
+  }
+  .back-btn {
+    margin-top: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #1e90ff;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  .back-btn:hover {
+    background-color: #006fd6;
+    transform: translateY(-2px);
+  }
+  .course-image {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+  }
+  @keyframes popFade {
+    0% {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
     }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      animation: fadeIn 0.7s ease-in-out;
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
-    h2 {
-      color: #333;
-    }
-    h4, p {
-      margin-bottom: 10px;
-    }
-    .back-btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 10px 15px;
-      background-color: #1e90ff;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: 0.3s;
-    }
-    .back-btn:hover {
-      background-color: #006fd6;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
   <div class="container">
+    <img id="course-image" class="course-image" src="" alt="Sawirka Koorsada" />
     <h2 id="course-name">Koorsada...</h2>
     <p id="teacher"></p>
     <h4 id="type"></h4>
@@ -57,18 +80,28 @@
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const course = urlParams.get("course");
-    const teacher = urlParams.get("teacher");
-    const type = urlParams.get("type");
-    const time = urlParams.get("time");
-    const price = urlParams.get("price");
+  // Soo qabso parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const course = urlParams.get("course");
+  const teacher = urlParams.get("teacher");
+  const type = urlParams.get("type");
+  const time = urlParams.get("time");
+  const price = urlParams.get("price");
+  const courseImage = urlParams.get("courseImage");
 
-    document.getElementById("course-name").innerText = course || "Koorsada...";
-    document.getElementById("teacher").innerText = "Macallin: " + (teacher || "Lama helin");
-    document.getElementById("type").innerText = "Nooca koorsada: " + (type || "Lama sheegin");
-    document.getElementById("time").innerText = "Waqtiga: " + (time || "Ma jiro");
-    document.getElementById("price").innerText = "Qiimaha: " + (price || "0") + " coins";
-  </script>
+  // Set data
+  document.getElementById("course-name").innerText = course || "Koorsada...";
+  document.getElementById("teacher").innerText = "Macallin: " + (teacher || "Lama helin");
+  document.getElementById("type").innerText = "Nooca koorsada: " + (type || "Lama sheegin");
+  document.getElementById("time").innerText = "Waqtiga: " + (time || "Ma jiro");
+  document.getElementById("price").innerText = "Qiimaha: " + (price || "0") + " coins";
+
+  // Set image saxan
+  if (courseImage) {
+    document.getElementById("course-image").src = courseImage;
+  } else {
+    document.getElementById("course-image").style.display = "none";
+  }
+</script>
 </body>
 </html>
