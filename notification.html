@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notifications Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #ece9e6, #ffffff);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .message-container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .message-container h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .message-box {
+      padding: 15px;
+      background-color: #f1f1f1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      min-height: 200px;
+      font-size: 16px;
+      color: #444;
+      word-wrap: break-word;
+    }
+
+    .btn-mark {
+      padding: 10px 20px;
+      margin: 5px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-mark:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="message-container">
+    <h2>Notifications</h2>
+    <div id="messageBox" class="message-box">Loading notifications...</div>
+    <button id="markReadBtn" class="btn-mark" style="display:none;">Mark as Read</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+      measurementId: "G-KKDNZBZLPG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getDatabase();
+
+    const messageBox = document.getElementById("messageBox");
+    const markReadBtn = document.getElementById("markReadBtn");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const userMessageRef = ref(db, `users/${user.uid}/message`);
+
+      onValue(userMessageRef, (messageSnap) => {
+        const message = messageSnap.val();
+
+        if (message) {
+          messageBox.innerText = message;
+          markReadBtn.style.display = "inline-block";
+        } else {
+          messageBox.innerText = "No notifications.";
+          markReadBtn.style.display = "none";
+        }
+      });
+
+      markReadBtn.addEventListener("click", async () => {
+        await set(userMessageRef, null); // Kaliya message null ka dhig
+        messageBox.innerText = "No notifications.";
+        markReadBtn.style.display = "none";
+      });
+    });
+  </script>
+
+</body>
+</html>
