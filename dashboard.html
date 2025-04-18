@@ -20,6 +20,7 @@
             <a href="Draw.html">Buy coins</a> 
             <a href="Coins.html">Daily rewards</a>
             <a href="deletion.html">Account deletion</a>
+          <a href="notification.html">Notification <span id="notification-badge" style="display: none; color: red; font-size: 20px;">•</span></a>
             <nav>
       <ul>
        <li><button id="logout-btn" class="btn-logout">Log Out</button></li>
@@ -123,4 +124,42 @@ document.querySelectorAll(".course-data").forEach(button => {
         window.location.href = query;
       });
     });
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+    authDomain: "exam-81b90.firebaseapp.com",
+    databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+    projectId: "exam-81b90",
+    storageBucket: "exam-81b90.appspot.com",
+    messagingSenderId: "461178422237",
+    appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+    measurementId: "G-KKDNZBZLPG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getDatabase();
+
+  const badge = document.getElementById("notification-badge");
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) return;
+
+    const userMessageRef = ref(db, `users/${user.uid}/message`);
+
+    onValue(userMessageRef, (snapshot) => {
+      const message = snapshot.val();
+
+      if (message) {
+        badge.style.display = "inline"; // Calaamada casan muuji
+      } else {
+        badge.style.display = "none"; // Ha muujinin
+      }
+    });
+  });
 </script>
