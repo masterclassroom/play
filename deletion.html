@@ -176,6 +176,7 @@
           const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
           const userRef = ref(database, `users/${user.uid}`);
           await update(userRef, { lastdelete: deleteTime });
+          await update(userRef, { message: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
           alert("Codsiga tirtirka account-ka waa la diray.");
           window.location.reload();
         }
@@ -205,7 +206,10 @@
 
       document.getElementById("cancel-btn").addEventListener("click", async () => {
         const userRef = ref(database, `users/${uid}/lastdelete`);
+        const backRef = ref(database, `users/${uid}`);
         await remove(userRef);
+        await update(backRef { message: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
+        
         alert("Codsiga tirtirka account-ka waa la baajiyey.");
         window.location.reload();
       });
