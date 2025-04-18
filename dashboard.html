@@ -48,11 +48,13 @@
       <!-- Unlock Buttons for Course 1 -->
       <button class="btn-unlock100" data-course="Siraha Muqaal Samaynta" qiime="50">Thraw</button>
       <button class="btn-unlock900" data-course="Siraha Muqaal Samaynta" qiime="1000">Unlock</button>
-       <button class="course-data" data-course="Siraha Muaaal Samaynta"
+       <button class="course-data" data-course="Siraha Muqaaal Samaynta"
         data-teacher="Maxamed"
         data-type="Video"
         data-time="1 hours and 17 minutes"
+         data-image="Siraha muqaal Samaynta.png"
         data-price="1000">☰</button>
+      
     </div>
 
     <!-- Course 2 -->
@@ -65,7 +67,10 @@
         data-teacher="Maxamed"
         data-type="text"
         data-time="No time"
+         data-image="Soo Dajinta Pes 25 Mobile Kasta.png"
         data-price="200">☰</button>
+       
+      
     </div>
 
     <!-- Course 3 -->
@@ -78,6 +83,7 @@
         data-teacher="Maxamed"
         data-type="text"
         data-time="No time"
+        data-image="Sirta Efootball 25.png"
         data-price="500">☰</button>
     </div>
   </section>
@@ -89,6 +95,7 @@
   <script type="module" src="akiidar.js"></script>
 </body>
   </html>
+
 <script>
   function toggleMenu() {
   const menu = document.getElementById("menu");
@@ -113,17 +120,18 @@ document.addEventListener("click", function (event) {
   }
 });
 document.querySelectorAll(".course-data").forEach(button => {
-      button.addEventListener("click", () => {
-        const name = button.dataset.course;
-        const teacher = button.dataset.teacher;
-        const type = button.dataset.type;
-        const time = button.dataset.time;
-        const price = button.dataset.price;
+  button.addEventListener("click", () => {
+    const name = button.dataset.course;
+    const teacher = button.dataset.teacher;
+    const type = button.dataset.type;
+    const time = button.dataset.time;
+    const price = button.dataset.price;
+    const image = button.dataset.image; // Haddii courseImage la waayo
 
-        const query = `details.html?course=${encodeURIComponent(name)}&teacher=${encodeURIComponent(teacher)}&type=${type}&time=${time}&price=${price}`;
-        window.location.href = query;
-      });
-    });
+    const query = `details.html?course=${encodeURIComponent(name)}&teacher=${encodeURIComponent(teacher)}&type=${encodeURIComponent(type)}&time=${encodeURIComponent(time)}&price=${encodeURIComponent(price)}&courseImage=${encodeURIComponent(image)}`;
+    window.location.href = query;
+  });
+});
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -162,4 +170,19 @@ document.querySelectorAll(".course-data").forEach(button => {
       }
     });
   });
+</script>
+<script>
+document.querySelectorAll(".course-card").forEach(card => {
+  const courseButton = card.querySelector(".course-data");
+  if (courseButton) {
+    const image = courseButton.dataset.image;
+    if (image) {
+      card.style.background = `url('${image}') center/cover no-repeat`;
+      card.style.color = "white"; // Optional: qoraalka cad ka dhig hadii loo baahdo
+      card.style.borderRadius = "12px"; // Optional: geesaha u wareeji
+      card.style.boxShadow = "0 8px 20px rgba(0,0,0,0.2)"; // Optional: qurxinta
+      card.style.padding = "20px"; // Optional: in content gudaha u jiro
+    }
+  }
+});
 </script>
