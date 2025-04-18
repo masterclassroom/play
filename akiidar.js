@@ -155,7 +155,7 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
 
           // 5% fursad guul marka 100 coins la isticmaalo
           success = randomChance < 0.05;
-          rewardCoins = success ? 0 : Math.floor(Math.random() * 100) + 1;
+          rewardCoins = success ? 0 : Math.floor(Math.random() * 10) + 1;
 
           if (success) {
             await update(usrCoinsRef, { coins: userCoins - qiime });
