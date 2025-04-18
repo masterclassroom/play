@@ -208,7 +208,7 @@
         const userRef = ref(database, `users/${uid}/lastdelete`);
         const backRef = ref(database, `users/${uid}`);
         await remove(userRef);
-        await update(backRef { message: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
+        await update(backRef, { message: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
         
         alert("Codsiga tirtirka account-ka waa la baajiyey.");
         window.location.reload();
