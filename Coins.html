@@ -173,12 +173,12 @@
     // Claim Coins
     // Claim Coins
 claimButton.addEventListener("click", async () => {
-  const randomCoins = Math.floor(Math.random() * 100) + 1; // 1 ilaa 100 random
+  const randomCoins = Math.floor(Math.random() * 10) + 1; // 1 ilaa 100 random
   userCoins += randomCoins;
   const coinsRef = ref(database, `users/${userId}/coins`);
   await set(coinsRef, userCoins);
   updateCoinDisplay();
-  Swal.fire("🎉 Success!", `You claimed ${randomCoins} coins!`, "success");
+  Swal.fire("🎉 Success!", `You claimed ${randomCoins} coins!`, "successfully!");
 
   // Save claim time
   const claimTimeRef = ref(database, `users/${userId}/lastClaimTime`);
