@@ -52,10 +52,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const countrySnapshot = await get(userRef);
         const countryData = countrySnapshot.val();
         if (countryData === "Somaliland") {
-          Swal.fire('Welcome', 'You claimed a 100 coins from Somaliland', 'success');
-          await update(veriRef, { coins: 100, claim: "claimed" });
+          Swal.fire('Welcome', 'You claimed a 50 coins for free', 'success');
+          await update(veriRef, { coins: 50, claim: "claimed" });
         } else {
-          Swal.fire('Welcome', 'You claimed 10 coins for free other country', 'success');
+          Swal.fire('Welcome', 'You claimed 10 coins for free', 'success');
           await update(veriRef, { coins: 10, claim: "claimed" });
         }
       }
