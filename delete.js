@@ -29,7 +29,7 @@ onAuthStateChanged(auth, async (user) => {
           // Reauthenticate user si deleteUser uu shaqeeyo
           const password = prompt("Password geli si account-ka loo tirtiro:");
           if (!password) {
-            alert("Password lama helin. Lama tirtiro account-ka.");
+            alert("Password lama helin. Lama tirtiri karo  account-ka.");
             return;
           }
           const credential = EmailAuthProvider.credential(user.email, password);
@@ -41,7 +41,7 @@ onAuthStateChanged(auth, async (user) => {
           alert("Account-kaaga waa la tirtiyay.");
         } catch (error) {
           console.error("Error during deletion:", error.message);
-          alert("Error: " + error.message);
+          alert("Incorrect password ");
         }
       }
     }
