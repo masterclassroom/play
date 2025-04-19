@@ -21,7 +21,7 @@ const translations = {
     en: {
         "reissue_password": "Reissue Password",
         "email": "Email",
-        "captcha": "Captcha",
+        "captcha": "Visual verification",
         "send_reset": "Send Reset",
         "back": "Back",
         "choose_language": "Choose Language",
@@ -32,7 +32,7 @@ const translations = {
     so: {
         "reissue_password": "Soo Celinta Furaha",
         "email": "Email",
-        "captcha": "Cabbirto",
+        "captcha": "Muuqaal xaqiijin",
         "send_reset": "Dir Dib-u-habeyn",
         "back": "Dib u Noqo",
         "choose_language": "Dooro Luuqad",
