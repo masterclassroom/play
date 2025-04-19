@@ -183,7 +183,7 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
         }, 3000); // 3-second delay for animation
       } else {
         Swal.fire({
-          title: 'Insufficient Coins',
+          title: 'Not enough Coins',
           text: `Waxaad u baahan tahay ${qiime} coins, adiguna waxaad haysataa ${userCoins} coins.`,
           icon: 'error',
           confirmButtonText: 'Ok'
@@ -250,7 +250,7 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
 
       } else {
         Swal.fire({
-          title: 'Insufficient Coins',
+          title: 'Not enough Coins',
           text: `Waxaad u baahan tahay ${qiime} coins, adiguna waxaad haysataa ${userCoins} coins.`,
           icon: 'error',
           confirmButtonText: 'Ok'
