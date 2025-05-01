@@ -89,6 +89,10 @@
   </style>
 </head>
 <body>
+  <audio src="click.mp3" id="click"></audio>
+  <audio src="back.mp3" id="back"></audio>
+  <audio src="suc.mp3" id="suc"></audio>
+  <audio src="ero.mp3" id="ero"></audio>
   <div class="container">
     <h2>🎉 Claim Your Daily Coins 🎉</h2>
     <div id="coinCount">Coins:..</div>
@@ -124,6 +128,12 @@
     const coinCountDiv = document.getElementById("coinCount");
     const claimButton = document.getElementById("claimButton");
     const timerDisplay = document.getElementById("timerDisplay");
+    var click = document.getElementById("click");
+    var suc = document.getElementById("suc");
+    var back = document.getElementById("back");
+   var shit = document.getElementById("shit");
+
+    
 
     // Global Variables
     let userId = null;
@@ -135,6 +145,7 @@
       claimButton.style.display = "none";  // Hide the button initially
 
       setTimeout(() => {
+        shit.play();
         claimButton.style.display = "block";  // Show the button after 3 seconds
       }, 2300); // 3000 milliseconds = 3 seconds
     });
@@ -173,11 +184,13 @@
     // Claim Coins
     // Claim Coins
 claimButton.addEventListener("click", async () => {
+  click.play();
   const randomCoins = Math.floor(Math.random() * 10) + 1; // 1 ilaa 100 random
   userCoins += randomCoins;
   const coinsRef = ref(database, `users/${userId}/coins`);
   await set(coinsRef, userCoins);
   updateCoinDisplay();
+  suc.play();
   Swal.fire("🎉 Success!", `You claimed ${randomCoins} coins!`, "successfully!");
 
   // Save claim time
@@ -236,9 +249,11 @@ claimButton.addEventListener("click", async () => {
   </script>
   <script>
   function laabo() {
+    back.play();
       window.location.href = "dashboard.html";
     }
      function Thraw() {
+       click.play();
        window.location.href = 'Draw.html';
      }
   </script>
