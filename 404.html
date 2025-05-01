@@ -32,9 +32,16 @@
     </style>
 </head>
 <body>
+    <audio src="click.mp3" id="back"></audio>
     <h1>404</h1>
     <p>Page not found!</p>
     <p>The page you are looking for does not exist or has been moved.</p>
-    <a href="https://masterclassroom.github.io/account/" target="_blank">Go back to home</a>
+    <a href="https://masterclassroom.github.io/account/" target="_blank" onclick="back()" >Go back to home</a>
 </body>
 </html>
+<script> function back() {
+    const sound = document.getElementById("back");
+    sound.play();
+}
+    
+</script>
