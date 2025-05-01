@@ -9,6 +9,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+  <audio src="click.mp3" id="click"></audio>
+  <audio src="back.mp3" id="back"></audio>
+  <audio src="suc.mp3" id="suc"></audio>
+  <audio src="ero.mp3" id="ero"></audio>
   <div class="container">
     <h2>Change your Password</h2>
     <button id="showPasswordChange">Change Password</button>
@@ -23,3 +27,9 @@
   <script type="module" src="chiyoober.js"></script>
 </body>
 </html>
+<script>
+  function window.history.back() {
+  var sound = document.getElementById("back");
+    sound.play();
+  }
+</script>
