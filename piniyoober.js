@@ -25,6 +25,10 @@ const oldPasswordInput = document.getElementById("oldPassword");
 const newPasswordInput = document.getElementById("newPassword");
 const updatePasswordButton = document.getElementById("updatePasswordButton");
 const coinsBalanceText = document.getElementById("coinsBalance");
+var click = document.getElementById("click");
+var ero = document.getElementById("ero");
+var back = document.getElementById("back");
+
 
 // Function to show messages
 function showMessage(text, isSuccess) {
@@ -65,6 +69,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // Show Password Change Section
 showPasswordChangeButton.addEventListener("click", () => {
+  click.play();
   passwordChangeSection.style.display = "block";
 });
 
@@ -74,10 +79,12 @@ updatePasswordButton.addEventListener("click", async () => {
   const Newpin = newPasswordInput.value.trim();
   
   if (!oldPassword || !Newpin) {
+    ero.play();
     showMessage("Please fill in both fields.", false);
     return;
   }
   if (Newpin.length !== 4) {
+    ero.play();
     showMessage("Please choose a 4-digit code.", false);
     return;
   }
@@ -106,6 +113,7 @@ updatePasswordButton.addEventListener("click", async () => {
     const userCoins = userData.coins || 0;
 
     if (userCoins < 1) {
+      ero.play();
       showMessage("Not enough coins you need 1 coins to change pincode!", false);
       return;
     }
@@ -114,6 +122,7 @@ updatePasswordButton.addEventListener("click", async () => {
     await set(ref(database, `users/${user.uid}/coins`), userCoins - 1);
 
     coinsBalanceText.textContent = userCoins - 1;
+    suc.play()
 
     showMessage("Your Pincode has been updated successfully!", true);
 
@@ -121,6 +130,7 @@ updatePasswordButton.addEventListener("click", async () => {
       window.location.replace("dashboard.html");
     }, 2500);
   } catch (error) {
+ero.play();
     showMessage("Incorrect password or an error occurred.", false);
   }
 });
