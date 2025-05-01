@@ -25,6 +25,9 @@ const newUsernameInput = document.getElementById("newUsername");
 const updateUsernameButton = document.getElementById("updateUsernameButton");
 const messageBox = document.getElementById("message");
 const coinsCount = document.getElementById("coinsCount");
+var click = document.getElementById("click");
+var suc = document.getElementById("suc");
+var ero = document.getElementById("ero");
 
 let userCoins = 0;
 
@@ -52,6 +55,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // Show Username Change Section
 showUsernameChangeButton.addEventListener("click", () => {
+click.play();
   usernameChangeSection.classList.remove("hidden");
 });
 
@@ -60,16 +64,19 @@ updateUsernameButton.addEventListener("click", async () => {
   const newUsername = newUsernameInput.value.trim();
   
   if (!newUsername) {
+ero.play();
     showMessage("Please enter a new username.", "error");
     return;
   }
 
   if (newUsername.length > 25) {
+click.play();
     showMessage("Invalid username. Must be 25 characters or less.", "error");
     return;
   }
 
   if (userCoins < 1) {
+ero.play();
     showMessage("Not enough coins! You need 1 coins to change your username.", "error");
     return;
   }
@@ -91,12 +98,15 @@ updateUsernameButton.addEventListener("click", async () => {
     userCoins -= 1;
     coinsCount.innerText = userCoins;
     await set(coinsRef, userCoins);
+suc.play();
+
     
     showMessage("Your username has been updated successfully!", "success");
     setTimeout(() => {
       window.location.replace("dashboard.html");
     }, 3000);
   } catch (error) {
+    ero.play();
     showMessage(error.message, "error");
   }
 });
