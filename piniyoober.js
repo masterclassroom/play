@@ -28,6 +28,7 @@ const coinsBalanceText = document.getElementById("coinsBalance");
 var click = document.getElementById("click");
 var ero = document.getElementById("ero");
 var back = document.getElementById("back");
+var suc = document.getElementById("suc");
 
 
 // Function to show messages
