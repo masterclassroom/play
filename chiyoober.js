@@ -24,6 +24,9 @@ const passwordChangeSection = document.getElementById("passwordChangeSection");
 const oldPasswordInput = document.getElementById("oldPassword");
 const newPasswordInput = document.getElementById("newPassword");
 const updatePasswordButton = document.getElementById("updatePasswordButton");
+var suc = document.getElementById("suc");
+var click = document.getElementById("click");
+var ero = document.getElementById("ero");
 const messageDiv = document.createElement("div"); // Message Div
 messageDiv.style.marginTop = "10px";
 messageDiv.style.padding = "10px";
@@ -63,10 +66,15 @@ updatePasswordButton.addEventListener("click", async () => {
   const newPassword = newPasswordInput.value.trim();
   
   if (!oldPassword || !newPassword) {
+ero.play();
+
+
     showMessage("Please fill in both fields.", false);
     return;
   }
    if(newPassword.length > 24 ) {
+     ero.play();
+
      showMessage("Your password is very tall.", false);
      return;
    }
@@ -88,6 +96,8 @@ updatePasswordButton.addEventListener("click", async () => {
     // Step 3: Update Password in Real-Time Database
     const userRef = ref(database, `users/${user.uid}/password`);
     await set(userRef, newPassword);
+    suc.play();
+
 
     // Show success message
     showMessage("Your password has been updated successfully!", true);
@@ -96,6 +106,7 @@ updatePasswordButton.addEventListener("click", async () => {
       window.location.replace("dashboard.html");
     }, 2000);
   } catch (error) {
+    ero.play();
     showMessage("Incorrect old password", false);
   }
 });
