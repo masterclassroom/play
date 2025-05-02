@@ -32,7 +32,10 @@
   function goback() {
   var sound = document.getElementById("back");
     sound.play();
+    setTimeout(() => {
+      
     window.history.back();
+      ), 500};
   }
 
   
