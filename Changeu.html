@@ -15,7 +15,7 @@
   <div class="container">
     <h2>Change your Username</h2>
     <button id="showUsernameChange">Change Username</button>
-    <button onclick="window()">Back</button>
+    <button onclick="goback()">Back</button>
     
     <div id="usernameChangeSection" class="hidden">
       <p id="coinsInfo">Your coins: <span id="coinsCount">Loading...</span></p>
@@ -31,7 +31,7 @@
 
 <script>
 
-  Function window() {
+  Function goback() {
   var sound = document.getElementById("back");
     sound.play();
     window.hhistory.back();
