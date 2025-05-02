@@ -16,7 +16,7 @@
   <div class="container">
     <h2>Change your Password</h2>
     <button id="showPasswordChange">Change Password</button>
-    <button onclick="window.history.back()">Back</button>
+    <button onclick="window()">Back</button>
     
     <div id="passwordChangeSection" style="display: none;">
       <input type="password" id="oldPassword" placeholder="Enter old password" />
@@ -28,8 +28,9 @@
 </body>
 </html>
 <script>
-  function window.history.back() {
+  function window() {
   var sound = document.getElementById("back");
     sound.play();
+    window.hhistory.back();
   }
 </script>
