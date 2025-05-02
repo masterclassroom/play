@@ -17,7 +17,7 @@
     <h2>Change your Pincode</h2>
     <p>Your Coins: <span id="coinsBalance">Loading...</span></p>
     <button id="showPasswordChange">Change Pincode</button>
-    <button onclick="window()">Back</button>
+    <button onclick="goback()">Back</button>
     
     <div id="passwordChangeSection" style="display: none;">
       <input type="password" id="oldPassword" placeholder="Enter your password" />
@@ -29,8 +29,8 @@
 </body>
 </html>
 <script>
-  function window() {
-  var sound document.getElementById("back");
+  function goback() {
+  var sound = document.getElementById("back");
     sound.play();
     window.history.back();
   }
