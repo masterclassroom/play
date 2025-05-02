@@ -57,6 +57,7 @@ onAuthStateChanged(auth, (user) => {
 
 // Show Password Change Section
 showPasswordChangeButton.addEventListener("click", () => {
+  click.play();
   passwordChangeSection.style.display = "block";
 });
 
