@@ -61,6 +61,7 @@ click.play();
 
 // Update Username
 updateUsernameButton.addEventListener("click", async () => {
+  click.play();
   const newUsername = newUsernameInput.value.trim();
   
   if (!newUsername) {
