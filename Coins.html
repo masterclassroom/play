@@ -144,13 +144,17 @@
 
     // Disable the claim button for 3 seconds after page load
     document.addEventListener("DOMContentLoaded", () => {
-      claimButton.style.display = "none";  // Hide the button initially
+  claimButton.style.display = "none";  // Hide the button initially
 
-      setTimeout(() => {
-        claimButton.style.display = "block";
-        shit.play()// Show the button after 3 seconds
-      }, 2300); // 3000 milliseconds = 3 seconds
-    });
+  setTimeout(() => {
+    claimButton.style.display = "block"; // Show the button after 2.3 seconds
+
+    // Play audio only if the button is now visible
+    if (claimButton.style.display === "block") {
+      shit.play().catch(e => console.error("Audio play failed:", e));
+    }
+  }, 2300);
+});
 
     // Auth State Listener
     onAuthStateChanged(auth, async (user) => {
