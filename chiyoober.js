@@ -63,6 +63,7 @@ showPasswordChangeButton.addEventListener("click", () => {
 
 // Update Password
 updatePasswordButton.addEventListener("click", async () => {
+  click.play();
   const oldPassword = oldPasswordInput.value.trim();
   const newPassword = newPasswordInput.value.trim();
   
