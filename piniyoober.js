@@ -76,6 +76,7 @@ showPasswordChangeButton.addEventListener("click", () => {
 
 // Update Pincode
 updatePasswordButton.addEventListener("click", async () => {
+  click.play();
   const oldPassword = oldPasswordInput.value.trim();
   const Newpin = newPasswordInput.value.trim();
   
