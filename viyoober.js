@@ -47,12 +47,15 @@ inputs.forEach((input, index) => {
 
   // Allow only one digit
   if (value.length > 1) {
+    ero.currentTime = 0;
+    ero.play();
     input.value = "";
     showAlert("Only one number allowed in each box!", "error");
     return;
   }
 
   if (isNaN(value)) {
+    ero.currentTime = 0;
     input.value = "";
     showAlert("Only numbers are allowed!", "error");
     return;
@@ -60,6 +63,7 @@ inputs.forEach((input, index) => {
 
   // Check ALL previous inputs
   for (let i = 0; i < index; i++) {
+    ero.ccurrentTime = 0;
     if (inputs[i].value === "") {
       input.value = ""; // Clear the current input
       inputs[i].focus(); // Focus the first empty one before this
@@ -100,6 +104,8 @@ onAuthStateChanged(auth, (user) => {
 
 // Check PIN
 document.getElementById("jecker").addEventListener("click", async () => {
+  click.ccurrentTime = 0;
+  click.play();
   if (!currentUser) {
     showAlert("You must be logged in first!", "error");
     return;
