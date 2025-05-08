@@ -159,6 +159,8 @@
 <body>
 
     <div class="container">
+        <audio src="click.mp3" id="click"></audio>
+        <audio src="back.mp3" id="back"></audio>
         <h2>Cabashada</h2>
         
         <div class="input-group">
@@ -220,6 +222,7 @@
         const database = getDatabase(app);
 
         document.getElementById("submitForm").addEventListener("click", async function() {
+            click.play();
             let username = document.getElementById("username").value.trim();
             let email = document.getElementById("email").value.trim();
             let number = document.getElementById("number").value.trim();
@@ -261,11 +264,14 @@
         });
 
         document.getElementById("kala").addEventListener("click", function() {
+            back.play();
+            setTimeout(() => {
             if (window.history.length > 1) {
                 window.history.go(-1);
             } else {
                 window.location.href = "Academy.html";
             }
+                        },1000);
         });
     </script>
 
