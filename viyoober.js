@@ -22,6 +22,8 @@ const auth = getAuth(app);
 const inputs = document.querySelectorAll(".pin-input");
 const alertBox = document.getElementById("alertBox");
 let currentUser = null;
+var click = document.getElementById("click");
+var ero = document.getElementById("ero");
 
 // Show message
 function showAlert(message, type) {
