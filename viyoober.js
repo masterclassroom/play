@@ -56,6 +56,7 @@ inputs.forEach((input, index) => {
 
   if (isNaN(value)) {
     ero.currentTime = 0;
+    ero.play();
     input.value = "";
     showAlert("Only numbers are allowed!", "error");
     return;
@@ -64,6 +65,7 @@ inputs.forEach((input, index) => {
   // Check ALL previous inputs
   for (let i = 0; i < index; i++) {
     ero.ccurrentTime = 0;
+    ero.play();
     if (inputs[i].value === "") {
       input.value = ""; // Clear the current input
       inputs[i].focus(); // Focus the first empty one before this
