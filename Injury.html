@@ -161,6 +161,7 @@
     <div class="container">
         <audio src="click.mp3" id="click"></audio>
         <audio src="back.mp3" id="back"></audio>
+        <audio src="shit.mp3" id="shit"></audio>
         <h2>Cabashada</h2>
         
         <div class="input-group">
@@ -180,7 +181,7 @@
 
         <div class="input-group">
             <label for="county">Dooro Waddankaaga</label>
-            <select id="county">
+            <select onclick="shi()" onchange="cli()" id="county">
                 <option value="" disabled selected="">-- Doorasho --</option>
                 <option value="Somaliland">Somaliland 🇮🇷</option>
                 <option value="Somalia">Somalia 🇸🇴</option>
@@ -273,6 +274,12 @@
             }
                         },1000);
         });
+        function cli() {
+            shit.play()
+                }
+        function shi() {
+            click.play();
+                }
     </script>
 
 </body>
