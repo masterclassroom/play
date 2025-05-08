@@ -91,9 +91,12 @@
 </head>
 <body>
   <div class="container">
+    <audio src="click.mp3" id="click"></audio>
+    <audio src="shit.mp3" id="shit"></audio>
+    <audio src="back.mp3" id="back"></audio>
     <h2> Buy coins </h2>
     <!-- Select option to choose coins -->
-    <select id="Buy">
+    <select onclick="cli()" onchange="shit()" id="Buy">
       <option  coin="100" value="1">100 coins/ $1</option>
       <option coin="500" value="5">500 coins/ $5</option>
       <option coin="1000" value="10">1000 coins/ $10</option>
@@ -104,13 +107,26 @@
   </div>
 
   <script>
+var click = document.getElementById("click"); 
+var shit = document.getElementById("shit");
+var back = document.getElementById("back");
+
+
       function Buyer() {
+        click.play();
+        setTimeout(() => {
         const select = document.getElementById("Buy");
 const coin = select.options[select.selectedIndex].getAttribute("coin");
         const buy = document.getElementById("Buy").value;
         window.location.href = `payment.html?price:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(buy)}&coin:detailshtmlhex1290pllknmagdhssg=${encodeURIComponent(coin)}`;
-  
+        },1000);
       }
+    function cli() {
+      click.play();
+    }
+    function shit() {
+      shit.play();
+    }
   
   
     
@@ -118,7 +134,10 @@ const coin = select.options[select.selectedIndex].getAttribute("coin");
     
   <script>
     function laabo() {
+      back.play();
+      setTimeout(() => {
       window.history.back();
+      },1200);
     }
   </script>
 </body>
