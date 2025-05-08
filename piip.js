@@ -27,6 +27,9 @@ onAuthStateChanged(auth, async (user) => {
         const userRef = ref(database, `users/${userID}`);
         const pinRef = ref(database, `users/${userID}/active`);
         const checkbox = document.getElementById("myCheckbox");
+        var click = document.getElementById("click");
+        var shit = document.getElementById("shit");
+        var back = document.getElementById("back");
 
         // Handle checkbox state based on existing pin
         try {
@@ -56,6 +59,8 @@ onAuthStateChanged(auth, async (user) => {
 
         // Handle checkbox change
         async function checkboxChanged() {
+            shit.currentTime = 0;
+            shit.play();
             const userRef = ref(database, `users/${userID}/active`);
             if (checkbox.checked) {
                 Swal.fire('Successfully!', 'Pin enabled Successfully', 'success');
@@ -65,6 +70,8 @@ onAuthStateChanged(auth, async (user) => {
                 
                 
             } else {
+                shit.currentTime = 0;
+            shit.play();
                 Swal.fire("Successfully!", "Pin disabled successfully", "success");
                 await set(userRef, {
                     active: null // Set the pin to null in the database
@@ -83,10 +90,19 @@ onAuthStateChanged(auth, async (user) => {
 
 // Back button functionality
 document.getElementById('backButton').addEventListener('click', () => {
+    back.currentTime = 0;
+    back.play();
+    setTimeout(() => {
+        
     window.history.back();
+    },1200);
 });
 
 // Edit button functionality
 document.getElementById('edit').addEventListener('click', () => {
+    click.currentTime = 0;
+    click.play();
+    setTimeout(() => {
     window.location.href = "Select.html";
+    },1200);
 });
