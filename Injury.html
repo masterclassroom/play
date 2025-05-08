@@ -225,6 +225,7 @@
         var click = document.getElementById("click");
 
         document.getElementById("submitForm").addEventListener("click", async function() {
+            click.currentTime = 0;
             click.play();
             let username = document.getElementById("username").value.trim();
             let email = document.getElementById("email").value.trim();
@@ -276,6 +277,9 @@
             }
                         },1000);
         });
+        
+    </script>
+    <script>
         function cli() {
     shit.currentTime = 0;
     shit.play();
