@@ -221,6 +221,8 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        var shit = document.getElementById("shit");
+        var click = document.getElementById("click");
 
         document.getElementById("submitForm").addEventListener("click", async function() {
             click.play();
@@ -275,10 +277,10 @@
                         },1000);
         });
         function cli() {
-            click.play();
+            shit.play();
                 }
         function shi() {
-            shit.play();
+            click.play();
                 }
     </script>
 
