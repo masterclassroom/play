@@ -125,6 +125,8 @@
     </style>
 </head>
 <body>
+    <audio src="back.mp3" id="back"></audio>
+    <audio src="shit.mp3" id="shit"></audio>
 
     <h1>Halkan ayaad ka helaysa dhamaan jawaabahaaga</h1>
 
@@ -160,8 +162,12 @@
     </div>
 
     <script>
+        var back = document.getElementById("back");
+        var shit = document.getElementById("shit");
         document.querySelectorAll(".faq-question").forEach(button => {
             button.addEventListener("click", function() {
+                shit.currentTime = 0;
+                shit.play();
                 const answer = this.nextElementSibling;
                 if (answer.style.display === "block") {
                     answer.style.display = "none";
@@ -172,7 +178,11 @@
         });
 
         function backer() {
+            back.currentTime = 0;
+            back.play();
+            setTimeout(() => {
             window.history.back();
+            },1200);
         }
     </script>
 
