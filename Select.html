@@ -9,12 +9,49 @@
   <link rel="icon" type="image/png" href="logo.png">
 </head>
 <body>
+<audio src="click.mp3" id="click"></audio>
+<audio src="back.mp3" id="back"></audio>
   <div class="container">
     <h2>What are you changing?</h2>
-    <button onclick="window.location.href='Changeu.html'">Username</button>
-   <button onclick="window.location.href='Changep.html'">Password</button>
-    <button onclick="window.location.href='Changeco.html'">Pincode</button>
-    <button onclick="window.history.back()">Back</button>
+    <button onclick="changeu()">Username</button>
+   <button onclick="changep()">Password</button>
+    <button onclick="changen()">Pincode</button>
+    <button onclick="backg()">Back</button>
   </div>
 </body>
 </html>
+<script>
+  var click = document.getElementById("click");
+  var back = document.getElementById("back");
+  function changeu() {
+  click.ccurrentTime = 0;
+    click.play();
+    setTimeout(() => {
+      window.location.href = "Changeu.html";
+    },1200);
+  }
+  function changep() {
+  click.ccurrentTime = 0;
+    click.play();
+    setTimeout(() => {
+      window.location.href = "Changep.html";
+    },1200);
+  }
+  function changen() {
+  click.ccurrentTime = 0;
+    click.play();
+    setTimeout(() => {
+      window.location.href = "Changep.html";
+    },1200);
+  }
+function backg()) {
+  back.ccurrentTime = 0;
+    back.play();
+    setTimeout(() => {
+      window.history();
+    },1200);
+}
+    
+
+  
+</script>
