@@ -192,17 +192,18 @@ footer {
   display: block;
   position: absolute;
   top: 50px;
-  left: -260px;
-  background: black;
-  width: 250px;
+  left: -350px;
+  background: saddlebrown;
+  width: 300px;
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   transition: left 0.7s ease;
   z-index: 999;
+   height: 700px;       
 }
 
 .menu.show {
-  left: 10px;
+  left: 0px;
 }
 
         .menu a {
