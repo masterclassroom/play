@@ -18,6 +18,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
+var suc = document.getElementById("suc");
+var click = document.getElementById("click");
+var back = document.getElementById("back");
+var shit = document.getElementById("shit");
 
 // DOMContentLoaded event
 document.addEventListener("DOMContentLoaded", () => {
@@ -52,9 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const countrySnapshot = await get(userRef);
         const countryData = countrySnapshot.val();
         if (countryData === "Somaliland") {
+          suc.currentTime = 0;
+          suc.play();
           Swal.fire('Welcome', 'You claimed a 50 coins for free', 'success');
           await update(veriRef, { coins: 50, claim: "claimed" });
         } else {
+          suc.currentTime = 0;
+          suc.play();
           Swal.fire('Welcome', 'You claimed 10 coins for free', 'success');
           await update(veriRef, { coins: 10, claim: "claimed" });
         }
@@ -75,7 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const sho = coinsSnapshot.val();
           const userCoinsSnapshot = await get(ref(database, `users/${user.uid}/coins`));
           const userCoins = userCoinsSnapshot.exists() ? userCoinsSnapshot.val() : 0;
-
+        suc.currentTime = 0;
+          suc.play();
           Swal.fire('Payment successfully!', `Your purchased ${sho} coins completed`, 'success');
           await update(verief, { coins: Number(userCoins) + Number(sho) });
           await set(paydeRef, { 
@@ -115,6 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function for unlocking with 100 coins
 document.querySelectorAll('.btn-unlock100').forEach((button) => {
   button.addEventListener('click', async (event) => {
+    click.currentTime = 0;
+          click.play();
     const courseName = event.target.getAttribute('data-course');
     const qiime = parseInt(event.target.getAttribute('qiime'));
     const userCoinsRef = ref(database, `users/${user.uid}/coins`);
@@ -127,8 +138,10 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
       let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
 
       if (userCoins >= qiime) {
+        ero.currentTime = 0.7;
+          ero.play();
         const { isConfirmed } = await Swal.fire({
-          title: 'Confirmation',
+          title: 'Payment confirmation',
           text: `Ma hubtaa inaad tuurato ${qiime} coins?`,
           icon: 'question',
           showCancelButton: true,
@@ -138,6 +151,10 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
 
         if (!isConfirmed) return;
         document.getElementById("user-coins").innerText = userCoins - qiime;
+        click.currentTime = 0;
+          click.play();
+          shit.currentTime = 0;
+          shit.play();
 
         Swal.fire({
           title: 'Matching random reward...',
@@ -149,43 +166,45 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
         });
 
         setTimeout(async () => {
-          let success = false;
-          let rewardCoins = 0;
-          let randomChance = Math.random(); // Number between 0 and 1
+  let success = false;
+  let rewardCoins = 0;
+  let randomChance = Math.random(); // 0 ilaa 1
+  let successRate = 5; // Halkan ku beddel boqolkiiba guusha aad rabto
 
-          // 5% fursad guul marka 100 coins la isticmaalo
-          success = randomChance < 0.05;
-          rewardCoins = success ? 0 : Math.floor(Math.random() * 10) + 1;
+  success = randomChance < successRate / 100;
+  rewardCoins = success ? 0 : Math.floor(Math.random() * 10) + 1;
 
-          if (success) {
-            await update(usrCoinsRef, { coins: userCoins - qiime });
-            await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
-            button.disabled = true;
-            button.innerText = "Already Unlocked";
+  if (success) {
+    await update(usrCoinsRef, { coins: userCoins - qiime });
+    await set(purchaseRef, { purchased: true, courseName, timestamp: new Date().toISOString() });
+    button.disabled = true;
+    button.innerText = "Already Unlocked";
 
-            Swal.fire({
-              title: 'You win!',
-              text: `Koorsada ${courseName} waa la furay!`,
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            await update(usrCoinsRef, { coins: userCoins - qiime + rewardCoins });
-            document.getElementById("user-coins").innerText = userCoins - qiime + rewardCoins;
-            
-            Swal.fire({
-              title: 'Try Again!',
-              text: `Waxaad lumisay ${qiime} coins, laakiin waxaad heshay ${rewardCoins} coins.`,
-              icon: 'info',
-              confirmButtonText: 'Ok'
-            });
-          }
-        }, 3000); // 3-second delay for animation
+    Swal.fire({
+      title: 'You win!',
+      text: `Koorsada ${courseName} waa la furay!`,
+      icon: 'success',
+      confirmButtonText: 'Ok'
+    });
+    suc.currentTime = 0;
+          suc.play();
+  } else {
+    await update(usrCoinsRef, { coins: userCoins - qiime + rewardCoins });
+    document.getElementById("user-coins").innerText = userCoins - qiime + rewardCoins;
+
+    Swal.fire({
+      title: 'Try Again!',
+      text: `Waxaad lumisay ${qiime} coins, laakiin waxaad heshay ${rewardCoins} coins.`,
+      icon: 'info',
+      confirmButtonText: 'Ok'
+    });
+  }
+}, 1000); // 1-second delay
       } else {
         Swal.fire({
-          title: 'Not enough Coins',
-          text: `Waxaad u baahan tahay ${qiime} coins, adiguna waxaad haysataa ${userCoins} coins.`,
-          icon: 'error',
+          title: 'Unable to thraw',
+          text: `Not enough coins. you need ${qiime}.coins to thraw `,
+          icon: 'warning',
           confirmButtonText: 'Ok'
         });
       }
@@ -202,6 +221,8 @@ document.querySelectorAll('.btn-unlock100').forEach((button) => {
 
 document.querySelectorAll('.btn-unlock900').forEach((button) => {
   button.addEventListener('click', async (event) => {
+    click.currentTime = 0;
+          click.play();
     const courseName = event.target.getAttribute('data-course');
     const qiime = parseInt(event.target.getAttribute('qiime'));
     const userCoinsRef = ref(database, `users/${user.uid}/coins`);
@@ -214,8 +235,10 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
       let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
 
       if (userCoins >= qiime) {
+        ero.currentTime = 0.7;
+          ero.play();
         const { isConfirmed } = await Swal.fire({
-          title: 'Confirmation',
+          title: ' Payment confirmation',
           text: `Ma hubtaa inaad furato koorsada ${courseName} adigoo bixinaya ${qiime} coins?`,
           icon: 'question',
           showCancelButton: true,
@@ -228,6 +251,8 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
         // Update coins
         await update(usrCoinsRef, { coins: userCoins - qiime });
         document.getElementById("user-coins").innerText = userCoins - qiime;
+        click.currentTime = 0;
+          click.play();
 
         // Set purchase
         await set(purchaseRef, {
@@ -239,6 +264,7 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
         // Update button
         button.disabled = true;
         button.innerText = "Already Unlocked";
+        setTimeout(() => {
 
         // Show success message
         Swal.fire({
@@ -247,12 +273,15 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
           icon: 'success',
           confirmButtonText: 'Ok'
         });
+        suc.currentTime = 0;
+          suc.play();
+        },900);
 
       } else {
         Swal.fire({
-          title: 'Not enough Coins',
-          text: `Waxaad u baahan tahay ${qiime} coins, adiguna waxaad haysataa ${userCoins} coins.`,
-          icon: 'error',
+          title: 'Unable to buy',
+          text: `Not enough coins you need ${qiime}. coins  to buy  .`,
+          icon: 'warning',
           confirmButtonText: 'Ok'
         });
       }
@@ -272,6 +301,8 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
     
     // About Modal
     document.getElementById('about-btn')?.addEventListener('click', () => {
+      click.currentTime = 0;
+          click.play();
       Swal.fire({
         title: 'About Us',
         text: 'Thanks for using this website!',
@@ -284,6 +315,8 @@ document.querySelectorAll('.btn-unlock900').forEach((button) => {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
+        click.currentTime = 0;
+          click.play();
         localStorage.removeItem("pinned");
         const user = auth.currentUser;
         if (user) {
