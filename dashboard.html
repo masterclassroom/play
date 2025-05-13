@@ -1,221 +1,300 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="stylesheet" href="akiidar.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
-  <audio src="ero.mp3" id="ero"></audio>
-  <audio src="click.mp3" id="click"></audio>
-  <audio src="shit.mp3" id="shit"></audio>
-  <audio src="suc.mp3" id="suc"></audio>
-  
-  <header>
-    <h1>Konimar</h1>
-       <div class="menu-container">
-        <button class="menu-button" onclick="toggleMenu()">☰</button>
-        <div class="menu" id="menu">
-            <a href="Profile.html">Profile</a>
-            <a href="purchased.html">Purchased courses</a>
-            <a href="message.html">messages</a>
-            <a href="Draw.html">Buy coins</a> 
-            <a href="Coins.html">Daily rewards</a>
-            <a href="deletion.html">Account deletion</a>
-          <a href="notification.html">Notification <span id="notification-badge" style="display: none; color: red; font-size: 20px;">•</span></a>
-            <nav>
-      <ul>
-       <li><button id="logout-btn" class="btn-logout">Log Out</button></li>
-      </ul>
-    </nav>
-        </div>
-    </div>
-    <nav>
-      <ul>
-        <li><p>User coins: <span id="user-coins">Loading..</span></p></li>
-        <li><a href="Question.html" class="green-link">FAQ</a></li> 
-        <li><a href="Injury.html" class="green-link">Inquiry</a></li>
-        <li><a href="https://wa.me/252672146979" target="_blank" class="green-link">Contact</a></li>
-         <li><a href="#" id="about-btn" class="green-link">About</a></li>        
-        </ul>
-    </nav>
-  </header>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-  <section class="courses">
-    <h2>Koorsooyin Tayo Leh</h2>
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+  authDomain: "exam-81b90.firebaseapp.com",
+  databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+  projectId: "exam-81b90",
+  storageBucket: "exam-81b90.appspot.com",
+  messagingSenderId: "461178422237",
+  appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+  measurementId: "G-KKDNZBZLPG"
+};
 
-    <!-- Course 1 -->
-    <div class="course-card" id="course1">
-      <h3>Koorsada:Siraha Muqaal Samaynta</h3>
-      <!-- Unlock Buttons for Course 1 -->
-      <button class="btn-unlock100" data-course="Siraha Muqaal Samaynta" qiime="70">70</button>
-      <button class="btn-unlock900" data-course="Siraha Muqaal Samaynta" qiime="1000">1000</button>
-       <button class="course-data" data-course="Siraha Muqaaal Samaynta"
-        data-teacher="Maxamed"
-        data-type="Video"
-        data-time="1 hours and 17 minutes"
-         data-image="Siraha Muqaal Samaynta.png"
-        data-price="1000">☰</button>
-      
-    </div>
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
 
-    <!-- Course 2 -->
-    <div class="course-card" id="course2">
-      <h3>Koorsada:Soo Dajinta Pes 25 Mobile Kasta</h3>
-      <!-- Unlock Buttons for Course 2 -->
-      <button class="btn-unlock100" data-course="Soo Dajinta Pes 25 Mobile Kasta" qiime="30">30</button>
-      <button class="btn-unlock900" data-course="Soo Dajinta Pes 25 Mobile Kasta" qiime="200">200</button>
-       <button class="course-data" data-course="Soo Dajinta Pes 25 Mobile Kasta"
-        data-teacher="Maxamed"
-        data-type="text"
-        data-time="No time"
-         data-image="Soo Dajinta Pes 25 Mobile Kasta.png"
-        data-price="200">☰</button>
-       
-      
-    </div>
-
-    <!-- Course 3 -->
-    <div class="course-card" id="course3">
-      <h3>Koorsada:Sirta Efootball 25</h3>
-      <!-- Unlock Buttons for Course 3 -->
-      <button class="btn-unlock100" data-course="Sirta Efootball 25" qiime="50">50</button>
-      <button class="btn-unlock900" data-course="Sirta Efootball 25" qiime="500">500</button>
-      <button class="course-data" data-course="Sirta Efootball 25"
-        data-teacher="Maxamed"
-        data-type="text"
-        data-time="No time"
-        data-image="Sirta Efootball 25.png"
-        data-price="500">☰</button>
-    </div>
-  </section>
-
-  <footer>
-    <p>&copy;2023-2025 Konimar All rights resevered</p>
-  </footer>
-
-  <script type="module" src="akiidar.js"></script>
-  <script type="module" src="confirm.js"></script>
-    
-</body>
-  </html>
-
-<script>
+var suc = document.getElementById("suc");
 var click = document.getElementById("click");
+var back = document.getElementById("back");
 var shit = document.getElementById("shit");
-  function toggleMenu() {
-    shit.currentTime = 0;
-    shit.play();
-  const menu = document.getElementById("menu");
-  const button = document.querySelector(".menu-button");
-  const isVisible = menu.classList.contains("show");
 
-  if (isVisible) {
-    menu.classList.remove("show");
-    button.innerHTML = "☰"; // dib ugu celi 3-da xariiq
-  } else {
-    menu.classList.add("show");
-    button.innerHTML = "×"; // badal calaamada marka menu furmo
-  }
-}
-document.addEventListener("click", function (event) {
-  
-  const menu = document.getElementById("menu");
-  const button = document.querySelector(".menu-button");
-
-  if (!menu.contains(event.target) && !button.contains(event.target)) {
-    menu.classList.remove("show");
-    button.innerHTML = "☰"; // marka meel banaan la taabto, ku celi 3-da xariiq
-  }
-});
-document.querySelectorAll(".course-data").forEach(button => {
-  button.addEventListener("click", () => {
-    click.currentTime = 0;
-    click.play();
-    const name = button.dataset.course;
-    const teacher = button.dataset.teacher;
-    const type = button.dataset.type;
-    const time = button.dataset.time;
-    const price = button.dataset.price;
-    const image = button.dataset.image; // Haddii courseImage la waayo
-    setTimeout(() => {
-
-    const query = `details.html?course=${encodeURIComponent(name)}&teacher=${encodeURIComponent(teacher)}&type=${encodeURIComponent(type)}&time=${encodeURIComponent(time)}&price=${encodeURIComponent(price)}&courseImage=${encodeURIComponent(image)}`;
-    window.location.href = query;
-    },1200);
-  });
-});
-</script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-    authDomain: "exam-81b90.firebaseapp.com",
-    databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-    projectId: "exam-81b90",
-    storageBucket: "exam-81b90.appspot.com",
-    messagingSenderId: "461178422237",
-    appId: "1:461178422237:web:8433ab42b524b0a17bac34",
-    measurementId: "G-KKDNZBZLPG"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getDatabase();
-
-  const badge = document.getElementById("notification-badge");
-
+document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, (user) => {
-    if (!user) return;
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
 
-    const userMessageRef = ref(db, `users/${user.uid}/message`);
-
-    onValue(userMessageRef, (snapshot) => {
-      const message = snapshot.val();
-
-      if (message) {
-        badge.style.display = "inline"; // Calaamada casan muuji
-      } else {
-        badge.style.display = "none"; // Ha muujinin
+    const uid = user.uid;
+    const pinRef = ref(database, `users/${uid}/pinned`);
+    onValue(pinRef, (snapshot) => {
+      if (snapshot.exists()) {
+        window.location.href = 'Pincode.html';
       }
     });
-  });
-</script>
-<script>
-document.querySelectorAll(".course-card").forEach(card => {
-  const courseButton = card.querySelector(".course-data");
-  if (courseButton) {
-    const image = courseButton.dataset.image;
-    if (image) {
-      card.style.background = `url('${image}') center/cover no-repeat`;
-      card.style.color = "white"; // Optional: qoraalka cad ka dhig hadii loo baahdo
-      card.style.borderRadius = "12px"; // Optional: geesaha u wareeji
-      card.style.boxShadow = "0 8px 20px rgba(0,0,0,0.2)"; // Optional: qurxinta
-      card.style.padding = "20px"; // Optional: in content gudaha u jiro
+
+    const claimRef = ref(database, `users/${uid}/claim`);
+    const veriRef = ref(database, `users/${uid}`);
+    const countryRef = ref(database, `users/${uid}/country`);
+    
+    onValue(claimRef, (snapshot) => {
+      if (!snapshot.exists()) {
+        onValue(countryRef, (countrySnap) => {
+          const countryData = countrySnap.val();
+          suc.currentTime = 0;
+          suc.play();
+          if (countryData === "Somaliland") {
+            Swal.fire('Welcome', 'You claimed a 50 coins for free', 'success');
+            update(veriRef, { coins: 50, claim: "claimed" });
+          } else {
+            Swal.fire('Welcome', 'You claimed 10 coins for free', 'success');
+            update(veriRef, { coins: 10, claim: "claimed" });
+          }
+        }, { onlyOnce: false });
+      }
+    }, { onlyOnce: false });
+
+    const paySuccRef = ref(database, `users/${uid}/payments/pur`);
+    const paydeRef = ref(database, `users/${uid}/payments`);
+    const payCoinsRef = ref(database, `users/${uid}/payments/coins`);
+    const verief = ref(database, `users/${uid}`);
+
+    onValue(paySuccRef, (paySuccSnapshot) => {
+      if (paySuccSnapshot.exists() && paySuccSnapshot.val() === "t") {
+        onValue(payCoinsRef, (coinsSnapshot) => {
+          if (coinsSnapshot.exists()) {
+            const sho = coinsSnapshot.val();
+            const userCoinsRef = ref(database, `users/${uid}/coins`);
+            onValue(userCoinsRef, (userCoinsSnapshot) => {
+              const userCoins = userCoinsSnapshot.exists() ? userCoinsSnapshot.val() : 0
+              suc.play();
+              Swal.fire('Payment successfully!', `Your purchased ${sho} coins completed`, 'success');
+              update(verief, { coins: Number(userCoins) + Number(sho) });
+              set(paydeRef, { de: null });
+            }, { onlyOnce: true });
+          }
+        }, { onlyOnce: true });
+      }
+    }, { onlyOnce: true });
+
+    const userCoinsRef = ref(database, `users/${uid}/coins`);
+    onValue(userCoinsRef, (coinsSnapshot) => {
+      const userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
+      document.getElementById("user-coins").innerText = userCoins;
+    });
+
+    document.querySelectorAll('.btn-unlock100, .btn-unlock900').forEach((button) => {
+      const courseName = button.getAttribute('data-course');
+      const purchaseRef = ref(database, `users/${uid}/purchases/${courseName}`);
+      onValue(purchaseRef, (purchaseSnapshot) => {
+        if (purchaseSnapshot.exists() && purchaseSnapshot.val().purchased) {
+          button.disabled = true;
+          button.innerText = 'Already unlocked';
+        }
+      }, { onlyOnce: false });
+    });
+
+    document.querySelectorAll('.btn-unlock100').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        click.currentTime = 0;
+        click.play();
+        const courseName = event.target.getAttribute('data-course');
+        const qiime = parseInt(event.target.getAttribute('qiime'));
+        const usrCoinsRef = ref(database, `users/${uid}`);
+        const purchaseRef = ref(database, `users/${uid}/purchases/${courseName}`);
+
+        const coinsSnapshot = await get(userCoinsRef);
+        let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
+
+        if (userCoins >= qiime) {
+          setTimeout(() => {
+          ero.currentTime = 0.3;
+          ero.play();
+          },300);
+          const { isConfirmed } = await Swal.fire({
+            title: 'Payment confirmation',
+            text: `Ma hubtaa inaad tuurato ${qiime} coins?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Haa',
+            cancelButtonText: 'Maya'
+          });
+
+          if (!isConfirmed) return;
+
+          document.getElementById("user-coins").innerText = userCoins - qiime;
+          click.currentTime = 0;
+          click.play();
+          shit.currentTime = 0;
+          shit.play();
+
+          Swal.fire({
+            title: 'Matching random reward...',
+            html: '<b>Processing...</b>',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          setTimeout(async () => {
+            let success = false;
+            let rewardCoins = 0;
+            let randomChance = Math.random();
+            let successRate = 5;
+
+            success = randomChance < successRate / 100;
+            rewardCoins = success ? 0 : Math.floor(Math.random() * 10) + 1;
+
+            if (success) {
+              await update(usrCoinsRef, { coins: userCoins - qiime });
+              await set(purchaseRef, {
+                purchased: true,
+                courseName,
+                timestamp: new Date().toISOString()
+              });
+
+              button.disabled = true;
+              button.innerText = "Already Unlocked";
+
+              Swal.fire({
+                title: 'You win!',
+                text: `Koorsada ${courseName} waa la furay!`,
+                icon: 'success',
+                confirmButtonText: 'Ok'
+              });
+              suc.currentTime = 0;
+              suc.play();
+            } else {
+              await update(usrCoinsRef, { coins: userCoins - qiime + rewardCoins });
+              document.getElementById("user-coins").innerText = userCoins - qiime + rewardCoins;
+
+              Swal.fire({
+                title: 'Try Again!',
+                text: `Waxaad lumisay ${qiime} coins, laakiin waxaad heshay ${rewardCoins} coins.`,
+                icon: 'info',
+                confirmButtonText: 'Ok'
+              });
+            }
+          }, 1000);
+        } else {
+          Swal.fire({
+            title: 'Unable to thraw',
+            text: `Not enough coins. you need ${qiime} coins to thraw.`,
+            icon: 'warning',
+            confirmButtonText: 'Ok'
+          });
+        }
+      });
+    });
+
+    document.querySelectorAll('.btn-unlock900').forEach((button) => {
+      button.addEventListener('click', async (event) => {
+        click.currentTime = 0;
+        click.play();
+        const courseName = event.target.getAttribute('data-course');
+        const qiime = parseInt(event.target.getAttribute('qiime'));
+        const usrCoinsRef = ref(database, `users/${uid}`);
+        const purchaseRef = ref(database, `users/${uid}/purchases/${courseName}`);
+
+        const coinsSnapshot = await get(userCoinsRef);
+        let userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
+
+        if (userCoins >= qiime) {
+          setTimeout(() => {
+          ero.currentTime = 0.3;
+          ero.play();
+          },300);
+          const { isConfirmed } = await Swal.fire({
+            title: 'Payment confirmation',
+            text: `Ma hubtaa inaad furato koorsada ${courseName} adigoo bixinaya ${qiime} coins?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Haa',
+            cancelButtonText: 'Maya'
+          });
+
+          if (!isConfirmed) return;
+
+          await update(usrCoinsRef, { coins: userCoins - qiime });
+          document.getElementById("user-coins").innerText = userCoins - qiime;
+          click.currentTime = 0;
+          click.play();
+
+          await set(purchaseRef, {
+            purchased: true,
+            courseName,
+            timestamp: new Date().toISOString()
+          });
+
+          button.disabled = true;
+          button.innerText = "Already Unlocked";
+
+          setTimeout(() => {
+            Swal.fire({
+              title: 'Successfully!',
+              text: `Koorsada ${courseName} waa la furay si guul ah!`,
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+            suc.currentTime = 0;
+            suc.play();
+          }, 900);
+        } else {
+          Swal.fire({
+            title: 'Unable to buy',
+            text: `Not enough coins. You need ${qiime} coins to buy.`,
+            icon: 'warning',
+            confirmButtonText: 'Ok'
+          });
+        }
+      });
+    });
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        click.currentTime = 0;
+          click.play();
+        localStorage.removeItem("pinned");
+        const user = auth.currentUser;
+        if (user) {
+          await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
+          const outRef = ref(database, `users/${user.uid}/active`);
+          const dataRef = ref(database, `users/${user.uid}/pinned`);
+          const snapshot = await get(outRef);
+
+          if (snapshot.exists()) {
+            await set(dataRef, {
+              pinned: true
+            });
+
+            signOut(auth)
+              .then(() => {
+                alert("Signed out successfully");
+                window.location.href = "login.html";
+              })
+              .catch((error) => {
+                console.error("Error signing out: ", error.message);
+              });
+          } else {
+            signOut(auth)
+              .then(() => {
+                alert("Signed out successfully.");
+                window.location.href = "login.html"; // Optional: Redirect to login page
+              })
+              .catch((error) => {
+                console.error("Error signing out: ", error.message);
+              });
+          }
+        }
+      });
     }
-  }
-});
-</script>
-<script>
-document.querySelectorAll("a").forEach(link => {
-  const originalHref = link.getAttribute("href");
-
-  // Ignore if href is just "#" or already has onclick
-  if (!originalHref || originalHref === "#" || link.hasAttribute("onclick")) return;
-
-  link.addEventListener("click", function (e) {
-    e.preventDefault(); // Jooji navigation-ka degdega ah
-    shit.currentTime = 0;
-    shit.play();
-    setTimeout(() => {
-      window.location.href = originalHref;
-    }, 1200);
   });
 });
-  </script>
