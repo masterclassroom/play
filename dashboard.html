@@ -22,7 +22,8 @@
             <a href="Profile.html">Profile</a>
             <a href="purchased.html">Purchased courses</a>
             <a href="message.html">messages</a>
-            <a href="Draw.html">Buy coins</a> 
+            <a href="Draw.html">Buy coins</a>
+            <a href="backup.html">Backup coins</a>
             <a href="Coins.html">Daily rewards</a>
             <a href="deletion.html">Account deletion</a>
           <a href="notification.html">Notification <span id="notification-badge" style="display: none; color: red; font-size: 20px;">•</span></a>
@@ -210,8 +211,8 @@ document.querySelectorAll("a").forEach(link => {
 
   link.addEventListener("click", function (e) {
     e.preventDefault(); // Jooji navigation-ka degdega ah
-    shit.currentTime = 0;
-    shit.play();
+    click.currentTime = 0;
+    click.play();
     setTimeout(() => {
       window.location.href = originalHref;
     }, 1200);
