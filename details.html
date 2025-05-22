@@ -67,6 +67,7 @@
   }
 </style>
 </head>
+<audio src="back.mp3" id="back"></audio>
 <body>
   <div class="container">
     <img id="course-image" class="course-image" src="" alt="Sawirka Koorsada" />
@@ -76,10 +77,11 @@
     <h4 id="time"></h4>
     <h4 id="price"></h4>
 
-    <a href="dashboard.html" class="back-btn">← Ku Laabo</a>
+    <a href="#" id="backer" class="back-btn">← Ku Laabo</a>
   </div>
 
   <script>
+  var sound = document.getElementById("back");
   // Soo qabso parameters
   const urlParams = new URLSearchParams(window.location.search);
   const course = urlParams.get("course");
@@ -102,6 +104,15 @@
   } else {
     document.getElementById("course-image").style.display = "none";
   }
+   document.getElementById("backer").addEventListener("click", function() {
+     sound.currentTime = 0;
+     sound.play();
+     setTimeout(() => {
+       window.location.href = 'dashboard.html';
+     },1000);
+     
+     
+});
 </script>
 </body>
 </html>
