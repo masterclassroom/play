@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coins Manager with Milliseconds Countdown</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    window.onload = () => {
+      const actionSelector = document.getElementById("action");
+      const actionTitle = document.getElementById("actionTitle");
+      const actionBtn = document.getElementById("actionBtn");
+      const amountInput = document.getElementById("amount");
+      const coinsText = document.getElementById("coins");
+      const backupText = document.getElementById("backup");
+      const timeLeftText = document.getElementById("timeLeft");
+      var shit = document.getElementById("shit");
+      var click = document.getElementById("click");
+
+      let intervalId = null;
+
+      const disableUI = (disable) => {
+        actionBtn.disabled = disable;
+        actionSelector.disabled = disable;
+      };
+
+      const getRemainingTime = (timestamp) => {
+        const now = Date.now();
+        const diff = timestamp + 86400000 - now; // 24h in ms
+        if (diff <= 0) return null;
+
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const milliseconds = diff % 1000;
+
+        const hh = hours.toString().padStart(2, "0");
+        const mm = minutes.toString().padStart(2, "0");
+        const ss = seconds.toString().padStart(2, "0");
+        const ms = milliseconds.toString().padStart(3, "0");
+
+        return `${hh}:${mm}:${ss}:${ms}`;
+      };
+
+      const checkTimeLock = async (userId) => {
+        const snap = await get(ref(db, "users/" + userId));
+        if (!snap.exists()) return false;
+
+        const data = snap.val();
+        const lastchange = data.lastchange || 0;
+        const now = Date.now();
+
+        if (now - lastchange >= 86400000) {
+          timeLeftText.innerText = "";
+          disableUI(false);
+          if(intervalId) clearInterval(intervalId);
+          return false;
+        } else {
+          disableUI(true);
+
+          if(intervalId) clearInterval(intervalId);
+          intervalId = setInterval(() => {
+            const rem = getRemainingTime(lastchange);
+            if (rem) {
+              timeLeftText.innerText = "Time Left: " + rem;
+            } else {
+              timeLeftText.innerText = "";
+              disableUI(false);
+              clearInterval(intervalId);
+              location.reload();
+            }
+          }, 50); // Update every 50ms for smooth milliseconds countdown
+
+          return true;
+        }
+      };
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        const userId = user.uid;
+        const userRef = ref(db, "users/" + userId);
+
+        async function refreshBalances() {
+          const snap = await get(userRef);
+          if (snap.exists()) {
+            const data = snap.val();
+            coinsText.innerText = "Coins: " + (data.coins || 0);
+            backupText.innerText = "Backup Coins: " + (data.backupcoins || 0);
+          }
+        }
+
+        refreshBalances();
+        await checkTimeLock(userId);
+
+        actionBtn.innerText = actionSelector.value === "withdraw" ? "Withdraw Coins" : "Backup Coins";
+        actionTitle.innerText = actionSelector.value === "withdraw" ? "Withdraw" : "Backup";
+
+        actionSelector.addEventListener("change", () => {
+          shit.currentTime = 0;
+          shit.play();
+          const action = actionSelector.value;
+          actionBtn.innerText = action === "withdraw" ? "Withdraw Coins" : "Backup Coins";
+          actionTitle.innerText = action === "withdraw" ? "Withdraw" : "Backup";
+        });
+
+        actionBtn.addEventListener("click", async () => {
+          click.currentTime = 0;
+          click.play();
+          const amount = parseInt(amountInput.value);
+          if (isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid amount.");
+            return;
+          }
+
+          const confirmAction = window.confirm(`Are you sure you want to ${actionSelector.value} ${amount} coins?`);
+          if (!confirmAction) return;
+
+          const snap = await get(userRef);
+          if (!snap.exists()) return alert("User data not found.");
+
+          const data = snap.val();
+          const coins = parseInt(data.coins || 0);
+          const backupcoins = parseInt(data.backupcoins || 0);
+          let updates = {};
+
+          if (actionSelector.value === "backup") {
+            if (coins < amount) return alert("Not enough coins to backup.");
+            updates.coins = coins - amount;
+            updates.backupcoins = backupcoins + amount;
+          } else {
+            if (backupcoins < amount) return alert("Not enough backup coins to withdraw.");
+            updates.coins = coins + amount;
+            updates.backupcoins = backupcoins - amount;
+          }
+
+          updates.lastchange = Date.now();
+          await update(userRef, updates);
+
+          alert("Transaction successful!");
+          refreshBalances();
+          amountInput.value = "";
+          await checkTimeLock(userId);
+        });
+      });
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    .box {
+      max-width: 400px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #000;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      background: #1a73e8;
+      color: white;
+      cursor: pointer;
+    }
+    #timeLeft {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 18px;
+    }
+  </style>
+</head>
+  <audio src="back.mp3" id="backk"></audio>
+  <audio src="click.mp3" id="click"></audio>
+   <audio src="shit.mp3" id="shit"></audio>
+  
+<body>
+  <div class="box">
+    <h2 id="actionTitle">Backup</h2>
+
+    <p id="coins">Coins: ...</p>
+    <p id="backup">Backup Coins: ...</p>
+    <p id="timeLeft"></p>
+
+    <select id="action" onclick="grc()">
+      <option value="backup">Backup</option>
+      <option value="withdraw">Withdraw</option>
+    </select>
+
+    <input type="number" id="amount" placeholder="Enter amount" min="1" />
+
+    <button id="actionBtn">Backup Coins</button>
+    <button id="bag">Back</button>
+  </div>
+</body>
+</html>
+  <script>
+  var sound = document.getElementById("backk");
+   document.getElementById("bag").addEventListener("click", function() {
+     sound.currentTime = 0;
+     sound.play();
+     setTimeout(() => {
+       window.history.back();
+     },1000);
+   
+});
+  function grc() {
+    click.currentTime = 0;
+          click.play();
+  }
+  
+  </script>
