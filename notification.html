@@ -44,6 +44,16 @@
       border-radius: 6px;
       cursor: pointer;
     }
+        #kir {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+        }
   </style>
 </head>
 <body>
@@ -53,7 +63,7 @@
 <h2>My Messages</h2>
 <div id="messagesList"></div>
 <button id="clearAllBtn">Clear All</button>
-<button onclick="bic()">Back</button>
+<button id="kir" onclick="bic()">Back</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -134,6 +144,9 @@
     function bic() {
       back.currentTime = 0;
         back.play();
+      setTimeout(() => {
+        window.history.back();
+      }, 500);
     }
    
     
