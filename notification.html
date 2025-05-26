@@ -47,10 +47,13 @@
   </style>
 </head>
 <body>
+  <audio src="back.mp3" id="back"></audio>
+<audio src="click.mp3" id="click"></audio>
 
 <h2>My Messages</h2>
 <div id="messagesList"></div>
 <button id="clearAllBtn">Clear All</button>
+<button onclick="bic()">Back</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -73,6 +76,8 @@
 
   const messagesList = document.getElementById("messagesList");
   const clearAllBtn = document.getElementById("clearAllBtn");
+  var click = document.getElementById("click");
+  var back = document.getElementById("back");
 
   onAuthStateChanged(auth, (user) => {
     if (!user) return window.location.href = "login.html";
@@ -110,6 +115,8 @@
         <button class="remove-btn" title="Delete">×</button>
       `;
       div.querySelector("button").onclick = () => {
+        click.ccurrentTime = 0;
+        click.play();
         const msgRef = ref(db, `users/${user.uid}/message/${key}`);
         remove(msgRef);
       };
@@ -117,10 +124,20 @@
     }
 
     clearAllBtn.onclick = () => {
+      click.ccurrentTime = 0;
+        click.play();
       remove(messagesRef);
     };
   });
 </script>
+  <script>
+    function bic() {
+      back.currentTime = 0;
+        back.play();
+    }
+   
+    
+  </script>
 
 </body>
 </html>
