@@ -87,7 +87,7 @@
         if (confirmDelete) {
           let randomNumber = Math.floor(Math.random() * 100) + 1;
           const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
-          const userRef = ref(database, `users/${user.uid`);
+          const userRef = ref(database, `users/${user.uid}`);
           const messagesRef = ref(database, `users/${user.uid/message}`);
           await update(userRef, { lastdelete: deleteTime });
           await update(messagesRef, { randomNumber: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
