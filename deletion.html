@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, update, get, remove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, update, get, remove, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
@@ -86,15 +86,20 @@
         const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga 24 saac kadib?");
         if (confirmDelete) {
           let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-let result = "";
-for (let i = 0; i < 6; i++) {
-  result += chars[Math.floor(Math.random() * chars.length)];
-}
+        let randomKey = "";
+        for (let i = 0; i < 6; i++) {
+          randomKey += chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        // Create new message ref with random key
+        const messageRef = ref(database, `users/${user.uid}/message/${randomKey}`);
+
+        // Set message
+        await set(messageRef, "Account-kaaga waxa la tirtiri doona 24 saac ka dib");
+
           const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
-          const userRef = ref(database, `users/${user.uid}`);
-          const messagesRef = ref(database, `users/${user.uid/message}`);
+          const userRef = ref(database, `users/${user.uid}`);       
           await update(userRef, { lastdelete: deleteTime });
-          await update(messagesRef, { result: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
           window.location.reload();
         }
       } catch (error) {
@@ -128,9 +133,9 @@ for (let i = 0; i < 6; i++) {
   result += chars[Math.floor(Math.random() * chars.length)];
 }
         const userRef = ref(database, `users/${uid}/lastdelete`);
-        const backRef = ref(database, `users/${uid}/message`);
+        const backRef = ref(database, `users/${uid}/message/${result}`);
         await remove(userRef);
-        await set(backRef, { result: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
+        await set(backRef, "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga");
         window.location.reload();
       });
     }
@@ -237,4 +242,4 @@ for (let i = 0; i < 6; i++) {
   .delete-btn:hover {
     background: #5a6268;
   }
-</style>
+  </style>
