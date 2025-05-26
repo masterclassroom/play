@@ -85,12 +85,16 @@
 
         const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga 24 saac kadib?");
         if (confirmDelete) {
-          let randomNumber = Math.floor(Math.random() * 100) + 1;
+          let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+let result = "";
+for (let i = 0; i < 6; i++) {
+  result += chars[Math.floor(Math.random() * chars.length)];
+}
           const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
           const userRef = ref(database, `users/${user.uid}`);
           const messagesRef = ref(database, `users/${user.uid/message}`);
           await update(userRef, { lastdelete: deleteTime });
-          await update(messagesRef, { randomNumber: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
+          await update(messagesRef, { result: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
           window.location.reload();
         }
       } catch (error) {
@@ -118,11 +122,15 @@
       }, 1000);
 
       document.getElementById("cancel-btn").addEventListener("click", async () => {
-        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+let result = "";
+for (let i = 0; i < 6; i++) {
+  result += chars[Math.floor(Math.random() * chars.length)];
+}
         const userRef = ref(database, `users/${uid}/lastdelete`);
         const backRef = ref(database, `users/${uid}/message`);
         await remove(userRef);
-        await update(backRef, { randomNumber: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
+        await set(backRef, { result: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
         window.location.reload();
       });
     }
