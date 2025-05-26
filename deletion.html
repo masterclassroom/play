@@ -85,11 +85,11 @@
 
         const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga 24 saac kadib?");
         if (confirmDelete) {
+          let randomNumber = Math.floor(Math.random() * 100) + 1;
           const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
-          const userRef = ref(database, `users/${user.uid}`);
+          const userRef = ref(database, `users/${user.uid/message}`);
           await update(userRef, { lastdelete: deleteTime });
-          await update(userRef, { message: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
-          alert("Codsiga tirtirka account-ka waa la diray.");
+          await update(userRef, { randomNumber: "Account kaaga waxa la tirtiri doona 24 saac ka dib" });
           window.location.reload();
         }
       } catch (error) {
@@ -117,12 +117,11 @@
       }, 1000);
 
       document.getElementById("cancel-btn").addEventListener("click", async () => {
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
         const userRef = ref(database, `users/${uid}/lastdelete`);
-        const backRef = ref(database, `users/${uid}`);
+        const backRef = ref(database, `users/${uid}/message`);
         await remove(userRef);
-        await update(backRef, { message: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
-        
-        alert("Codsiga tirtirka account-ka waa la baajiyey.");
+        await update(backRef, { randomNumber: "Waad ku guulaysatay inaad joojiso in la tirtiro account-kaaga"});
         window.location.reload();
       });
     }
