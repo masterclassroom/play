@@ -30,6 +30,7 @@
       const coinsText = document.getElementById("coins");
       const backupText = document.getElementById("backup");
       const timeLeftText = document.getElementById("timeLeft");
+      const message = document.getElementById("message");
       var shit = document.getElementById("shit");
       var click = document.getElementById("click");
 
@@ -42,7 +43,7 @@
 
       const getRemainingTime = (timestamp) => {
         const now = Date.now();
-        const diff = timestamp + 86400000 - now; // 24h in ms
+        const diff = timestamp + 86400000 - now;
         if (diff <= 0) return null;
 
         const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -50,12 +51,11 @@
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         const milliseconds = diff % 1000;
 
-        const hh = hours.toString().padStart(2, "0");
-        const mm = minutes.toString().padStart(2, "0");
-        const ss = seconds.toString().padStart(2, "0");
-        const ms = milliseconds.toString().padStart(3, "0");
-
-        return `${hh}:${mm}:${ss}:${ms}`;
+        return `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}:${milliseconds
+          .toString()
+          .padStart(3, "0")}`;
       };
 
       const checkTimeLock = async (userId) => {
@@ -69,12 +69,11 @@
         if (now - lastchange >= 86400000) {
           timeLeftText.innerText = "";
           disableUI(false);
-          if(intervalId) clearInterval(intervalId);
+          if (intervalId) clearInterval(intervalId);
           return false;
         } else {
           disableUI(true);
-
-          if(intervalId) clearInterval(intervalId);
+          if (intervalId) clearInterval(intervalId);
           intervalId = setInterval(() => {
             const rem = getRemainingTime(lastchange);
             if (rem) {
@@ -85,8 +84,7 @@
               clearInterval(intervalId);
               location.reload();
             }
-          }, 50); // Update every 50ms for smooth milliseconds countdown
-
+          }, 50);
           return true;
         }
       };
@@ -127,8 +125,9 @@
           click.currentTime = 0;
           click.play();
           const amount = parseInt(amountInput.value);
+          message.style.color = "red";
           if (isNaN(amount) || amount <= 0) {
-            alert("Please enter a valid amount.");
+            message.innerText = "Please enter a valid amount.";
             return;
           }
 
@@ -136,7 +135,10 @@
           if (!confirmAction) return;
 
           const snap = await get(userRef);
-          if (!snap.exists()) return alert("User data not found.");
+          if (!snap.exists()) {
+            message.innerText = "User data not found.";
+            return;
+          }
 
           const data = snap.val();
           const coins = parseInt(data.coins || 0);
@@ -144,11 +146,17 @@
           let updates = {};
 
           if (actionSelector.value === "backup") {
-            if (coins < amount) return alert("Not enough coins to backup.");
+            if (coins < amount) {
+              message.innerText = "Not enough coins to backup.";
+              return;
+            }
             updates.coins = coins - amount;
             updates.backupcoins = backupcoins + amount;
           } else {
-            if (backupcoins < amount) return alert("Not enough backup coins to withdraw.");
+            if (backupcoins < amount) {
+              message.innerText = "Not enough backup coins to withdraw.";
+              return;
+            }
             updates.coins = coins + amount;
             updates.backupcoins = backupcoins - amount;
           }
@@ -156,7 +164,13 @@
           updates.lastchange = Date.now();
           await update(userRef, updates);
 
-          alert("Transaction successful!");
+          message.style.color = "green";
+          message.innerText = "Transaction successful!";
+          setTimeout(() => {
+            message.innerText = "";
+            message.style.color = "red";
+          }, 5000);
+
           refreshBalances();
           amountInput.value = "";
           await checkTimeLock(userId);
@@ -164,48 +178,12 @@
       });
     };
   </script>
-
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #111;
-      color: #fff;
-      padding: 20px;
-    }
-    .box {
-      max-width: 400px;
-      margin: auto;
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #000;
-    }
-    select, input, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    button {
-      background: #1a73e8;
-      color: white;
-      cursor: pointer;
-    }
-    #timeLeft {
-      color: red;
-      font-weight: bold;
-      margin-top: 10px;
-      font-family: monospace;
-      font-size: 18px;
-    }
-  </style>
 </head>
-  <audio src="back.mp3" id="backk"></audio>
-  <audio src="click.mp3" id="click"></audio>
-   <audio src="shit.mp3" id="shit"></audio>
-  
+
+<audio src="back.mp3" id="backk"></audio>
+<audio src="click.mp3" id="click"></audio>
+<audio src="shit.mp3" id="shit"></audio>
+
 <body>
   <div class="box">
     <h2 id="actionTitle">Backup</h2>
@@ -213,6 +191,8 @@
     <p id="coins">Coins: ...</p>
     <p id="backup">Backup Coins: ...</p>
     <p id="timeLeft"></p>
+
+    <p id="message" style="color:red; font-weight:bold;"></p>
 
     <select id="action" onclick="grc()">
       <option value="backup">Backup</option>
@@ -225,20 +205,57 @@
     <button id="bag">Back</button>
   </div>
 </body>
-</html>
-  <script>
+
+<script>
   var sound = document.getElementById("backk");
-   document.getElementById("bag").addEventListener("click", function() {
-     sound.currentTime = 0;
-     sound.play();
-     setTimeout(() => {
-       window.history.back();
-     },1000);
-   
-});
+  document.getElementById("bag").addEventListener("click", function () {
+    sound.currentTime = 0;
+    sound.play();
+    setTimeout(() => {
+      window.history.back();
+    }, 1000);
+  });
+
   function grc() {
     click.currentTime = 0;
-          click.play();
+    click.play();
   }
-  
-  </script>
+</script>
+
+<style>
+  body {
+    font-family: sans-serif;
+    background: #f5f5f5;
+  }
+
+  .box {
+    width: 300px;
+    margin: 50px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  input,
+  select,
+  button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    background: #aaa;
+  }
+</style>
+</html>
