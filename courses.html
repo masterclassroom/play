@@ -79,11 +79,15 @@
     <a href="#" onclick="backg()" id="back">laabo</a>
 
     <script>
+        
         // Shaqada tirtiraysa sessionStorage marka page-ka la xiro, refresh gareeyo ama tab-ka laga baxo
         function clearSessionStorage() {
+    
             sessionStorage.clear();
         }
         var back = document.getElementById("back");
+        back.currentTime = 0,
+            back.play();
 
         // Tirtir sessionStorage marka user-ku ka baxo page-ka
         window.addEventListener("pagehide", clearSessionStorage);
