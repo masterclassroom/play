@@ -3,6 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <title>Coins Manager with Milliseconds Countdown</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      width: 320px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    p {
+      margin: 8px 0;
+      font-weight: bold;
+    }
+
+    #timeLeft {
+      color: red;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: background 0.3s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #2980b9;
+    }
+
+    button:disabled {
+      background-color: #bbb;
+      cursor: not-allowed;
+    }
+  </style>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
@@ -30,9 +94,8 @@
       const coinsText = document.getElementById("coins");
       const backupText = document.getElementById("backup");
       const timeLeftText = document.getElementById("timeLeft");
-      const message = document.getElementById("message");
-      var shit = document.getElementById("shit");
-      var click = document.getElementById("click");
+      const shit = document.getElementById("shit");
+      const click = document.getElementById("click");
 
       let intervalId = null;
 
@@ -51,11 +114,12 @@
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         const milliseconds = diff % 1000;
 
-        return `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}:${milliseconds
-          .toString()
-          .padStart(3, "0")}`;
+        const hh = hours.toString().padStart(2, "0");
+        const mm = minutes.toString().padStart(2, "0");
+        const ss = seconds.toString().padStart(2, "0");
+        const ms = milliseconds.toString().padStart(3, "0");
+
+        return `${hh}:${mm}:${ss}:${ms}`;
       };
 
       const checkTimeLock = async (userId) => {
@@ -74,6 +138,7 @@
         } else {
           disableUI(true);
           if (intervalId) clearInterval(intervalId);
+
           intervalId = setInterval(() => {
             const rem = getRemainingTime(lastchange);
             if (rem) {
@@ -125,9 +190,8 @@
           click.currentTime = 0;
           click.play();
           const amount = parseInt(amountInput.value);
-          message.style.color = "red";
           if (isNaN(amount) || amount <= 0) {
-            message.innerText = "Please enter a valid amount.";
+            alert("Please enter a valid amount.");
             return;
           }
 
@@ -135,10 +199,7 @@
           if (!confirmAction) return;
 
           const snap = await get(userRef);
-          if (!snap.exists()) {
-            message.innerText = "User data not found.";
-            return;
-          }
+          if (!snap.exists()) return alert("User data not found.");
 
           const data = snap.val();
           const coins = parseInt(data.coins || 0);
@@ -146,17 +207,11 @@
           let updates = {};
 
           if (actionSelector.value === "backup") {
-            if (coins < amount) {
-              message.innerText = "Not enough coins to backup.";
-              return;
-            }
+            if (coins < amount) return alert("Not enough coins to backup.");
             updates.coins = coins - amount;
             updates.backupcoins = backupcoins + amount;
           } else {
-            if (backupcoins < amount) {
-              message.innerText = "Not enough backup coins to withdraw.";
-              return;
-            }
+            if (backupcoins < amount) return alert("Not enough backup coins to withdraw.");
             updates.coins = coins + amount;
             updates.backupcoins = backupcoins - amount;
           }
@@ -164,13 +219,7 @@
           updates.lastchange = Date.now();
           await update(userRef, updates);
 
-          message.style.color = "green";
-          message.innerText = "Transaction successful!";
-          setTimeout(() => {
-            message.innerText = "";
-            message.style.color = "red";
-          }, 5000);
-
+          alert("Transaction successful!");
           refreshBalances();
           amountInput.value = "";
           await checkTimeLock(userId);
@@ -180,19 +229,16 @@
   </script>
 </head>
 
-<audio src="back.mp3" id="backk"></audio>
-<audio src="click.mp3" id="click"></audio>
-<audio src="shit.mp3" id="shit"></audio>
-
 <body>
+  <audio src="back.mp3" id="backk"></audio>
+  <audio src="click.mp3" id="click"></audio>
+  <audio src="shit.mp3" id="shit"></audio>
+
   <div class="box">
     <h2 id="actionTitle">Backup</h2>
-
     <p id="coins">Coins: ...</p>
     <p id="backup">Backup Coins: ...</p>
     <p id="timeLeft"></p>
-
-    <p id="message" style="color:red; font-weight:bold;"></p>
 
     <select id="action" onclick="grc()">
       <option value="backup">Backup</option>
@@ -200,62 +246,26 @@
     </select>
 
     <input type="number" id="amount" placeholder="Enter amount" min="1" />
-
     <button id="actionBtn">Backup Coins</button>
     <button id="bag">Back</button>
   </div>
+
+  <script>
+    var sound = document.getElementById("backk");
+    var click = document.getElementById("click");
+
+    document.getElementById("bag").addEventListener("click", function () {
+      sound.currentTime = 0;
+      sound.play();
+      setTimeout(() => {
+        window.history.back();
+      }, 1000);
+    });
+
+    function grc() {
+      click.currentTime = 0;
+      click.play();
+    }
+  </script>
 </body>
-
-<script>
-  var sound = document.getElementById("backk");
-  document.getElementById("bag").addEventListener("click", function () {
-    sound.currentTime = 0;
-    sound.play();
-    setTimeout(() => {
-      window.history.back();
-    }, 1000);
-  });
-
-  function grc() {
-    click.currentTime = 0;
-    click.play();
-  }
-</script>
-
-<style>
-  body {
-    font-family: sans-serif;
-    background: #f5f5f5;
-  }
-
-  .box {
-    width: 300px;
-    margin: 50px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  input,
-  select,
-  button {
-    width: 100%;
-    padding: 8px;
-    margin-top: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  button {
-    background: #3498db;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  button:disabled {
-    background: #aaa;
-  }
-</style>
 </html>
