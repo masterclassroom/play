@@ -1,9 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deletion account</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #ff4e50, #f9d423);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #ff4e50;
+      font-size: 24px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input[type="password"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #ff4e50;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px 5px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #delete-btn {
+      background-color: #ff4e50;
+      color: white;
+    }
+
+    #delete-btn:hover {
+      background-color: #e2433f;
+    }
+
+    .delete-btn {
+      background-color: #555;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background-color: #333;
+    }
+
+    .cancel-btn {
+      background-color: #f9d423;
+      color: #000;
+    }
+
+    .cancel-btn:hover {
+      background-color: #f7c600;
+    }
+
+    #countdown-section {
+      margin-top: 20px;
+    }
+
+    .countdown {
+      font-size: 16px;
+      font-weight: 600;
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    #message-box {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ff4e50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 999;
+      display: none;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -22,7 +139,8 @@
     </div>
     <button onclick="window.history.back()" class="delete-btn">Back</button>
   </div>
-  <script type="module" src="confirm.js"></script>
+
+  <div id="message-box"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -42,6 +160,15 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const database = getDatabase(app);
+
+    function showMessage(text) {
+      const box = document.getElementById("message-box");
+      box.innerText = text;
+      box.style.display = "block";
+      setTimeout(() => {
+        box.style.display = "none";
+      }, 3000);
+    }
 
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
@@ -64,11 +191,11 @@
       const user = auth.currentUser;
 
       if (!checkbox.checked) {
-        alert("Fadlan sax checkbox-ka si aad u xaqiijiso.");
+        showMessage("Fadlan sax checkbox-ka si aad u xaqiijiso.");
         return;
       }
       if (!password || !pin) {
-        alert("Fadlan geli password iyo PIN.");
+        showMessage("Fadlan geli password iyo PIN.");
         return;
       }
 
@@ -76,7 +203,7 @@
         const pinRef = ref(database, `users/${user.uid}/Pin`);
         const snapshot = await get(pinRef);
         if (!snapshot.exists() || snapshot.val() !== pin) {
-          alert("PIN waa qalad.");
+          showMessage("PIN waa qalad.");
           return;
         }
 
@@ -86,24 +213,21 @@
         const confirmDelete = confirm("Ma hubtaa inaad codsato in la tirtiro account-kaaga 24 saac kadib?");
         if (confirmDelete) {
           let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        let randomKey = "";
-        for (let i = 0; i < 6; i++) {
-          randomKey += chars[Math.floor(Math.random() * chars.length)];
-        }
+          let randomKey = "";
+          for (let i = 0; i < 6; i++) {
+            randomKey += chars[Math.floor(Math.random() * chars.length)];
+          }
 
-        // Create new message ref with random key
-        const messageRef = ref(database, `users/${user.uid}/message/${randomKey}`);
-
-        // Set message
-        await set(messageRef, "Account-kaaga waxa la tirtiri doona 24 saac ka dib");
+          const messageRef = ref(database, `users/${user.uid}/message/${randomKey}`);
+          await set(messageRef, "Account-kaaga waxa la tirtiri doona 24 saac ka dib");
 
           const deleteTime = Date.now() + 24 * 60 * 60 * 1000;
-          const userRef = ref(database, `users/${user.uid}`);       
+          const userRef = ref(database, `users/${user.uid}`);
           await update(userRef, { lastdelete: deleteTime });
           window.location.reload();
         }
       } catch (error) {
-        alert("Error: " + error.message);
+        showMessage("Error: " + error.message);
       }
     });
 
@@ -128,10 +252,10 @@
 
       document.getElementById("cancel-btn").addEventListener("click", async () => {
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-let result = "";
-for (let i = 0; i < 6; i++) {
-  result += chars[Math.floor(Math.random() * chars.length)];
-}
+        let result = "";
+        for (let i = 0; i < 6; i++) {
+          result += chars[Math.floor(Math.random() * chars.length)];
+        }
         const userRef = ref(database, `users/${uid}/lastdelete`);
         const backRef = ref(database, `users/${uid}/message/${result}`);
         await remove(userRef);
@@ -142,104 +266,3 @@ for (let i = 0; i < 6; i++) {
   </script>
 </body>
 </html>
-  <style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .container {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-  }
-
-  h2 {
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 24px;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: #555;
-  }
-
-  input[type="password"],
-  input[type="number"] {
-    width: 100%;
-    padding: 12px 15px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #f9f9f9;
-    font-size: 15px;
-    transition: border-color 0.3s;
-  }
-
-  input[type="password"]:focus,
-  input[type="number"]:focus {
-    border-color: #74ebd5;
-    outline: none;
-  }
-
-  button {
-    width: 100%;
-    padding: 12px;
-    background: #74ebd5;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: background 0.3s;
-  }
-
-  button:hover {
-    background: #66d1c2;
-  }
-
-  #countdown-section {
-    margin-top: 20px;
-    background: #f1f1f1;
-    padding: 15px;
-    border-radius: 10px;
-  }
-
-  .countdown {
-    color: #d9534f;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-
-  .cancel-btn {
-    background: #ff4d4d;
-    margin-top: 10px;
-  }
-
-  .cancel-btn:hover {
-    background: #e04343;
-  }
-
-  .delete-btn {
-    margin-top: 10px;
-    background: #6c757d;
-  }
-
-  .delete-btn:hover {
-    background: #5a6268;
-  }
-  </style>
