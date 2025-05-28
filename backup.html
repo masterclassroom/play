@@ -4,68 +4,6 @@
   <meta charset="UTF-8" />
   <title>Coins Manager with Milliseconds Countdown</title>
 
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .box {
-      width: 320px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 15px;
-    }
-
-    p {
-      margin: 8px 0;
-      font-weight: bold;
-    }
-
-    #timeLeft {
-      color: red;
-    }
-
-    input,
-    select,
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    button {
-      background-color: #3498db;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-      transition: background 0.3s ease;
-    }
-
-    button:hover:not(:disabled) {
-      background-color: #2980b9;
-    }
-
-    button:disabled {
-      background-color: #bbb;
-      cursor: not-allowed;
-    }
-  </style>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -269,3 +207,85 @@
   </script>
 </body>
 </html>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background: linear-gradient(135deg, #1a1a40, #1f4068);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .box {
+    background-color: #2e2e4d;
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 350px;
+  }
+
+  h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #ffcc00;
+  }
+
+  p {
+    margin: 10px 0;
+    font-size: 16px;
+  }
+
+  #timeLeft {
+    color: #ff5e5e;
+    font-weight: bold;
+  }
+
+  select, input, button {
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: 0.3s ease-in-out;
+  }
+
+  select, input {
+    background-color: #444460;
+    color: #fff;
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    box-shadow: 0 0 5px #ffd700;
+  }
+
+  button {
+    background-color: #ffcc00;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #e6b800;
+  }
+
+  #bag {
+    background-color: #999;
+    margin-top: 10px;
+  }
+
+  #bag:hover {
+    background-color: #777;
+  }
+</style>
