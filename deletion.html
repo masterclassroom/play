@@ -140,7 +140,7 @@
       <p class="countdown" id="countdown-text"></p>
       <button class="cancel-btn" id="cancel-btn">Cancel Request</button>
     </div>
-    <button onclick="window.history.back()" class="delete-btn">Back</button>
+    <button onclick="backg()" class="delete-btn">Back</button>
   </div>
 
   <div id="message-box"></div>
@@ -261,8 +261,8 @@ var back = document.getElementById("back");
       }, 1000);
 
       document.getElementById("cancel-btn").addEventListener("click", async () => {
-        back.ccurrentTime = 0;
-      back.play();
+        click.ccurrentTime = 0;
+      click.play();
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         let result = "";
         for (let i = 0; i < 6; i++) {
@@ -276,5 +276,15 @@ var back = document.getElementById("back");
       });
     }
   </script>
+<script>
+function backg() {
+  back.ccurrentTime = 0;
+      back.play();
+  setTimeout(() => {
+    window.history.back();
+  },1000);
+}
+
+
 </body>
 </html>
