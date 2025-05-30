@@ -123,6 +123,9 @@
   </style>
 </head>
 <body>
+  <audio src="click.mp3" id="click"></audio>
+  <audio src="back.mp3" id="back"></audio>
+  <audio src="shit.mp3" id="shit"></audio>
   <div class="container">
     <h2>Delete Account</h2>
     <label>
@@ -184,8 +187,14 @@
         startCountdown(snapshot.val().lastdelete, user.uid);
       }
     });
+var back = document.getElementById("back");
+    var click = document.getElementById("click");
+    var shit = document.getElementById("shit");
+
 
     document.getElementById("delete-btn").addEventListener("click", async () => {
+      click.ccurrentTime = 0;
+      click.play();
       const checkbox = document.getElementById("confirm-check");
       const password = document.getElementById("password").value.trim();
       const pin = document.getElementById("pin").value.trim();
@@ -252,6 +261,8 @@
       }, 1000);
 
       document.getElementById("cancel-btn").addEventListener("click", async () => {
+        back.ccurrentTime = 0;
+      back.play();
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         let result = "";
         for (let i = 0; i < 6; i++) {
