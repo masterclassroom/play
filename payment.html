@@ -35,6 +35,10 @@
         let originalPrice = parseFloat(urlParams.get('price:detailshtmlhex1290pllknmagdhssg')) || 0;
         let currency = "USD";
         let priceStr = `${originalPrice.toFixed(0)} ${currency}`;
+        var click = document.getElementById("click");
+        var back = document.getElementById("back");
+        var shit = document.getElementById("shit");
+        var ero = document.getElementById("ero");
 
         document.addEventListener("DOMContentLoaded", () => {
             const priceElement = document.getElementById("pricer");
@@ -44,6 +48,7 @@
 
             // Marka nooca lacagta la doorto
             currencyTypeElement.addEventListener("change", function () {
+                
                 let price = originalPrice;
                 if (this.value === "shilling") {
                     price = price * 10000; 
@@ -57,9 +62,12 @@
 
             // Dir lacagta
             document.getElementById('payment-button').addEventListener('click', function () {
+                click.ccurrentTime = 0;
+      click.play();
                 const method = document.getElementById("payment-method").value;
                 const currencyType = document.getElementById("currency-type").value;
                 const messageElement = document.getElementById("messages");
+                setTimeout(() => {
 
                 if (method === "none" || currencyType === "none") {
                     messageElement.textContent = 'Fadlan dooro habka lacag bixinta iyo nooca lacagta';
@@ -86,10 +94,13 @@
                 if (ussdCode) {
                     window.location.href = `tel:${ussdCode}`;
                 }
+                },1000);
             });
 
             // Handle "Codso" button
             document.getElementById('request-button').addEventListener('click', async function () {
+                click.ccurrentTime = 0;
+      click.play();
                 const username = document.getElementById('username').value;
                 const email = document.getElementById('email').value;
                 const phone = document.getElementById('phone').value;
@@ -113,6 +124,9 @@
                      messageElement.textContent = 'Fadlan dooro habka lacagta iyo nooca lacagta';
                      return;
                  }
+                setTimeout(() => {
+                    ero.ccurrentTime = 0;
+      ero.play();
 
                 const { isConfirmed } = await Swal.fire({
                     title: 'Payment confirmation?',
@@ -122,8 +136,11 @@
                     confirmButtonText: 'Haa',
                     cancelButtonText: 'Maya'
                 });
+                },1000);
 
                 if (isConfirmed) {
+                    click.ccurrentTime = 0;
+      click.play();
                     const paymentRef = ref(database, `users/${auth.currentUser.uid}/payments`);
                     
                     try {
@@ -242,6 +259,9 @@ button:hover {
 
 <div class="container">
     <h2>payment</h2>
+<audio src="click.mp3" id="click"></audio>
+    <audio src="back.mp3" id="back"></audio>
+    <audio src="shit.mp3" id="shit"></audio>
     <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
     <p><strong>Coins:</strong> <span id="coin"></span></p>
 
@@ -252,7 +272,7 @@ button:hover {
         <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
 
         <label>Habka Lacagta</label>
-        <select id="payment-method" required>
+        <select onclick="paym()" onchange="payme()" id="payment-method" required>
             <option value="none" disabled selected>Dooro</option>
             <option value="Zaad">Zaad</option>
             <option value="Soltelco">Soltelco</option>
@@ -261,7 +281,7 @@ button:hover {
         </select>
 
         <label>Nooca Lacagta</label>
-        <select id="currency-type" required>
+        <select onclick="nooca()" ="currency-type" required>
             <option value="none" disabled selected>None</option>
             <option value="usd">USD</option>
             <option value="shilling">Shilling</option>
@@ -273,10 +293,28 @@ button:hover {
 
     <p id="messages"></p>
 
-    <button onclick="window.history.back()">Back</button>
+    <button onclick="backg()">Back</button>
 </div>
 
 <script>
+    function backg() {
+        setTimeout(() => {
+        window.history.back();
+        },1000);
+    }
+    function nooca() {
+        shit.ccurrentTime = 0;
+      shit.play();
+    }
+    function paym() {
+        shit.ccurrentTime = 0;
+      shit.play();
+    }
+    function payme() {
+        click.ccurrentTime = 0;
+      click.play();
+    }
+        
     document.getElementById('coin').innerText = new URLSearchParams(window.location.search).get('coin:detailshtmlhex1290pllknmagdhssg') || "Unknown Coins";
 </script>
 </body>
