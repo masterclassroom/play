@@ -6,151 +6,213 @@
   <title>User Messages</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f0f0, #e2e2e2);
       padding: 20px;
+      margin: 0;
     }
+
     h2 {
       text-align: center;
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 30px;
     }
+
     .msg-container {
       background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 10px auto;
+      padding: 15px 20px;
+      border-radius: 20px;
+      margin: 15px auto;
       max-width: 500px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      gap: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
+
+    .msg-container:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .avatar {
+      width: 50px;
+      height: 50px;
+      background: #007bff;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-text {
+      flex: 1;
+      color: #333;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
     .remove-btn {
-      background-color: red;
+      background-color: #ff4d4f;
       border: none;
       color: white;
       font-weight: bold;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       cursor: pointer;
+      font-size: 1.2rem;
+      transition: background-color 0.3s ease;
     }
-    #clearAllBtn {
+
+    .remove-btn:hover {
+      background-color: #e60000;
+    }
+
+    #clearAllBtn, #kir {
       display: block;
       margin: 20px auto;
-      padding: 10px 20px;
-      background: #444;
+      padding: 12px 25px;
+      background: #1e1e2f;
       color: white;
+      font-size: 1rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
     }
-        #kir {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      background: #444;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-        }
+
+    #clearAllBtn:hover, #kir:hover {
+      background: #3e3e55;
+      transform: scale(1.03);
+    }
+
+    #clearAllBtn:active, #kir:active {
+      transform: scale(0.97);
+    }
+
+    @media (max-width: 600px) {
+      .msg-container {
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 20px;
+      }
+
+      .remove-btn {
+        margin-left: auto;
+      }
+
+      #clearAllBtn, #kir {
+        width: 90%;
+      }
+    }
   </style>
 </head>
 <body>
   <audio src="back.mp3" id="back"></audio>
-<audio src="click.mp3" id="click"></audio>
+  <audio src="click.mp3" id="click"></audio>
 
-<h2>My Messages</h2>
-<div id="messagesList"></div>
-<button id="clearAllBtn">Clear All</button>
-<button id="kir" onclick="bic()">Back</button>
+  <h2>My Messages</h2>
+  <div id="messagesList"></div>
+  <button id="clearAllBtn">Clear All</button>
+  <button id="kir" onclick="bic()">Back</button>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-  import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-    authDomain: "exam-81b90.firebaseapp.com",
-    databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-    projectId: "exam-81b90",
-    storageBucket: "exam-81b90.appspot.com",
-    messagingSenderId: "461178422237",
-    appId: "1:461178422237:web:8433ab42b524b0a17bac34"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getDatabase();
-
-  const messagesList = document.getElementById("messagesList");
-  const clearAllBtn = document.getElementById("clearAllBtn");
-  var click = document.getElementById("click");
-  var back = document.getElementById("back");
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) return window.location.href = "login.html";
-
-    const messagesRef = ref(db, `users/${user.uid}/message`);
-
-    onValue(messagesRef, (snapshot) => {
-      messagesList.innerHTML = "";
-
-      const data = snapshot.val();
-      if (!data) {
-        messagesList.innerHTML = "<p style='text-align:center;'>No messages found.</p>";
-        clearAllBtn.style.display = "none";
-        return;
-      }
-
-      clearAllBtn.style.display = "block";
-
-      const entries = Array.isArray(data)
-        ? data.entries()
-        : Object.entries(data);
-
-      for (const [key, value] of entries) {
-        if (value !== null) {
-          createMessageElement(key, value);
-        }
-      }
-    });
-
-    function createMessageElement(key, value) {
-      const div = document.createElement("div");
-      div.className = "msg-container";
-      div.innerHTML = `
-        <span>${value}</span>
-        <button class="remove-btn" title="Delete">×</button>
-      `;
-      div.querySelector("button").onclick = () => {
-        click.ccurrentTime = 0;
-        click.play();
-        const msgRef = ref(db, `users/${user.uid}/message/${key}`);
-        remove(msgRef);
-      };
-      messagesList.appendChild(div);
-    }
-
-    clearAllBtn.onclick = () => {
-      click.ccurrentTime = 0;
-        click.play();
-      remove(messagesRef);
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
     };
-  });
-</script>
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getDatabase();
+
+    const messagesList = document.getElementById("messagesList");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+    const click = document.getElementById("click");
+    const back = document.getElementById("back");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return window.location.href = "login.html";
+
+      const messagesRef = ref(db, `users/${user.uid}/message`);
+
+      onValue(messagesRef, (snapshot) => {
+        messagesList.innerHTML = "";
+
+        const data = snapshot.val();
+        if (!data) {
+          messagesList.innerHTML = "<p style='text-align:center;'>No messages found.</p>";
+          clearAllBtn.style.display = "none";
+          return;
+        }
+
+        clearAllBtn.style.display = "block";
+
+        const entries = Array.isArray(data) ? data.entries() : Object.entries(data);
+
+        for (const [key, value] of entries) {
+          if (value !== null) {
+            createMessageElement(key, value);
+          }
+        }
+      });
+
+      function createMessageElement(key, value) {
+        const div = document.createElement("div");
+        div.className = "msg-container";
+
+        const initial = value?.charAt(0)?.toUpperCase() || "M";
+
+        div.innerHTML = `
+          <div class="avatar">${initial}</div>
+          <div class="message-text">${value}</div>
+          <button class="remove-btn" title="Delete">×</button>
+        `;
+
+        div.querySelector("button").onclick = () => {
+          click.currentTime = 0;
+          click.play();
+          const msgRef = ref(db, `users/${user.uid}/message/${key}`);
+          remove(msgRef);
+        };
+
+        messagesList.appendChild(div);
+      }
+
+      clearAllBtn.onclick = () => {
+        click.currentTime = 0;
+        click.play();
+        remove(messagesRef);
+      };
+    });
+  </script>
+
   <script>
     function bic() {
       back.currentTime = 0;
-        back.play();
+      back.play();
       setTimeout(() => {
         window.history.back();
       }, 500);
     }
-   
-    
   </script>
-
 </body>
 </html>
