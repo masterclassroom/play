@@ -1,321 +1,321 @@
 <!DOCTYPE html>
 <html lang="so">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Payment</title>
-    <link rel="icon" type="image/png" href="logo.png">
-    <script type="module">
-        // Import Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-            authDomain: "exam-81b90.firebaseapp.com",
-            databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-            projectId: "exam-81b90",
-            storageBucket: "exam-81b90.appspot.com",
-            messagingSenderId: "461178422237",
-            appId: "1:461178422237:web:8433ab42b524b0a17bac34",
-            measurementId: "G-KKDNZBZLPG"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const database = getDatabase(app);
-
-        // Get course name and price from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseName = urlParams.get('course:detailshtmlhex1290pllknmagdhssg') || "Unknown Course";
-        let originalPrice = parseFloat(urlParams.get('price:detailshtmlhex1290pllknmagdhssg')) || 0;
-        let currency = "USD";
-        let priceStr = `${originalPrice.toFixed(0)} ${currency}`;
-        var click = document.getElementById("click");
-        var back = document.getElementById("back");
-        var shit = document.getElementById("shit");
-        var ero = document.getElementById("ero");
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const priceElement = document.getElementById("pricer");
-            const currencyTypeElement = document.getElementById("currency-type");
-
-            priceElement.innerText = priceStr;
-
-            // Marka nooca lacagta la doorto
-            currencyTypeElement.addEventListener("change", function () {
-                
-                let price = originalPrice;
-                if (this.value === "shilling") {
-                    price = price * 10000; 
-                    currency = "Shilling";
-                } else {
-                    currency = "USD";
-                }
-                priceStr = `${price.toFixed(0)} ${currency}`;
-                priceElement.innerText = priceStr;
-            });
-
-            // Dir lacagta
-            document.getElementById('payment-button').addEventListener('click', function () {
-                click.ccurrentTime = 0;
-      click.play();
-                const method = document.getElementById("payment-method").value;
-                const currencyType = document.getElementById("currency-type").value;
-                const messageElement = document.getElementById("messages");
-                setTimeout(() => {
-
-                if (method === "none" || currencyType === "none") {
-                    messageElement.textContent = 'Fadlan dooro habka lacag bixinta iyo nooca lacagta';
-                    return;
-                }
-
-                let price = originalPrice;
-                if (currencyType === "shilling") {
-                    price *= 10000;
-                }
-                let priceAmount = price.toFixed(0);
-
-                let ussdCode = "";
-                if (method === "Zaad") {
-                    ussdCode = currencyType === "usd" ? `*880*634041087*${priceAmount}#` : `*220*634041087*${priceAmount}#`;
-                } else if (method === "Evc") {
-                    ussdCode = currencyType === "usd" ? `*150*634041087*${priceAmount}#` : `*150*634041087*${priceAmount}#`;
-                } else if (method === "Somtel") {
-                    ussdCode = currencyType === "usd" ? `*200*634041087*${priceAmount}#` : `*200*634041087*${priceAmount}#`;
-                } else if (method === "Soltelco") {
-                    ussdCode = currencyType === "usd" ? `*660*634041087*${priceAmount}*0#` : `*770*634041087*${priceAmount}#`;
-                }
-
-                if (ussdCode) {
-                    window.location.href = `tel:${ussdCode}`;
-                }
-                },1000);
-            });
-
-            // Handle "Codso" button
-            document.getElementById('request-button').addEventListener('click', async function () {
-                click.ccurrentTime = 0;
-      click.play();
-                const username = document.getElementById('username').value;
-                const email = document.getElementById('email').value;
-                const phone = document.getElementById('phone').value;
-                const paymentNumber = document.getElementById('payment-number').value;
-                const paymentMethod = document.getElementById('payment-method').value;
-                const currencyType = document.getElementById('currency-type').value;
-                const prices = document.getElementById("pricer").innerText;
-                const Coon = document.getElementById("coin").innerText;
-                const messageElement = document.getElementById("messages");
-                
-                 if(!username || !email || !phone) {
-                     messageElement.textContent = 'Fadlan buuxi dhamaan foomka';
-                     return;
-                 }
-
-                if (phone.length < 10) {
-                    messageElement.textContent = 'Fadlan gali number dhamaystiran';
-                    return;
-                }
-                 if(paymentMethod === "none" || currencyType === "none") {
-                     messageElement.textContent = 'Fadlan dooro habka lacagta iyo nooca lacagta';
-                     return;
-                 }
-                setTimeout(() => {
-                    ero.ccurrentTime = 0;
-      ero.play();
-
-                const { isConfirmed } = await Swal.fire({
-                    title: 'Payment confirmation?',
-                    text: `Ma Hubta inaad codsato ${Coon} coins oo qiimihiisu yahay ${prices}`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Haa',
-                    cancelButtonText: 'Maya'
-                });
-                },1000);
-
-                if (isConfirmed) {
-                    click.ccurrentTime = 0;
-      click.play();
-                    const paymentRef = ref(database, `users/${auth.currentUser.uid}/payments`);
-                    
-                    try {
-                        await set(paymentRef, {
-                            userId: auth.currentUser.uid,                         
-                            username: username,
-                            email: email,
-                            phone: phone,
-                            paymentNumber: paymentNumber,
-                            paymentMethod: paymentMethod,
-                            currencyType: currencyType,
-                            qiimaha: prices,
-                            coins: Coon,
-                            pur: "false",
-                            timestamp: new Date().toISOString()
-                        });                     
-
-                        messageElement.textContent = 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.';
-                    } catch (error) {
-                        messageElement.textContent = `Waxaa dhacay khalad: ${error.message}`;
-                    }
-                }
-            });
-
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    window.location.href = "login.html";
-                }
-            });
-        });
-    </script>
-    <style>
+  <style>
     body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #fff;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
-    width: 90%;
-    max-width: 400px;
-    margin: 50px auto;
-    backdrop-filter: blur(10px);
-}
-
-h2 {
-    font-size: 24px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-p {
-    font-size: 18px;
-    margin: 10px 0;
-}
-
-input, select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s ease-in-out;
-}
-
-input:focus, select:focus {
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(90deg, #ff416c, #ff4b2b);
-    color: white;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-button:hover {
-    background: linear-gradient(90deg, #ff4b2b, #ff416c);
-    box-shadow: 0px 0px 15px rgba(255, 69, 0, 0.7);
-    transform: scale(1.05);
-}
-
-#messages {
-    margin-top: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: yellow;
-}
-
-@media (max-width: 480px) {
-    .container {
-        width: 95%;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
     }
-}</style>
 
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+      width: 90%;
+      max-width: 400px;
+      margin: 50px auto;
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    p {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    input:focus, select:focus {
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      color: white;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #ff4b2b, #ff416c);
+      box-shadow: 0px 0px 15px rgba(255, 69, 0, 0.7);
+      transform: scale(1.05);
+    }
+
+    #messages {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: yellow;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: 95%;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
-    <h2>payment</h2>
-<audio src="click.mp3" id="click"></audio>
+  <div class="container">
+    <h2>Payment</h2>
+    <audio src="click.mp3" id="click"></audio>
     <audio src="back.mp3" id="back"></audio>
     <audio src="shit.mp3" id="shit"></audio>
+    <audio src="ero.mp3" id="ero"></audio>
+
     <p><strong>Qiimaha:</strong> <span id="pricer"></span></p>
     <p><strong>Coins:</strong> <span id="coin"></span></p>
 
     <form id="payment-form">
-        <input type="text" id="username" placeholder="Gali magacaaga" required>
-        <input type="email" id="email" placeholder="Gali emailkaaga" required>
-        <input type="number" id="phone" placeholder="Gali numberkaaga" required>
-        <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
+      <input type="text" id="username" placeholder="Gali magacaaga" required>
+      <input type="email" id="email" placeholder="Gali emailkaaga" required>
+      <input type="number" id="phone" placeholder="Gali numberkaaga" required>
+      <input type="number" id="payment-number" placeholder="Gali numberka lacagta lagaso dirayo" required>
 
-        <label>Habka Lacagta</label>
-        <select onclick="paym()" onchange="payme()" id="payment-method" required>
-            <option value="none" disabled selected>Dooro</option>
-            <option value="Zaad">Zaad</option>
-            <option value="Soltelco">Soltelco</option>
-            <option value="Evc">Evc</option>
-            <option value="Somtel">Somtel</option>
-        </select>
+      <label>Habka Lacagta</label>
+      <select onclick="paym()" onchange="payme()" id="payment-method" required>
+        <option value="none" disabled selected>Dooro</option>
+        <option value="Zaad">Zaad</option>
+        <option value="Soltelco">Soltelco</option>
+        <option value="Evc">Evc</option>
+        <option value="Somtel">Somtel</option>
+      </select>
 
-        <label>Nooca Lacagta</label>
-        <select onclick="nooca()" ="currency-type" required>
-            <option value="none" disabled selected>None</option>
-            <option value="usd">USD</option>
-            <option value="shilling">Shilling</option>
-        </select>
+      <label>Nooca Lacagta</label>
+      <select onclick="nooca()" id="currency-type" required>
+        <option value="none" disabled selected>None</option>
+        <option value="usd">USD</option>
+        <option value="shilling">Shilling</option>
+      </select>
 
-        <button type="button" id="payment-button">Dir Lacagta</button>
-        <button type="button" id="request-button">Codso</button>
+      <button type="button" id="payment-button">Dir Lacagta</button>
+      <button type="button" id="request-button">Codso</button>
     </form>
 
     <p id="messages"></p>
 
     <button onclick="backg()">Back</button>
-</div>
+  </div>
 
-<script>
-    function backg() {
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+      measurementId: "G-KKDNZBZLPG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseName = urlParams.get('course:detailshtmlhex1290pllknmagdhssg') || "Unknown Course";
+    let originalPrice = parseFloat(urlParams.get('price:detailshtmlhex1290pllknmagdhssg')) || 0;
+    let currency = "USD";
+    let priceStr = `${originalPrice.toFixed(0)} ${currency}`;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const priceElement = document.getElementById("pricer");
+      const currencyTypeElement = document.getElementById("currency-type");
+
+      priceElement.innerText = priceStr;
+
+      currencyTypeElement.addEventListener("change", function () {
+          click.currentTime = 0;
+      click.play();
+        let price = originalPrice;
+        if (this.value === "shilling") {
+          price *= 10000;
+          currency = "Shilling";
+        } else {
+          currency = "USD";
+        }
+        priceStr = `${price.toFixed(0)} ${currency}`;
+        priceElement.innerText = priceStr;
+      });
+
+      document.getElementById('payment-button').addEventListener('click', function () {
+        click.currentTime = 0;
+        click.play();
+
+        const method = document.getElementById("payment-method").value;
+        const currencyType = document.getElementById("currency-type").value;
+        const messageElement = document.getElementById("messages");
+
         setTimeout(() => {
+          if (method === "none" || currencyType === "none") {
+            messageElement.textContent = 'Fadlan dooro habka lacag bixinta iyo nooca lacagta';
+            return;
+          }
+
+          let price = originalPrice;
+          if (currencyType === "shilling") {
+            price *= 10000;
+          }
+
+          let priceAmount = price.toFixed(0);
+          let ussdCode = "";
+
+          if (method === "Zaad") {
+            ussdCode = currencyType === "usd" ? `*880*634041087*${priceAmount}#` : `*220*634041087*${priceAmount}#`;
+          } else if (method === "Evc") {
+            ussdCode = `*150*634041087*${priceAmount}#`;
+          } else if (method === "Somtel") {
+            ussdCode = `*200*634041087*${priceAmount}#`;
+          } else if (method === "Soltelco") {
+            ussdCode = currencyType === "usd" ? `*660*634041087*${priceAmount}*0#` : `*770*634041087*${priceAmount}#`;
+          }
+
+          if (ussdCode) {
+            window.location.href = `tel:${ussdCode}`;
+          }
+        }, 1000);
+      });
+
+      document.getElementById('request-button').addEventListener('click', async function () {
+        click.currentTime = 0;
+        click.play();
+
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const paymentNumber = document.getElementById('payment-number').value;
+        const paymentMethod = document.getElementById('payment-method').value;
+        const currencyType = document.getElementById('currency-type').value;
+        const prices = document.getElementById("pricer").innerText;
+        const Coon = document.getElementById("coin").innerText;
+        const messageElement = document.getElementById("messages");
+
+        if (!username || !email || !phone) {
+          messageElement.textContent = 'Fadlan buuxi dhamaan foomka';
+          return;
+        }
+
+        if (phone.length < 10) {
+          messageElement.textContent = 'Fadlan gali number dhamaystiran';
+          return;
+        }
+
+        if (paymentMethod === "none" || currencyType === "none") {
+          messageElement.textContent = 'Fadlan dooro habka lacagta iyo nooca lacagta';
+          return;
+        }
+
+        setTimeout(async () => {
+          ero.currentTime = 0;
+          ero.play();
+
+          const { isConfirmed } = await Swal.fire({
+            title: 'Payment confirmation?',
+            text: `Ma Hubta inaad codsato ${Coon} coins oo qiimihiisu yahay ${prices}`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Haa',
+            cancelButtonText: 'Maya'
+          });
+
+          if (isConfirmed) {
+            click.currentTime = 0;
+            click.play();
+            const paymentRef = ref(database, `users/${auth.currentUser.uid}/payments`);
+            try {
+              await set(paymentRef, {
+                userId: auth.currentUser.uid,
+                username: username,
+                email: email,
+                phone: phone,
+                paymentNumber: paymentNumber,
+                paymentMethod: paymentMethod,
+                currencyType: currencyType,
+                qiimaha: prices,
+                coins: Coon,
+                pur: "false",
+                timestamp: new Date().toISOString()
+              });
+
+              messageElement.textContent = 'Codsigaaga waa la diray, fadlan sug 24 saacadood gudahood.';
+            } catch (error) {
+              messageElement.textContent = `Waxaa dhacay khalad: ${error.message}`;
+            }
+          }
+        }, 500);
+      });
+
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+        }
+      });
+
+      document.getElementById('coin').innerText = urlParams.get('coin:detailshtmlhex1290pllknmagdhssg') || "Unknown Coins";
+    });
+  </script>
+
+  <script>
+    function backg() {
+      setTimeout(() => {
         window.history.back();
-        },1000);
+      }, 1000);
     }
+
     function nooca() {
-        shit.ccurrentTime = 0;
+      shit.currentTime = 0;
       shit.play();
     }
+
     function paym() {
-        shit.ccurrentTime = 0;
+      shit.currentTime = 0;
       shit.play();
     }
+
     function payme() {
-        click.ccurrentTime = 0;
+      click.currentTime = 0;
       click.play();
     }
-        
-    document.getElementById('coin').innerText = new URLSearchParams(window.location.search).get('coin:detailshtmlhex1290pllknmagdhssg') || "Unknown Coins";
-</script>
+  </script>
 </body>
     </html>
