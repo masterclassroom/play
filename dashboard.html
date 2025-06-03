@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <h2>Koorsooyin Tayo Leh</h2>
+<input type="text" id="course-search" placeholder="Raadi koorso..." style="padding: 10px; margin-bottom: 20px; width: 100%; font-size: 16px;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
@@ -16,7 +18,7 @@
   <audio src="back.mp3" id="back"></audio>
   
   <header>
-    <h1>Konimar</h1>
+    <h1>Master class room</h1>
        <div class="menu-container">
         <button class="menu-button" onclick="toggleMenu()">☰</button>
         <div class="menu" id="menu">
@@ -96,7 +98,7 @@
   </section>
 
   <footer>
-    <p>&copy;2023-2025 Konimar All rights resevered</p>
+    <p>&copy;2023-2025 Master class room All rights resevered</p>
   </footer>
 
   <script type="module" src="akiidar.js"></script>
@@ -220,3 +222,69 @@ document.querySelectorAll("a").forEach(link => {
   });
 });
             </script>
+
+<style>
+  #course-search {
+    padding: 12px 16px;
+    width: 100%;
+    font-size: 16px;
+    border: 2px solid #00c853;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+  }
+
+  #course-search:focus {
+    outline: none;
+    border-color: #ffd600;
+    box-shadow: 0 0 8px #ffd600;
+  }
+
+  ::placeholder {
+    color: #aaa;
+    font-style: italic;
+  }
+</style>
+<script>
+  const searchInput = document.getElementById("course-search");
+
+  searchInput.addEventListener("input", () => {
+    const searchValue = searchInput.value.toLowerCase().trim();
+
+    document.querySelectorAll(".course-card").forEach(card => {
+      const heading = card.querySelector("h3");
+      const originalText = heading.getAttribute("data-original") || heading.textContent;
+      heading.setAttribute("data-original", originalText); // Save original text
+      const lowerOriginal = originalText.toLowerCase();
+
+      if (searchValue && lowerOriginal.includes(searchValue)) {
+        // Highlight match
+        const startIndex = lowerOriginal.indexOf(searchValue);
+        const endIndex = startIndex + searchValue.length;
+
+        const beforeMatch = originalText.slice(0, startIndex);
+        const matchText = originalText.slice(startIndex, endIndex);
+        const afterMatch = originalText.slice(endIndex);
+
+        heading.innerHTML = `${beforeMatch}<span style="color: red;">${matchText}</span>${afterMatch}`;
+
+        // Show matched course
+        card.style.display = "block";
+        card.style.border = "2px solid gold";
+        card.style.transform = "scale(1.02)";
+        card.style.transition = "0.3s";
+      } else if (searchValue) {
+        // Hide unmatched
+        card.style.display = "none";
+      } else {
+        // Reset if input is cleared
+        heading.innerHTML = originalText;
+        card.style.display = "block";
+        card.style.border = "";
+        card.style.transform = "";
+      }
+    });
+  });
+</script>
+
