@@ -1,108 +1,102 @@
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-    authDomain: "exam-81b90.firebaseapp.com",
-    databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-    projectId: "exam-81b90",
-    storageBucket: "exam-81b90.firebasestorage.app",
-    messagingSenderId: "461178422237",
-    appId: "1:461178422237:web:8433ab42b524b0a17bac34",
-    measurementId: "G-KKDNZBZLPG"
-};
-
-// Initialize Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
 
-// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+  authDomain: "exam-81b90.firebaseapp.com",
+  databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+  projectId: "exam-81b90",
+  storageBucket: "exam-81b90.appspot.com",
+  messagingSenderId: "461178422237",
+  appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+};
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Check if the user is logged in
+const urlParams = new URLSearchParams(window.location.search);
+const usernameFromUrl = urlParams.get("username");
+
+// Elements
+const userNameEl = document.getElementById("userName");
+const userEmailEl = document.getElementById("userEmail");
+const numberEl = document.getElementById("number");
+const checkbox = document.getElementById("myCheckbox");
+const clickSound = document.getElementById("click");
+const shitSound = document.getElementById("shit");
+const backSound = document.getElementById("back");
+
 onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const userID = user.uid;
-        const userRef = ref(database, `users/${userID}`);
-        const pinRef = ref(database, `users/${userID}/active`);
-        const checkbox = document.getElementById("myCheckbox");
-        var click = document.getElementById("click");
-        var shit = document.getElementById("shit");
-        var back = document.getElementById("back");
+  if (!user) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "login.html";
+    return;
+  }
 
-        // Handle checkbox state based on existing pin
-        try {
-            const snapshot = await get(pinRef); // Await for pin data
-            checkbox.checked = snapshot.exists();
-        } catch (error) {
-            console.error("Error fetching pin data: ", error);
-        }
+  const userRef = ref(database, `users/${user.uid}`);
+  const snapshot = await get(userRef);
 
-        // Fetch user data (Username, Email, Phone Number)
-        onValue(userRef, (snapshot) => {
-            const userData = snapshot.val();
-            if (userData) {
-                const username = userData.username;
-                const email = user.email;
-                const number = userData.number;
+  if (!snapshot.exists()) {
+    window.location.href = "404.html";
+    return;
+  }
 
-                document.getElementById('number').textContent = "Phone number: " + number;
-                document.getElementById('userName').textContent = "Username: " + username;
-                document.getElementById('userEmail').textContent = "Email: " + email;
-            } else {
-                document.getElementById('number').textContent = "User not found.";
-                document.getElementById('userName').textContent = "";
-                document.getElementById('userEmail').textContent = "";
-            }
-        });
+  const userData = snapshot.val();
+  const usernameFromDb = userData.username;
 
-        // Handle checkbox change
-        async function checkboxChanged() {
-            shit.currentTime = 0;
-            shit.play();
-            const userRef = ref(database, `users/${userID}/active`);
-            if (checkbox.checked) {
-                Swal.fire('Successfully!', 'Pin enabled Successfully', 'success');
-                await set(userRef, {
-                    active:true,
-                });
-                
-                
-            } else {
-                shit.currentTime = 0;
-            shit.play();
-                Swal.fire("Successfully!", "Pin disabled successfully", "success");
-                await set(userRef, {
-                    active: null // Set the pin to null in the database
-                });
-            }
-        }
+  // Haddii URL username uusan jirin
+  if (!usernameFromUrl) {
+    const currentUrl = window.location.href.split("?")[0];
+    window.location.href = `${currentUrl}?username=${encodeURIComponent(usernameFromDb)}`;
+    return;
+  }
 
-        // Attach event listener to checkbox
-        document.getElementById("myCheckbox").addEventListener("change", checkboxChanged);
+  // Haddii username URL iyo DB isku mid ahayn
+  if (usernameFromUrl !== usernameFromDb) {
+    window.location.href = "404.html";
+    return;
+  }
 
+  // Haddii username sax ah, xogta muuji
+  userNameEl.textContent = "Username: " + usernameFromDb;
+  userEmailEl.textContent = "Email: " + (userData.email || "Not set");
+  numberEl.textContent = "Number: " + (userData.number || "N/A");
+
+  // Checkbox active state ka soo qaad DB
+  const activeRef = ref(database, `users/${user.uid}/active`);
+  const activeSnapshot = await get(activeRef);
+  checkbox.checked = activeSnapshot.exists() && activeSnapshot.val() === true;
+
+  // Checkbox change handler
+  checkbox.addEventListener("change", async () => {
+    shitSound.play();
+
+    if (checkbox.checked) {
+      await set(activeRef, true);
+      Swal.fire('Successfully!', 'Pin enabled Successfully', 'success');
     } else {
-        alert("You must be logged in to view this page.");
-        window.location.href = "login.html";
+      await set(activeRef, null);
+      Swal.fire('Successfully!', 'Pin disabled Successfully', 'success');
     }
+  });
 });
 
-// Back button functionality
-document.getElementById('backButton').addEventListener('click', () => {
-    back.currentTime = 0;
-    back.play();
-    setTimeout(() => {
-        
+// Back button
+document.getElementById("backButton").addEventListener("click", () => {
+  backSound.currentTime = 0;
+  backSound.play();
+  setTimeout(() => {
     window.history.back();
-    },1200);
+  }, 1200);
 });
 
-// Edit button functionality
-document.getElementById('edit').addEventListener('click', () => {
-    click.currentTime = 0;
-    click.play();
-    setTimeout(() => {
+// Edit button
+document.getElementById("edit").addEventListener("click", () => {
+  clickSound.currentTime = 0;
+  clickSound.play();
+  setTimeout(() => {
     window.location.href = "Select.html";
-    },1200);
+  }, 1200);
 });
