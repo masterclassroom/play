@@ -50,6 +50,9 @@
 
   <section class="courses">
     <h2>Koorsooyin Tayo Leh</h2>
+    <p id="no-results" style="display: none; color: red; font-size: 18px; font-weight: bold; text-align: center; margin-top: 20px;">
+  No course found
+</p>
 
     <!-- Course 1 -->
     <div class="course-card" id="course1">
@@ -249,42 +252,72 @@ document.querySelectorAll("a").forEach(link => {
 <script>
   const searchInput = document.getElementById("course-search");
 
-  searchInput.addEventListener("input", () => {
-    const searchValue = searchInput.value.toLowerCase().trim();
+  // Hel query string value 'search'
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchParam = urlParams.get('search')?.toLowerCase().trim();
 
+  function filterCourses(searchValue) {
     document.querySelectorAll(".course-card").forEach(card => {
       const heading = card.querySelector("h3");
       const originalText = heading.getAttribute("data-original") || heading.textContent;
-      heading.setAttribute("data-original", originalText); // Save original text
+      heading.setAttribute("data-original", originalText); // Kaydi asalka
+      
       const lowerOriginal = originalText.toLowerCase();
 
       if (searchValue && lowerOriginal.includes(searchValue)) {
-        // Highlight match
+        // Highlight
         const startIndex = lowerOriginal.indexOf(searchValue);
         const endIndex = startIndex + searchValue.length;
-
         const beforeMatch = originalText.slice(0, startIndex);
         const matchText = originalText.slice(startIndex, endIndex);
         const afterMatch = originalText.slice(endIndex);
 
         heading.innerHTML = `${beforeMatch}<span style="color: red;">${matchText}</span>${afterMatch}`;
-
-        // Show matched course
         card.style.display = "block";
         card.style.border = "2px solid gold";
         card.style.transform = "scale(1.02)";
         card.style.transition = "0.3s";
       } else if (searchValue) {
-        // Hide unmatched
         card.style.display = "none";
       } else {
-        // Reset if input is cleared
         heading.innerHTML = originalText;
         card.style.display = "block";
         card.style.border = "";
         card.style.transform = "";
       }
     });
-  });
-</script>
 
+    // No result
+    const visible = [...document.querySelectorAll(".course-card")].some(card => card.style.display !== "none");
+    let noResult = document.getElementById("no-course");
+    if (!visible) {
+      if (!noResult) {
+        noResult = document.createElement("p");
+        noResult.id = "no-course";
+        noResult.textContent = "No course found!";
+        noResult.style.color = "red";
+        noResult.style.fontWeight = "bold";
+        noResult.style.textAlign = "center";
+        noResult.style.marginTop = "20px";
+        document.querySelector(".courses").appendChild(noResult);
+      }
+    } else {
+      if (noResult) noResult.remove();
+    }
+  }
+
+  // Marka la geliyo input
+  searchInput.addEventListener("input", () => {
+    const value = searchInput.value.toLowerCase().trim();
+    // Update URL without reload
+    const newURL = window.location.pathname + (value ? `?search=${encodeURIComponent(value)}` : '');
+    window.history.pushState({}, '', newURL);
+    filterCourses(value);
+  });
+
+  // Haddii search param jiro URL-ka, ku shub input-ka
+  if (searchParam) {
+    searchInput.value = searchParam;
+    filterCourses(searchParam);
+  }
+  </script>
