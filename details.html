@@ -2,73 +2,85 @@
 <html lang="so">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Faahfaahin Koorsada</title>
-  <link rel="icon" href="logo.png" type="image/png">
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    padding: 20px;
-  }
-  .container {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    animation: popFade 0.8s ease forwards;
-    transform-origin: center;
-    text-align: center;
-  }
-  h2 {
-    color: #222;
-    font-size: 28px;
-    margin-bottom: 15px;
-  }
-  h4, p {
-    margin-bottom: 12px;
-    color: #555;
-  }
-  .back-btn {
-    margin-top: 20px;
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #1e90ff;
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  .back-btn:hover {
-    background-color: #006fd6;
-    transform: translateY(-2px);
-  }
-  .course-image {
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    object-fit: cover;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
-  }
-  @keyframes popFade {
-    0% {
-      opacity: 0;
-      transform: scale(0.95) translateY(20px);
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faahfaahin Koorsada & Iibsasho</title>
+  <link rel="icon" href="logo.png" type="image/png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
     }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(0);
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      animation: popFade 0.8s ease forwards;
+      transform-origin: center;
+      text-align: center;
     }
-  }
-</style>
+    h2 {
+      color: #222;
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+    h4, p {
+      margin-bottom: 12px;
+      color: #555;
+    }
+    .back-btn, #buy-btn {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      border: none;
+    }
+    .back-btn {
+      background-color: #1e90ff;
+      color: white;
+      text-decoration: none;
+    }
+    .back-btn:hover {
+      background-color: #006fd6;
+      transform: translateY(-2px);
+    }
+    #buy-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    #buy-btn:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    .course-image {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+    }
+    @keyframes popFade {
+      0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+  </style>
 </head>
-<audio src="back.mp3" id="back"></audio>
 <body>
+  <audio src="back.mp3" id="back"></audio>
   <div class="container">
     <img id="course-image" class="course-image" src="" alt="Sawirka Koorsada" />
     <h2 id="course-name">Koorsada...</h2>
@@ -77,42 +89,119 @@
     <h4 id="time"></h4>
     <h4 id="price"></h4>
 
-    <a href="#" id="backer" class="back-btn">← Ku Laabo</a>
+    <button id="buy-btn" disabled>Loading...</button>
+    <button id="backer" class="back-btn">← Ku Laabo</button>
   </div>
 
-  <script>
-  var sound = document.getElementById("back");
-  // Soo qabso parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const course = urlParams.get("course");
-  const teacher = urlParams.get("teacher");
-  const type = urlParams.get("type");
-  const time = urlParams.get("time");
-  const price = urlParams.get("price");
-  const courseImage = urlParams.get("courseImage");
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-  // Set data
-  document.getElementById("course-name").innerText = course || "Koorsada...";
-  document.getElementById("teacher").innerText = "Macallin: " + (teacher || "Lama helin");
-  document.getElementById("type").innerText = "Nooca koorsada: " + (type || "Lama sheegin");
-  document.getElementById("time").innerText = "Waqtiga: " + (time || "Ma jiro");
-  document.getElementById("price").innerText = "Qiimaha: " + (price || "0") + " coins";
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34",
+      measurementId: "G-KKDNZBZLPG"
+    };
 
-  // Set image saxan
-  if (courseImage) {
-    document.getElementById("course-image").src = courseImage;
-  } else {
-    document.getElementById("course-image").style.display = "none";
-  }
-   document.getElementById("backer").addEventListener("click", function() {
-     sound.currentTime = 0;
-     sound.play();
-     setTimeout(() => {
-       window.location.href = 'dashboard.html';
-     },1000);
-     
-     
-});
-</script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    const sound = document.getElementById("back");
+
+    // Soo qabso parameters URL-ka
+    const urlParams = new URLSearchParams(window.location.search);
+    const course = urlParams.get("course");
+    const teacher = urlParams.get("teacher");
+    const type = urlParams.get("type");
+    const time = urlParams.get("time");
+    const price = urlParams.get("price");
+    const courseImage = urlParams.get("courseImage");
+
+    // Elements
+    const courseNameEl = document.getElementById("course-name");
+    const teacherEl = document.getElementById("teacher");
+    const typeEl = document.getElementById("type");
+    const timeEl = document.getElementById("time");
+    const priceEl = document.getElementById("price");
+    const courseImageEl = document.getElementById("course-image");
+    const buyBtn = document.getElementById("buy-btn");
+    const backBtn = document.getElementById("backer");
+
+    // Set data to elements
+    courseNameEl.innerText = course || "Koorsada...";
+    teacherEl.innerText = "Macallin: " + (teacher || "Lama helin");
+    typeEl.innerText = "Nooca koorsada: " + (type || "Lama sheegin");
+    timeEl.innerText = "Waqtiga: " + (time || "Ma jiro");
+    priceEl.innerText = "Qiimaha: " + (price || "0") + " coins";
+
+    if (courseImage) {
+      courseImageEl.src = courseImage;
+      courseImageEl.style.display = "block";
+    } else {
+      courseImageEl.style.display = "none";
+    }
+
+    // Hubinta user login iyo iibsashada koorsada
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("Fadlan soo gal si aad u iibsato koorsada");
+        buyBtn.disabled = true;
+        buyBtn.innerText = "Fadlan soo gal";
+        // Redirect to login page after 2 seconds (optional)
+        setTimeout(() => window.location.href = "login.html", 2000);
+        return;
+      }
+
+      if (!course) {
+        buyBtn.disabled = true;
+        buyBtn.innerText = "Ma jiro koorso lagu iibiyo";
+        return;
+      }
+
+      try {
+        const purchaseRef = ref(database, `users/${user.uid}/purchases/${course}`);
+        const snapshot = await get(purchaseRef);
+        if (snapshot.exists() && snapshot.val().purchased) {
+          buyBtn.disabled = true;
+          buyBtn.innerText = "Koorsadan waa la iibsaday";
+        } else {
+          buyBtn.disabled = false;
+          buyBtn.innerText = "Buy Koorsada";
+        }
+      } catch (error) {
+        console.error("Error checking purchase: ", error);
+        buyBtn.disabled = true;
+        buyBtn.innerText = "Error, isku day mar kale";
+      }
+    });
+
+    // Button Buy click
+    buyBtn.addEventListener("click", () => {
+      if (buyBtn.disabled) return;
+      // U gudbi dashboard.html with params
+      const waitingParam = encodeURIComponent(courseNameEl.innerText);
+      const priceParam = encodeURIComponent(priceEl.innerText.split(" ")[1] === "coins" ? priceEl.innerText.split(" ")[1] : priceEl.innerText.split(" ")[0]);
+      // Waxaan kuu fududeeyay price oo ah tiro keliya (int)
+      // Hadaba si ka fudud:
+      const priceValue = (price || "0");
+      window.location.href = `dashboard.html?waiting=${waitingParam}&price=${priceValue}`;
+    });
+
+    // Button Back click
+    backBtn.addEventListener("click", () => {
+      sound.currentTime = 0;
+      sound.play();
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1000);
+    });
+  </script>
 </body>
 </html>
