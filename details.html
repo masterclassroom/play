@@ -92,11 +92,12 @@
     <button id="buy-btn" disabled>Loading...</button>
     <button id="backer" class="back-btn">← Ku Laabo</button>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
@@ -173,25 +174,69 @@
           buyBtn.innerText = "Koorsadan waa la iibsaday";
         } else {
           buyBtn.disabled = false;
-          buyBtn.innerText = "Buy Koorsada";
+          buyBtn.innerText = "Iibso Koorsada";
         }
       } catch (error) {
-        console.error("Error checking purchase: ", error);
+        console.error("Khalad marka la eegayay iibsashada: ", error);
         buyBtn.disabled = true;
-        buyBtn.innerText = "Error, isku day mar kale";
+        buyBtn.innerText = "Khalad ayaa dhacay, isku day mar kale";
       }
     });
 
-    // Button Buy click
-    buyBtn.addEventListener("click", () => {
-      if (buyBtn.disabled) return;
-      // U gudbi dashboard.html with params
-      const waitingParam = encodeURIComponent(courseNameEl.innerText);
-      const priceParam = encodeURIComponent(priceEl.innerText.split(" ")[1] === "coins" ? priceEl.innerText.split(" ")[1] : priceEl.innerText.split(" ")[0]);
-      // Waxaan kuu fududeeyay price oo ah tiro keliya (int)
-      // Hadaba si ka fudud:
-      const priceValue = (price || "0");
-      window.location.href = `dashboard.html?waiting=${waitingParam}&price=${priceValue}`;
+    // Geli habka iibsashada
+    buyBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        Swal.fire("Fadlan soo gal", "Waa inaad soo gashaa marka hore", "error");
+        return;
+      }
+
+      const coursePrice = parseInt(price);
+      const userRef = ref(database, `users/${user.uid}`);
+      
+      try {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          const userCoins = userData.coins || 0;
+
+          if (userCoins < coursePrice) {
+            Swal.fire("Haraadigaa ah", "Ma haysatid lacag ku filan", "warning");
+            return;
+          }
+
+          const result = await Swal.fire({
+            title: 'Xaqiijin',
+            text: `Ma rabtaa inaad iibsatid ${course}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Haa, Iibso',
+            cancelButtonText: 'Dib u noqo'
+          });
+
+          if (result.isConfirmed) {
+            // Keydso iibsashada
+            const purchaseRef = ref(database, `users/${user.uid}/purchases/${course}`);
+            await set(purchaseRef, {
+              courseName: course,
+              date: new Date().toISOString(),
+              purchased: true
+            });
+
+            // Jar coins-ka
+            await update(userRef, {
+              coins: userCoins - coursePrice
+            });
+
+            Swal.fire("Mahadsanid!", "Koorsada ayaad u iibsatey!", "success");
+            buyBtn.disabled = true;
+            buyBtn.innerText = "Koorsadan waa la iibsaday";
+          }
+        }
+      } catch (error) {
+        console.error("Khalad iibsashada: ", error);
+        Swal.fire("Khalad", "Wax khalad ayaa dhacay, isku day mar kale", "error");
+      }
     });
 
     // Button Back click
@@ -204,4 +249,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
