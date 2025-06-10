@@ -23,6 +23,65 @@ var suc = document.getElementById("suc");
 var click = document.getElementById("click");
 var back = document.getElementById("back");
 var shit = document.getElementById("shit");
+document.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const waitingCourse = urlParams.get("waiting");
+const prices = new URLSearchParams(window.location.search);
+  const price = prices.get("price");
+  if (waitingCourse) {
+    // Hel coins user-ka
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const uid = user.uid;
+      const userCoinsRef = ref(database, `users/${uid}/coins`);
+      const purchaseRef = ref(database, `users/${uid}/purchases/${waitingCourse}`);
+
+      const coinsSnapshot = await get(userCoinsRef);
+      const userCoins = coinsSnapshot.exists() ? coinsSnapshot.val() : 0;
+
+      // Qiimaha koorsada: tusaale ahaan 100 coins
+      const coursePrice = price;
+
+      if (userCoins < coursePrice) {
+  Swal.fire('Warning', 'Not enough coins to buy this course.', 'warning').then(() => {
+    window.location.replace("dashboard.html");
+  });
+  return;
+}
+
+      const { isConfirmed } = await Swal.fire({
+        title: 'Buy Course',
+        text: `Do you want to buy the course "${waitingCourse}" for ${coursePrice} coins?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, buy it!',
+        cancelButtonText: 'No, cancel'
+      });
+
+      if (isConfirmed) {
+        // Update coins and mark purchase
+        await update(ref(database, `users/${uid}`), {
+          coins: userCoins - coursePrice
+        });
+        await set(purchaseRef, {
+          purchased: true,
+          courseName: waitingCourse,
+          timestamp: new Date().toISOString()
+        });
+
+     Swal.fire('Successfully', `You bought the course "${waitingCourse}"!`, 'success').then(() => {
+  window.location.replace("dashboard.html");
+});
+      } else {
+        Swal.fire('Cancelled', 'You did not buy the course.', 'info');
+      }
+    });
+  }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, (user) => {
