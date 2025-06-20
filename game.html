@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Football Multiplayer Game</title>
+  <style>
+    body { margin:0; background:#111; font-family:sans-serif; color:white; text-align:center; }
+    #scoreboard { padding:10px; font-size:18px; }
+    #gameContainer { display: flex; justify-content: center; }
+    canvas { background:green; border:3px solid white; touch-action: none; 
+             max-width: 100%; height: auto; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div id="scoreboard">
+    Home: <span id="homeScore">0</span> |
+    Away: <span id="awayScore">0</span> |
+    Time: <span id="timer">0</span>s |
+    Stake: <span id="stake">0</span> coins
+  </div>
+  <div id="gameContainer">
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, set, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const c = document.getElementById("gameCanvas");
+    const ctx = c.getContext("2d");
+    
+    function resizeCanvas() {
+      const container = document.getElementById('gameContainer');
+      const maxWidth = container.clientWidth - 20;
+      const ratio = 400/600;
+      
+      if (maxWidth < 400) {
+        c.width = maxWidth;
+        c.height = maxWidth / ratio;
+      } else {
+        c.width = 400;
+        c.height = 600;
+      }
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let myUid, roomId, role, stake = 0, homeScore = 0, awayScore = 0, timer = 0, currentCoins = 0;
+    let lastGoalTime = 0, gameEnded = false, timerInterval;
+    let gameActive = false;
+
+    let ball = { x: 0.5, y: 0.5, vx: 0.005, vy: 0.005, r: 0.02 };
+    let keeperH = { x: 0.5, y: 0.9, r: 0.05 };
+    let keeperA = { x: 0.5, y: 0.1, r: 0.05 };
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return location.href = "login.html";
+      
+      try {
+        myUid = user.uid;
+        const url = new URLSearchParams(location.search);
+        roomId = url.get("room");
+        role = url.get("role");
+        stake = +url.get("stake");
+        
+        if (!roomId || !role || !stake) {
+          await Swal.fire("Invalid game parameters");
+          return location.href = "search.html";
+        }
+
+        document.getElementById("stake").innerText = stake;
+        const snap = await get(ref(db, `users/${myUid}/coins`));
+        currentCoins = snap.exists() ? snap.val() : 0;
+
+        const rSnap = await get(ref(db, `rooms/${roomId}`));
+        if (!rSnap.exists()) {
+          await Swal.fire("Room not found");
+          return location.href = "search.html";
+        }
+
+        if (role === "home") {
+          await set(ref(db, `rooms/${roomId}/ball`), {
+            x: 0.5, y: 0.5, 
+            vx: Math.random() > 0.5 ? 0.005 : -0.005,
+            vy: Math.random() > 0.5 ? 0.005 : -0.005,
+            r: 0.02
+          });
+          await set(ref(db, `rooms/${roomId}/keepers`), {
+            homeX: 0.5, homeY: 0.9,
+            awayX: 0.5, awayY: 0.1
+          });
+          await set(ref(db, `rooms/${roomId}/score`), {
+            home: 0, away: 0
+          });
+          await set(ref(db, `rooms/${roomId}/timer`), 0);
+          gameActive = true;
+          startTimer();
+        }
+
+        setupListeners();
+        gameLoop();
+
+        c.addEventListener("touchmove", moveTouch, { passive: false });
+        c.addEventListener("mousemove", moveMouse);
+        
+      } catch (error) {
+        console.error("Initialization error:", error);
+        Swal.fire("Error initializing game").then(() => location.href = "search.html");
+      }
+    });
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (!gameEnded && gameActive) {
+          timer++;
+          update(ref(db, `rooms/${roomId}/timer`), timer);
+        }
+      }, 1000);
+    }
+
+    function setupListeners() {
+      onValue(ref(db, `rooms/${roomId}/ball`), snap => {
+        if (snap.exists()) Object.assign(ball, snap.val());
+      });
+
+      onValue(ref(db, `rooms/${roomId}/keepers`), snap => {
+        if (snap.exists()) {
+          const d = snap.val();
+          keeperH.x = d.homeX; keeperH.y = d.homeY;
+          keeperA.x = d.awayX; keeperA.y = d.awayY;
+        }
+      });
+
+      onValue(ref(db, `rooms/${roomId}/score`), snap => {
+        if (snap.exists()) {
+          homeScore = snap.val().home;
+          awayScore = snap.val().away;
+          document.getElementById("homeScore").innerText = homeScore;
+          document.getElementById("awayScore").innerText = awayScore;
+          
+          // Check for winning condition after score update
+          if (homeScore >= 3 || awayScore >= 3) {
+            endGame();
+          }
+        }
+      });
+
+      onValue(ref(db, `rooms/${roomId}/timer`), snap => {
+        if (snap.exists()) {
+          timer = snap.val();
+          document.getElementById("timer").innerText = timer;
+          
+          if (timer >= 90) {
+            endGame();
+          }
+        }
+      });
+      
+      onValue(ref(db, `rooms/${roomId}`), snap => {
+        if (!snap.exists() && !gameEnded) {
+          gameEnded = true;
+          Swal.fire("Opponent left the game").then(() => {
+            location.href = "search.html";
+          });
+        }
+      });
+    }
+
+    function gameLoop() {
+      if (gameEnded) return;
+      
+      if (role === "home" && gameActive) {
+        updateBall();
+      }
+      
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function updateBall() {
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      if (ball.x - ball.r < 0 || ball.x + ball.r > 1) {
+        ball.vx *= -1;
+        ball.x = Math.max(ball.r, Math.min(1 - ball.r, ball.x));
+      }
+
+      if ((ball.y - ball.r < 0 && (ball.x < 0.5 - 0.2 || ball.x > 0.5 + 0.2)) ||
+          (ball.y + ball.r > 1 && (ball.x < 0.5 - 0.2 || ball.x > 0.5 + 0.2))) {
+        ball.vy *= -1;
+        ball.y = Math.max(ball.r, Math.min(1 - ball.r, ball.y));
+      }
+
+      if (ball.y + ball.r >= 1 && ball.x > 0.5 - 0.2 && ball.x < 0.5 + 0.2) {
+        if (Date.now() - lastGoalTime > 1000) {
+          lastGoalTime = Date.now();
+          update(ref(db, `rooms/${roomId}/score`), { 
+            home: homeScore, 
+            away: awayScore + 1 
+          });
+        }
+      }
+
+      if (ball.y - ball.r <= 0 && ball.x > 0.5 - 0.2 && ball.x < 0.5 + 0.2) {
+        if (Date.now() - lastGoalTime > 1000) {
+          lastGoalTime = Date.now();
+          update(ref(db, `rooms/${roomId}/score`), { 
+            home: homeScore + 1, 
+            away: awayScore 
+          });
+        }
+      }
+
+      if (distance(ball, keeperH) < ball.r + keeperH.r) {
+        bounce(keeperH);
+      }
+      if (distance(ball, keeperA) < ball.r + keeperA.r) {
+        bounce(keeperA);
+      }
+
+      const maxSpeed = 0.01;
+      const speed = Math.sqrt(ball.vx ** 2 + ball.vy ** 2);
+      if (speed > maxSpeed) {
+        ball.vx = (ball.vx / speed) * maxSpeed;
+        ball.vy = (ball.vy / speed) * maxSpeed;
+      }
+
+      update(ref(db, `rooms/${roomId}/ball`), ball);
+    }
+
+    function bounce(k) {
+      const angle = Math.atan2(ball.y - k.y, ball.x - k.x);
+      const speed = Math.sqrt(ball.vx ** 2 + ball.vy ** 2) * 1.1;
+      
+      ball.vx = Math.cos(angle) * speed;
+      ball.vy = Math.sin(angle) * speed;
+    }
+
+    function distance(a, b) {
+      let dx = a.x - b.x;
+      let dy = a.y - b.y;
+      return Math.hypot(dx, dy);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+
+      ctx.beginPath(); 
+      ctx.arc(c.width/2, c.height/2, c.width * 0.125, 0, Math.PI * 2); 
+      ctx.stroke();
+      
+      ctx.beginPath(); 
+      ctx.moveTo(0, c.height/2); 
+      ctx.lineTo(c.width, c.height/2); 
+      ctx.stroke();
+
+      ctx.beginPath(); 
+      ctx.moveTo(c.width/2 - c.width * 0.2, 0); 
+      ctx.lineTo(c.width/2 + c.width * 0.2, 0);
+      ctx.lineTo(c.width/2 + c.width * 0.2, c.height * 0.02); 
+      ctx.lineTo(c.width/2 - c.width * 0.2, c.height * 0.02); 
+      ctx.closePath(); 
+      ctx.stroke();
+
+      ctx.beginPath(); 
+      ctx.moveTo(c.width/2 - c.width * 0.2, c.height); 
+      ctx.lineTo(c.width/2 + c.width * 0.2, c.height);
+      ctx.lineTo(c.width/2 + c.width * 0.2, c.height * 0.98); 
+      ctx.lineTo(c.width/2 - c.width * 0.2, c.height * 0.98); 
+      ctx.closePath(); 
+      ctx.stroke();
+
+      ctx.fillStyle = "white"; 
+      ctx.beginPath(); 
+      ctx.arc(ball.x * c.width, ball.y * c.height, ball.r * c.width, 0, Math.PI * 2); 
+      ctx.fill();
+      
+      ctx.fillStyle = "red"; 
+      ctx.beginPath(); 
+      ctx.arc(keeperH.x * c.width, keeperH.y * c.height, keeperH.r * c.width, 0, Math.PI * 2); 
+      ctx.fill();
+      
+      ctx.fillStyle = "blue"; 
+      ctx.beginPath(); 
+      ctx.arc(keeperA.x * c.width, keeperA.y * c.height, keeperA.r * c.width, 0, Math.PI * 2); 
+      ctx.fill();
+    }
+
+    function moveTouch(e) {
+      e.preventDefault();
+      if (!e.touches || e.touches.length === 0) return;
+      const rect = c.getBoundingClientRect();
+      const x = (e.touches[0].clientX - rect.left) / rect.width;
+      const y = (e.touches[0].clientY - rect.top) / rect.height;
+      updateKeeperPosition(x, y);
+    }
+
+    function moveMouse(e) {
+      const rect = c.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      updateKeeperPosition(x, y);
+    }
+
+    function updateKeeperPosition(x, y) {
+      const k = role === "home" ? keeperH : keeperA;
+      
+      k.x = Math.max(k.r, Math.min(1 - k.r, x));
+      k.y = role === "home"
+        ? Math.max(0.5 + k.r, Math.min(1 - k.r, y))
+        : Math.max(k.r, Math.min(0.5 - k.r, y));
+      
+      const updateData = role === "home"
+        ? { homeX: k.x, homeY: k.y }
+        : { awayX: k.x, awayY: k.y };
+        
+      update(ref(db, `rooms/${roomId}/keepers`), updateData);
+    }
+
+    async function endGame() {
+      if (gameEnded) return;
+      gameEnded = true;
+      clearInterval(timerInterval);
+      
+      let result = "Draw!";
+      let coinsChange = 0;
+      
+      if (homeScore > awayScore) {
+        result = role === "home" ? "You Win!" : "You Lose!";
+        coinsChange = role === "home" ? stake * 2 : -stake;
+      } else if (awayScore > homeScore) {
+        result = role === "away" ? "You Win!" : "You Lose!";
+        coinsChange = role === "away" ? stake * 2 : -stake;
+      }
+      
+      if (coinsChange !== 0) {
+        try {
+          await update(ref(db, `users/${myUid}`), { 
+            coins: currentCoins + coinsChange 
+          });
+        } catch (error) {
+          console.error("Error updating coins:", error);
+        }
+      }
+      
+      await Swal.fire({
+        title: "Game Over",
+        text: `${result} Final Score: Home ${homeScore} - ${awayScore} Away`,
+        confirmButtonText: "OK"
+      });
+      
+      try {
+        await remove(ref(db, `rooms/${roomId}`));
+      } catch (error) {
+        console.error("Error removing room:", error);
+      }
+      
+      location.href = "search.html";
+    }
+  </script>
+</body>
+</html>
