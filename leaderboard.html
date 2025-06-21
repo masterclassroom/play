@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Game Stats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .stats-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 350px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .stats-card h2 {
+      margin-bottom: 20px;
+      font-size: 26px;
+      border-bottom: 1px solid white;
+      padding-bottom: 10px;
+    }
+
+    .stat {
+      font-size: 18px;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .btn {
+      background-color: #00b894;
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #019374;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="stats-card">
+    <h2>Your Game Stats</h2>
+    <div class="stat">Matches Played: <span id="played">0</span></div>
+    <div class="stat">Wins: <span id="wins">0</span></div>
+    <div class="stat">Losses: <span id="losses">0</span></div>
+    <div class="stat">Total Coins Won: <span id="coinswon">0</span></div>
+  </div>
+
+  <button class="btn" onclick="location.href='search.html'">⬅️ Back to Search</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        await Swal.fire("You must login first");
+        return location.href = "login.html";
+      }
+
+      const uid = user.uid;
+      try {
+        const statsSnap = await get(ref(db, `users/${uid}/stats`));
+        if (statsSnap.exists()) {
+          const stats = statsSnap.val();
+          document.getElementById("played").innerText = stats.played || 0;
+          document.getElementById("wins").innerText = stats.wins || 0;
+          document.getElementById("losses").innerText = stats.losses || 0;
+          document.getElementById("coinswon").innerText = stats.totalcoinswon || 0;
+        } else {
+          Swal.fire("No stats found yet.");
+        }
+      } catch (error) {
+        console.error("Stats error:", error);
+        Swal.fire("Error loading stats.");
+      }
+    });
+  </script>
+</body>
+</html>

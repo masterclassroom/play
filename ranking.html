@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking Players</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+.user-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px auto;
+  max-width: 600px;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.user-info {
+  text-align: left;
+}
+
+.rank-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00cec9;
+  width: 30px;
+}
+
+.button-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 20px;
+  border-radius: 12px;
+  z-index: 1000;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #74b9ff;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: transparent;
+  margin: 10px;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  background-color: #0984e3;
+  border-color: #0984e3;
+}
+
+#searchInput {
+  padding: 10px;
+  width: 300px;
+  max-width: 90%;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <h2>📊 Ranking Players</h2>  <input type="text" id="searchInput" placeholder="Search username...">
+  <div id="rankingList"></div>  <div class="button-container">
+    <button class="btn" onclick="location.href='search.html'">⬅️ Back to Search</button>
+    <button class="btn" id="myRankBtn">⭐ My Ranking</button>
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    let allUsers = [];
+    let myUid = null;
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        await Swal.fire("Login first");
+        location.href = "login.html";
+        return;
+      }
+
+      myUid = user.uid;
+      const usersRef = ref(db, "users");
+      const usersSnap = await get(usersRef);
+
+      if (!usersSnap.exists()) return;
+
+      usersSnap.forEach(childSnap => {
+        const uid = childSnap.key;
+        const data = childSnap.val();
+        if (data.stats && data.username) {
+          allUsers.push({
+            uid,
+            username: data.username,
+            ...data.stats
+          });
+        }
+      });
+
+      allUsers.sort((a, b) => (b.wins || 0) - (a.wins || 0));
+      renderList(allUsers);
+    });
+
+    function renderList(users) {
+      const container = document.getElementById("rankingList");
+      container.innerHTML = "";
+
+      users.forEach((user, index) => {
+        const div = document.createElement("div");
+        div.className = "user-card";
+        div.setAttribute("data-uid", user.uid);
+        div.innerHTML = `
+          <div class="rank-number">${index + 1}</div>
+          <div class="user-info">
+            <strong>${user.username}</strong><br>
+            Wins: ${user.wins || 0} | Played: ${user.played || 0} | Losses: ${user.losses || 0} | Coins Won: ${user.totalcoinswon || 0}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", e => {
+      const val = e.target.value.toLowerCase();
+      const filtered = allUsers.filter(u => u.username.toLowerCase().includes(val));
+      renderList(filtered);
+    });
+
+    document.getElementById("myRankBtn").addEventListener("click", () => {
+      const cards = document.querySelectorAll(".user-card");
+      for (let card of cards) {
+        if (card.getAttribute("data-uid") === myUid) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.border = "2px solid yellow";
+          setTimeout(() => card.style.border = "", 2000);
+          break;
+        }
+      }
+    });
+  </script></body>
+</html>
