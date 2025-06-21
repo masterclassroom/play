@@ -8,8 +8,7 @@
     body { margin:0; background:#111; font-family:sans-serif; color:white; text-align:center; }
     #scoreboard { padding:10px; font-size:18px; }
     #gameContainer { display: flex; justify-content: center; }
-    canvas { background:green; border:3px solid white; touch-action: none; 
-             max-width: 100%; height: auto; }
+    canvas { background:green; border:3px solid white; touch-action: none; max-width: 100%; height: auto; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -45,74 +44,66 @@
 
     const c = document.getElementById("gameCanvas");
     const ctx = c.getContext("2d");
-    
-    function resizeCanvas() {
-      const container = document.getElementById('gameContainer');
-      const maxWidth = container.clientWidth - 20;
-      const ratio = 400/600;
-      
-      if (maxWidth < 400) {
-        c.width = maxWidth;
-        c.height = maxWidth / ratio;
-      } else {
-        c.width = 400;
-        c.height = 600;
-      }
-    }
-    
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
 
-    let myUid, roomId, role, stake = 0, homeScore = 0, awayScore = 0, timer = 0, currentCoins = 0;
-    let lastGoalTime = 0, gameEnded = false, timerInterval;
-    let gameActive = false;
+    let myUid, roomId, role, stake = 0, homeScore = 0, awayScore = 0, currentCoins = 0;
+    let timer = 0, timerInterval;
+    let lastGoalTime = 0, gameEnded = false, gameActive = false;
 
     let ball = { x: 0.5, y: 0.5, vx: 0.005, vy: 0.005, r: 0.02 };
     let keeperH = { x: 0.5, y: 0.9, r: 0.05 };
     let keeperA = { x: 0.5, y: 0.1, r: 0.05 };
 
+    function resizeCanvas() {
+      const container = document.getElementById('gameContainer');
+      const maxWidth = container.clientWidth - 20;
+      const ratio = 400/600;
+      c.width = maxWidth < 400 ? maxWidth : 400;
+      c.height = maxWidth < 400 ? maxWidth / ratio : 600;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
     onAuthStateChanged(auth, async user => {
       if (!user) return location.href = "login.html";
-      
       try {
         myUid = user.uid;
         const url = new URLSearchParams(location.search);
         roomId = url.get("room");
         role = url.get("role");
         stake = +url.get("stake");
-        
-        if (!roomId || !role || !stake) {
-          await Swal.fire("Invalid game parameters");
-          return location.href = "search.html";
-        }
+        if (!roomId || !role || !stake) return Swal.fire("Invalid game parameters").then(() => location.href = "search.html");
 
         document.getElementById("stake").innerText = stake;
-        const snap = await get(ref(db, `users/${myUid}/coins`));
-        currentCoins = snap.exists() ? snap.val() : 0;
+        const coinsSnap = await get(ref(db, `users/${myUid}/coins`));
+        currentCoins = coinsSnap.exists() ? coinsSnap.val() : 0;
 
-        const rSnap = await get(ref(db, `rooms/${roomId}`));
-        if (!rSnap.exists()) {
-          await Swal.fire("Room not found");
-          return location.href = "search.html";
+        const roomSnap = await get(ref(db, `rooms/${roomId}`));
+        if (!roomSnap.exists()) return Swal.fire("Room not found").then(() => location.href = "search.html");
+
+        if (roomSnap.child("score").exists()) {
+          const score = roomSnap.child("score").val();
+          homeScore = score.home || 0;
+          awayScore = score.away || 0;
+          document.getElementById("homeScore").innerText = homeScore;
+          document.getElementById("awayScore").innerText = awayScore;
         }
 
         if (role === "home") {
-          await set(ref(db, `rooms/${roomId}/ball`), {
-            x: 0.5, y: 0.5, 
-            vx: Math.random() > 0.5 ? 0.005 : -0.005,
-            vy: Math.random() > 0.5 ? 0.005 : -0.005,
-            r: 0.02
-          });
-          await set(ref(db, `rooms/${roomId}/keepers`), {
-            homeX: 0.5, homeY: 0.9,
-            awayX: 0.5, awayY: 0.1
-          });
-          await set(ref(db, `rooms/${roomId}/score`), {
-            home: 0, away: 0
-          });
-          await set(ref(db, `rooms/${roomId}/timer`), 0);
+          await Promise.all([
+            set(ref(db, `rooms/${roomId}/ball`), ball),
+            set(ref(db, `rooms/${roomId}/keepers`), {
+              homeX: keeperH.x, homeY: keeperH.y,
+              awayX: keeperA.x, awayY: keeperA.y
+            }),
+            set(ref(db, `rooms/${roomId}/score`), {
+              home: homeScore,
+              away: awayScore
+            }),
+            set(ref(db, `rooms/${roomId}/timer`), 0)
+          ]);
           gameActive = true;
-          startTimer();
+          startTimer(); // ⏱️ Start timer here
         }
 
         setupListeners();
@@ -120,26 +111,27 @@
 
         c.addEventListener("touchmove", moveTouch, { passive: false });
         c.addEventListener("mousemove", moveMouse);
-        
       } catch (error) {
-        console.error("Initialization error:", error);
+        console.error("Init error:", error);
         Swal.fire("Error initializing game").then(() => location.href = "search.html");
       }
     });
 
     function startTimer() {
-      timerInterval = setInterval(() => {
-        if (!gameEnded && gameActive) {
-          timer++;
-          update(ref(db, `rooms/${roomId}/timer`), timer);
+      timerInterval = setInterval(async () => {
+        if (gameEnded) return;
+        timer++;
+        document.getElementById("timer").innerText = timer;
+        await set(ref(db, `rooms/${roomId}/timer`), timer);
+        if (timer >= 90) {
+          clearInterval(timerInterval);
+          endGame();
         }
       }, 1000);
     }
 
     function setupListeners() {
-      onValue(ref(db, `rooms/${roomId}/ball`), snap => {
-        if (snap.exists()) Object.assign(ball, snap.val());
-      });
+      onValue(ref(db, `rooms/${roomId}/ball`), snap => { if (snap.exists()) Object.assign(ball, snap.val()); });
 
       onValue(ref(db, `rooms/${roomId}/keepers`), snap => {
         if (snap.exists()) {
@@ -155,11 +147,7 @@
           awayScore = snap.val().away;
           document.getElementById("homeScore").innerText = homeScore;
           document.getElementById("awayScore").innerText = awayScore;
-          
-          // Check for winning condition after score update
-          if (homeScore >= 3 || awayScore >= 3) {
-            endGame();
-          }
+          if (homeScore >= 3 || awayScore >= 3) endGame();
         }
       });
 
@@ -167,30 +155,21 @@
         if (snap.exists()) {
           timer = snap.val();
           document.getElementById("timer").innerText = timer;
-          
-          if (timer >= 90) {
-            endGame();
-          }
+          if (timer >= 90) endGame();
         }
       });
-      
+
       onValue(ref(db, `rooms/${roomId}`), snap => {
         if (!snap.exists() && !gameEnded) {
           gameEnded = true;
-          Swal.fire("Opponent left the game").then(() => {
-            location.href = "search.html";
-          });
+          Swal.fire("Opponent left the game").then(() => location.href = "search.html");
         }
       });
     }
 
     function gameLoop() {
       if (gameEnded) return;
-      
-      if (role === "home" && gameActive) {
-        updateBall();
-      }
-      
+      if (role === "home" && gameActive) updateBall();
       draw();
       requestAnimationFrame(gameLoop);
     }
@@ -204,38 +183,27 @@
         ball.x = Math.max(ball.r, Math.min(1 - ball.r, ball.x));
       }
 
-      if ((ball.y - ball.r < 0 && (ball.x < 0.5 - 0.2 || ball.x > 0.5 + 0.2)) ||
-          (ball.y + ball.r > 1 && (ball.x < 0.5 - 0.2 || ball.x > 0.5 + 0.2))) {
+      if ((ball.y - ball.r < 0 && (ball.x < 0.3 || ball.x > 0.7)) || (ball.y + ball.r > 1 && (ball.x < 0.3 || ball.x > 0.7))) {
         ball.vy *= -1;
         ball.y = Math.max(ball.r, Math.min(1 - ball.r, ball.y));
       }
 
-      if (ball.y + ball.r >= 1 && ball.x > 0.5 - 0.2 && ball.x < 0.5 + 0.2) {
-        if (Date.now() - lastGoalTime > 1000) {
-          lastGoalTime = Date.now();
-          update(ref(db, `rooms/${roomId}/score`), { 
-            home: homeScore, 
-            away: awayScore + 1 
-          });
-        }
+      if (ball.y - ball.r <= 0 && ball.x > 0.3 && ball.x < 0.7 && Date.now() - lastGoalTime > 1000) {
+        lastGoalTime = Date.now();
+        homeScore++;
+        update(ref(db, `rooms/${roomId}/score`), { home: homeScore, away: awayScore });
+        resetBall();
       }
 
-      if (ball.y - ball.r <= 0 && ball.x > 0.5 - 0.2 && ball.x < 0.5 + 0.2) {
-        if (Date.now() - lastGoalTime > 1000) {
-          lastGoalTime = Date.now();
-          update(ref(db, `rooms/${roomId}/score`), { 
-            home: homeScore + 1, 
-            away: awayScore 
-          });
-        }
+      if (ball.y + ball.r >= 1 && ball.x > 0.3 && ball.x < 0.7 && Date.now() - lastGoalTime > 1000) {
+        lastGoalTime = Date.now();
+        awayScore++;
+        update(ref(db, `rooms/${roomId}/score`), { home: homeScore, away: awayScore });
+        resetBall();
       }
 
-      if (distance(ball, keeperH) < ball.r + keeperH.r) {
-        bounce(keeperH);
-      }
-      if (distance(ball, keeperA) < ball.r + keeperA.r) {
-        bounce(keeperA);
-      }
+      if (distance(ball, keeperH) < ball.r + keeperH.r) bounce(keeperH);
+      if (distance(ball, keeperA) < ball.r + keeperA.r) bounce(keeperA);
 
       const maxSpeed = 0.01;
       const speed = Math.sqrt(ball.vx ** 2 + ball.vy ** 2);
@@ -247,17 +215,20 @@
       update(ref(db, `rooms/${roomId}/ball`), ball);
     }
 
+    function resetBall() {
+      ball = { x: 0.5, y: 0.5, vx: (Math.random() > 0.5 ? 1 : -1) * 0.005, vy: (Math.random() > 0.5 ? 1 : -1) * 0.005, r: 0.02 };
+      update(ref(db, `rooms/${roomId}/ball`), ball);
+    }
+
     function bounce(k) {
       const angle = Math.atan2(ball.y - k.y, ball.x - k.x);
       const speed = Math.sqrt(ball.vx ** 2 + ball.vy ** 2) * 1.1;
-      
       ball.vx = Math.cos(angle) * speed;
       ball.vy = Math.sin(angle) * speed;
     }
 
     function distance(a, b) {
-      let dx = a.x - b.x;
-      let dy = a.y - b.y;
+      let dx = a.x - b.x, dy = a.y - b.y;
       return Math.hypot(dx, dy);
     }
 
@@ -266,45 +237,17 @@
       ctx.strokeStyle = "white";
       ctx.lineWidth = 2;
 
-      ctx.beginPath(); 
-      ctx.arc(c.width/2, c.height/2, c.width * 0.125, 0, Math.PI * 2); 
-      ctx.stroke();
-      
-      ctx.beginPath(); 
-      ctx.moveTo(0, c.height/2); 
-      ctx.lineTo(c.width, c.height/2); 
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(c.width/2, c.height/2, c.width * 0.125, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, c.height/2); ctx.lineTo(c.width, c.height/2); ctx.stroke();
 
-      ctx.beginPath(); 
-      ctx.moveTo(c.width/2 - c.width * 0.2, 0); 
-      ctx.lineTo(c.width/2 + c.width * 0.2, 0);
-      ctx.lineTo(c.width/2 + c.width * 0.2, c.height * 0.02); 
-      ctx.lineTo(c.width/2 - c.width * 0.2, c.height * 0.02); 
-      ctx.closePath(); 
-      ctx.stroke();
+      // Goals
+      ctx.beginPath(); ctx.moveTo(c.width/2 - c.width * 0.2, 0); ctx.lineTo(c.width/2 + c.width * 0.2, 0); ctx.lineTo(c.width/2 + c.width * 0.2, c.height * 0.02); ctx.lineTo(c.width/2 - c.width * 0.2, c.height * 0.02); ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(c.width/2 - c.width * 0.2, c.height); ctx.lineTo(c.width/2 + c.width * 0.2, c.height); ctx.lineTo(c.width/2 + c.width * 0.2, c.height * 0.98); ctx.lineTo(c.width/2 - c.width * 0.2, c.height * 0.98); ctx.closePath(); ctx.stroke();
 
-      ctx.beginPath(); 
-      ctx.moveTo(c.width/2 - c.width * 0.2, c.height); 
-      ctx.lineTo(c.width/2 + c.width * 0.2, c.height);
-      ctx.lineTo(c.width/2 + c.width * 0.2, c.height * 0.98); 
-      ctx.lineTo(c.width/2 - c.width * 0.2, c.height * 0.98); 
-      ctx.closePath(); 
-      ctx.stroke();
-
-      ctx.fillStyle = "white"; 
-      ctx.beginPath(); 
-      ctx.arc(ball.x * c.width, ball.y * c.height, ball.r * c.width, 0, Math.PI * 2); 
-      ctx.fill();
-      
-      ctx.fillStyle = "red"; 
-      ctx.beginPath(); 
-      ctx.arc(keeperH.x * c.width, keeperH.y * c.height, keeperH.r * c.width, 0, Math.PI * 2); 
-      ctx.fill();
-      
-      ctx.fillStyle = "blue"; 
-      ctx.beginPath(); 
-      ctx.arc(keeperA.x * c.width, keeperA.y * c.height, keeperA.r * c.width, 0, Math.PI * 2); 
-      ctx.fill();
+      // Ball & keepers
+      ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(ball.x * c.width, ball.y * c.height, ball.r * c.width, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "red"; ctx.beginPath(); ctx.arc(keeperH.x * c.width, keeperH.y * c.height, keeperH.r * c.width, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "blue"; ctx.beginPath(); ctx.arc(keeperA.x * c.width, keeperA.y * c.height, keeperA.r * c.width, 0, Math.PI * 2); ctx.fill();
     }
 
     function moveTouch(e) {
@@ -325,59 +268,77 @@
 
     function updateKeeperPosition(x, y) {
       const k = role === "home" ? keeperH : keeperA;
-      
       k.x = Math.max(k.r, Math.min(1 - k.r, x));
-      k.y = role === "home"
-        ? Math.max(0.5 + k.r, Math.min(1 - k.r, y))
-        : Math.max(k.r, Math.min(0.5 - k.r, y));
-      
-      const updateData = role === "home"
-        ? { homeX: k.x, homeY: k.y }
-        : { awayX: k.x, awayY: k.y };
-        
+      k.y = role === "home" ? Math.max(0.5 + k.r, Math.min(1 - k.r, y)) : Math.max(k.r, Math.min(0.5 - k.r, y));
+      const updateData = role === "home" ? { homeX: k.x, homeY: k.y } : { awayX: k.x, awayY: k.y };
       update(ref(db, `rooms/${roomId}/keepers`), updateData);
     }
 
-    async function endGame() {
-      if (gameEnded) return;
-      gameEnded = true;
-      clearInterval(timerInterval);
-      
-      let result = "Draw!";
-      let coinsChange = 0;
-      
-      if (homeScore > awayScore) {
-        result = role === "home" ? "You Win!" : "You Lose!";
-        coinsChange = role === "home" ? stake * 2 : -stake;
-      } else if (awayScore > homeScore) {
-        result = role === "away" ? "You Win!" : "You Lose!";
-        coinsChange = role === "away" ? stake * 2 : -stake;
-      }
-      
-      if (coinsChange !== 0) {
-        try {
-          await update(ref(db, `users/${myUid}`), { 
-            coins: currentCoins + coinsChange 
-          });
-        } catch (error) {
-          console.error("Error updating coins:", error);
-        }
-      }
-      
-      await Swal.fire({
-        title: "Game Over",
-        text: `${result} Final Score: Home ${homeScore} - ${awayScore} Away`,
-        confirmButtonText: "OK"
+ async function endGame() {
+  if (gameEnded) return;
+  gameEnded = true;
+  clearInterval(timerInterval);
+  
+  let result = "Draw!";
+  let coinsChange = 0;
+  let isWin = false;
+
+  if (homeScore > awayScore) {
+    result = role === "home" ? "You Win!" : "You Lose!";
+    coinsChange = role === "home" ? stake * 2 : -stake;
+    isWin = role === "home";
+  } else if (awayScore > homeScore) {
+    result = role === "away" ? "You Win!" : "You Lose!";
+    coinsChange = role === "away" ? stake * 2 : -stake;
+    isWin = role === "away";
+  }
+
+  // Update coins
+  if (coinsChange !== 0) {
+    try {
+      await update(ref(db, `users/${myUid}`), {
+        coins: currentCoins + coinsChange
       });
-      
-      try {
-        await remove(ref(db, `rooms/${roomId}`));
-      } catch (error) {
-        console.error("Error removing room:", error);
-      }
-      
-      location.href = "search.html";
+    } catch (error) {
+      console.error("Error updating coins:", error);
     }
+  }
+
+  // ✅ Update stats
+  try {
+    const statsRef = ref(db, `users/${myUid}/stats`);
+    const statsSnap = await get(statsRef);
+    let stats = statsSnap.exists() ? statsSnap.val() : {
+      played: 0, wins: 0, losses: 0, totalcoinswon: 0
+    };
+
+    stats.played += 1;
+    if (isWin) {
+      stats.wins += 1;
+      stats.totalcoinswon += stake * 2;
+    } else {
+      stats.losses += 1;
+    }
+
+    await set(statsRef, stats);
+  } catch (error) {
+    console.error("Error updating stats:", error);
+  }
+
+  await Swal.fire({
+    title: "Game Over",
+    text: `${result} Final Score: Home ${homeScore} - ${awayScore} Away`,
+    confirmButtonText: "OK"
+  });
+
+  try {
+    await remove(ref(db, `rooms/${roomId}`));
+  } catch (error) {
+    console.error("Error removing room:", error);
+  }
+
+  location.href = "search.html";
+}
   </script>
 </body>
 </html>
