@@ -90,6 +90,14 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    #rank { 
+      background: #007bff; 
+      color: white; 
+    }
+    #rank:hover {
+      background: #0069d9;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -112,6 +120,7 @@
 
     <button id="createBtn">Create Room</button>
     <button id="joinBtn">Join Room</button>
+    <button onclick="rank()" id="rank">Ranking</button>
 
     <div class="loading-spinner" id="loadingSpinner"></div>
     <div id="statusText"></div>
@@ -410,5 +419,10 @@
     // Clean up when page unloads
     window.addEventListener("beforeunload", cleanup);
   </script>
+<script>
+  function rank() {
+    window.location.href = 'ranking.html';
+  }
+</script>
 </body>
   </html>
