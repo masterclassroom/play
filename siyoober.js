@@ -215,4 +215,3 @@ function switchLanguage(lang) {
 
 // Default language and account limit checker
 switchLanguage(currentLanguage);
-checkLimit();
