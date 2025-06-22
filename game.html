@@ -101,7 +101,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, update, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, update, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -178,7 +178,7 @@
       }
       myUid = user.uid;
 
-      if(!roomId || !role || !stake) {
+      if(!roomId || !role) {
         await Swal.fire("Invalid game parameters");
         return location.href = "search.html";
       }
@@ -263,14 +263,13 @@
           await Swal.fire({
             title: "Round Result",
             text: `${resultMsg}\nHome: ${data.lastResult.homeCard} | Away: ${data.lastResult.awayCard}`,
-            icon: data.lastResult.winner ? "success" : "info",
-            timer: 3000,
-            showConfirmButton: false
+            icon: data.lastResult.winner ? "success" : "info",        
+            showConfirmButton: true
           });
         }
 
         if(round > maxRounds) {
-          endGame();
+          await endGame();
         }
       });
 
@@ -331,32 +330,114 @@
         }
         roundProcessing = false;
       });
+ 
+  async function endGame() {
+  playBtn.disabled = true;
 
-      function endGame() {
-        playBtn.disabled = true;
-        // Determine winner
-        let msg = "";
-        let icon = "info";
-        if(scoreHome > scoreAway) {
-          msg = "Home Player Wins!";
-          icon = "success";
-        } else if(scoreAway > scoreHome) {
-          msg = "Away Player Wins!";
-          icon = "success";
-        } else {
-          msg = "It's a Draw!";
-          icon = "info";
-        }
-        Swal.fire({
-          title: "Game Over",
-          text: msg,
-          icon: icon,
-          confirmButtonText: "OK"
-        }).then(() => {
-          location.href = "search.html";
-        });
-      }
+  let msg = "";
+  let icon = "info";
+  let userWon = false;
+
+  if(scoreHome > scoreAway) {
+    msg = "Home Player Wins!";
+    icon = "success";
+    userWon = (role === "home");
+  } else if(scoreAway > scoreHome) {
+    msg = "Away Player Wins!";
+    icon = "success";
+    userWon = (role === "away");
+  } else {
+    msg = "It's a Draw!";
+    icon = "info";
+  }
+
+  const roomRef = ref(db, `rooms/${roomId}`);
+  const roomSnap = await get(roomRef);
+  const roomData = roomSnap.val();
+
+  if(roomData?.type === "friendmatch") {
+    const youMsg = userWon ? "You Win!" : (msg === "It's a Draw!" ? "It's a Draw!" : "You Lose!");
+
+    await Swal.fire({
+      title: youMsg,
+      text: `Final Score - Home: ${scoreHome} | Away: ${scoreAway}`,
+      icon: userWon ? "success" : "error",
+      confirmButtonText: "OK"
     });
+
+    // Markii userku OK riixo, halkan tirtir room-ka
+    await remove(roomRef);
+
+    // Kadib u gudub search.html
+    location.href = "search.html";
+
+  } else {
+    // Normal match: update stats & coins
+    const userStatsRef = ref(db, `users/${myUid}/stats`);
+
+    try {
+      const statsSnap = await get(userStatsRef);
+      let stats = statsSnap.exists() ? statsSnap.val() : { played:0, wins:0, losses:0, coins:0, coinswon:0 };
+
+      stats.played = (stats.played || 0) + 1;
+      if(userWon) {
+        stats.wins = (stats.wins || 0) + 1;
+        stats.coins = (stats.coins || 0) + stake * 2;
+        stats.totalcoinswon = (stats.totalcoinswon || 0) + stake * 2;
+        await Swal.fire({
+        title: msg,
+        text: `Final Score - Home: ${scoreHome} | Away: ${scoreAway}`,
+        icon: icon,
+        confirmButtonText: "OK"
+      });
+        await remove(roomRef);
+        setTimeout(() => {
+
+      location.href = "search.html";
+        },2000);
+     
+      } else if(msg === "It's a Draw!") {
+        stats.draws = (stats.draws || 0) + 1;
+        await Swal.fire({
+        title: msg,
+        text: `Final Score - Home: ${scoreHome} | Away: ${scoreAway}`,
+        icon: icon,
+        confirmButtonText: "OK"
+      });
+       await remove(roomRef);
+        setTimeout(() => {
+                   
+
+      location.href = "search.html";
+        },2000);
+      } else {
+        stats.losses = (stats.losses || 0) + 1;
+        await Swal.fire({
+        title: msg,
+        text: `Final Score - Home: ${scoreHome} | Away: ${scoreAway}`,
+        icon: icon,
+        confirmButtonText: "OK"
+      });
+
+      location.href = "search.html";
+      }
+
+      await update(userStatsRef, stats);
+  
+
+    } catch(e) {
+      console.error("Stats update error:", e);
+      await Swal.fire("Error updating stats");
+      location.href = "search.html";
+    }
+  }
+}
+    });
+     
+  
+
+      
+
   </script>
 </body>
 </html>
