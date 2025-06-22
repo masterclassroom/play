@@ -190,7 +190,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
             alert(translations[currentLanguage].successfulLogin.replace('{attempts}', loginAttempts));
             setTimeout(() => {
-                window.location.href = "dashboard.html";
+                window.location.href = "home.html";
             }, 1000);
         } else {
             errorMessage.style.display = 'block';
