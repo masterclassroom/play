@@ -137,12 +137,6 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        if (!user.emailVerified) {
-            errorMessage.style.display = 'block';
-            errorMessage.innerText = translations[currentLanguage].emailNotVerified;
-            return;
-        }
-
         const userRef = ref(database, `users/${user.uid}`);
         const snapshot = await get(userRef);
 
