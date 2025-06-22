@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Friends</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #141e30;
+      color: white;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+    }
+    .info img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #00cec9;
+    }
+    .info div {
+      font-size: 18px;
+    }
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .accept {
+      background: #00b894;
+    }
+    .accept:hover {
+      background: #00d29b;
+    }
+    .decline {
+      background: #d63031;
+    }
+    .decline:hover {
+      background: #ff4d4d;
+    }
+    .remove {
+      background: #0984e3;
+    }
+    .remove:hover {
+      background: #74b9ff;
+    }
+    .no-data {
+      text-align: center;
+      margin: 10px;
+      color: #aaa;
+      font-style: italic;
+    }
+    .go-profile {
+      width: 100%;
+      padding: 12px;
+      background: #00cec9;
+      color: white;
+      border: none;
+      margin-top: 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+   .go-back  {
+      width: 100%;
+      padding: 12px;
+      background: #00cec9;
+      color: white;
+      border: none;
+      margin-top: 30px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Friend Requests</h2>
+  <div id="requests"><p class="no-data">Loading...</p></div>
+
+  <h2>Pending Requests</h2>
+  <div id="pending"><p class="no-data">Loading...</p></div>
+
+  <h2>Your Friends</h2>
+  <div id="friends"><p class="no-data">Loading...</p></div>
+
+  <button class="go-profile" id="goProfileBtn">Go to My Profile</button>
+  <button class="go-back" onclick="goBack()">Back</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    let meUid = null;
+    const reqDiv = document.getElementById('requests');
+    const frDiv = document.getElementById('friends');
+    const pendingDiv = document.getElementById('pending');
+    const goProfileBtn = document.getElementById('goProfileBtn');
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
+      meUid = user.uid;
+
+      goProfileBtn.onclick = () => location.href = `profile.html?uid=${meUid}`;
+      goProfileBtn.style.display = "block";
+
+      loadRequests();
+      loadPendingRequests();
+      loadFriends();
+    });
+
+    async function loadRequests() {
+      const snap = await get(ref(db, `friendRequests/${meUid}`));
+      reqDiv.innerHTML = '';
+      if (!snap.exists()) {
+        reqDiv.innerHTML = '<p class="no-data">No requests</p>';
+        return;
+      }
+
+      for (const senderUid in snap.val()) {
+        const userSnap = await get(ref(db, `users/${senderUid}`));
+        const { username = "Unknown", logo = "default" } = userSnap.val() || {};
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="info" onclick="location.href='profile.html?uid=${senderUid}'">
+            <img src="${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
+          </div>
+          <div>
+            <button class="accept">Accept</button>
+            <button class="decline">Decline</button>
+          </div>`;
+
+        card.querySelector('.accept').onclick = async () => {
+          await set(ref(db, `friends/${meUid}/${senderUid}`), true);
+          await set(ref(db, `friends/${senderUid}/${meUid}`), true);
+          await remove(ref(db, `friendRequests/${meUid}/${senderUid}`));
+          Swal.fire("Accepted!");
+          loadRequests();
+          loadFriends();
+        };
+
+        card.querySelector('.decline').onclick = async () => {
+          await remove(ref(db, `friendRequests/${meUid}/${senderUid}`));
+          Swal.fire("Declined");
+          loadRequests();
+        };
+
+        reqDiv.appendChild(card);
+      }
+    }
+
+    async function loadPendingRequests() {
+      const allUsersSnap = await get(ref(db, 'friendRequests'));
+      pendingDiv.innerHTML = '';
+      let found = false;
+
+      if (allUsersSnap.exists()) {
+        const allRequests = allUsersSnap.val();
+        for (const otherUid in allRequests) {
+          if (allRequests[otherUid][meUid]) {
+            const userSnap = await get(ref(db, `users/${otherUid}`));
+            const { username = "Unknown", logo = "default" } = userSnap.val() || {};
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <div class="info" onclick="location.href='profile.html?uid=${otherUid}'">
+                <img src="${logo}.png" onerror="this.src='default.png'"><div>${username} <span style="font-size:14px; color:#ccc;">(Pending)</span></div>
+              </div>
+              <button class="decline">Cancel</button>`;
+
+            card.querySelector('.decline').onclick = async () => {
+              await remove(ref(db, `friendRequests/${otherUid}/${meUid}`));
+              Swal.fire("Cancelled");
+              loadPendingRequests();
+            };
+
+            pendingDiv.appendChild(card);
+            found = true;
+          }
+        }
+      }
+
+      if (!found) pendingDiv.innerHTML = '<p class="no-data">No pending requests</p>';
+    }
+
+    async function loadFriends() {
+      const snap = await get(ref(db, `friends/${meUid}`));
+      frDiv.innerHTML = '';
+      if (!snap.exists()) {
+        frDiv.innerHTML = '<p class="no-data">No friends</p>';
+        return;
+      }
+
+      for (const friendUid in snap.val()) {
+        const userSnap = await get(ref(db, `users/${friendUid}`));
+        const { username = "Unknown", logo = "default" } = userSnap.val() || {};
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="info" onclick="location.href='profile.html?uid=${friendUid}'">
+            <img src="${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
+          </div>
+          <div>
+            <button class="remove">Remove</button>
+            <button class="accept">Chat</button>
+          </div>`;
+
+        card.querySelector('.remove').onclick = async () => {
+          await remove(ref(db, `friends/${meUid}/${friendUid}`));
+          await remove(ref(db, `friends/${friendUid}/${meUid}`));
+          Swal.fire("Removed");
+          loadFriends();
+        };
+
+        card.querySelector('.accept').onclick = () => {
+          location.href = `chat.html?uid=${friendUid}`;
+        };
+
+        frDiv.appendChild(card);
+      }
+    }
+  </script>
+  <script>
+  function goBack() {
+    window.history.back();
+  }
+  </script>
+</body>
+</html> 

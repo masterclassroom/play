@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title> Game - 5 Rounds</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      user-select: none;
+    }
+    #role { font-weight: bold; color: #ffcc00; margin-bottom: 20px; font-size: 24px;}
+    #round {
+      margin-bottom: 10px;
+      font-size: 20px;
+      transition: opacity 0.5s ease;
+      opacity: 1;
+      display: inline-block;
+      min-width: 140px;
+    }
+    #round.fade { opacity: 0; }
+    #cardHome, #cardAway {
+      font-size: 100px;
+      display: inline-block;
+      width: 150px;
+      height: 180px;
+      border: 3px solid white;
+      border-radius: 15px;
+      line-height: 180px;
+      margin: 10px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 1;
+      cursor: default;
+      user-select: none;
+    }
+    #cardHome.animate, #cardAway.animate {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    #scoreboard {
+      margin: 20px 0;
+      font-size: 22px;
+      transition: color 0.5s ease;
+    }
+    #playBtn {
+      padding: 15px 40px;
+      font-size: 24px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background-color: #28a745;
+      color: white;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    #playBtn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    /* Friend Match Room ID and Copy */
+    #friendRoomInfo {
+      margin: 15px auto 30px;
+      font-size: 20px;
+      display: none;
+      user-select: text;
+    }
+    #friendRoomInfo button {
+      margin-left: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background-color: #00cec9;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    #friendRoomInfo button:hover {
+      background-color: #01a3a4;
+    }
+  </style>
+</head>
+<body>
+  <div id="role">Loading role...</div>
+  <div id="round">Round: 1 / 5</div>
+  <div id="friendRoomInfo">
+    Room ID: <span id="roomIdText"></span>
+    <button id="copyBtn">📋 Copy</button>
+  </div>
+  <div>
+    <div id="cardHome">🂠</div>
+    <div id="cardAway">🂠</div>
+  </div>
+  <div id="scoreboard">Home: 0 | Away: 0</div>
+  <button id="playBtn" disabled>Play Your Card</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, update, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const urlParams = new URLSearchParams(location.search);
+    const roomId = urlParams.get("room");
+    const role = urlParams.get("role");
+    const stake = +urlParams.get("stake");
+
+    const roleEl = document.getElementById("role");
+    const roundEl = document.getElementById("round");
+    const cardHomeEl = document.getElementById("cardHome");
+    const cardAwayEl = document.getElementById("cardAway");
+    const scoreboardEl = document.getElementById("scoreboard");
+    const playBtn = document.getElementById("playBtn");
+    const friendRoomInfo = document.getElementById("friendRoomInfo");
+    const roomIdText = document.getElementById("roomIdText");
+    const copyBtn = document.getElementById("copyBtn");
+
+    let myUid = null;
+    let round = 1;
+    const maxRounds = 5;
+
+    let scoreHome = 0;
+    let scoreAway = 0;
+
+    const cardValues = [2,3,4,5,6,7,8,9,10,11,12,13,14];
+    let roundProcessing = false;
+    let roomListenerUnsub = null;
+    let lastSeenRound = 0;
+
+    function cardDisplay(val) {
+      return val === 11 ? "J" : val === 12 ? "Q" : val === 13 ? "K" : val === 14 ? "A" : val.toString();
+    }
+
+    function updatePlayButton(turn) {
+      if(turn === role && !roundProcessing) {
+        playBtn.disabled = false;
+        playBtn.innerText = "Play Your Card";
+      } else {
+        playBtn.disabled = true;
+        playBtn.innerText = "Waiting for opponent...";
+      }
+    }
+
+    function animateCard(cardEl) {
+      cardEl.classList.add("animate");
+      setTimeout(() => cardEl.classList.remove("animate"), 400);
+    }
+
+    async function animateRound(newRoundText) {
+      roundEl.classList.add("fade");
+      await new Promise(r => setTimeout(r, 500));
+      roundEl.innerText = newRoundText;
+      roundEl.classList.remove("fade");
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user) {
+        if(roomListenerUnsub) roomListenerUnsub();
+        return location.href = "login.html";
+      }
+      myUid = user.uid;
+
+      if(!roomId || !role || !stake) {
+        await Swal.fire("Invalid game parameters");
+        return location.href = "search.html";
+      }
+
+      roleEl.innerText = `Role: ${role}`;
+      const roomRef = ref(db, `rooms/${roomId}`);
+      if(roomListenerUnsub) roomListenerUnsub();
+
+      // Set Room ID text and copy button
+      roomIdText.innerText = roomId;
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(roomId).then(() => {
+          copyBtn.innerText = "✅ Copied!";
+          setTimeout(() => copyBtn.innerText = "📋 Copy", 2000);
+        });
+      };
+
+      roomListenerUnsub = onValue(roomRef, async snap => {
+        if(!snap.exists()) {
+          await Swal.fire("Game ended or room deleted");
+          return location.href = "search.html";
+        }
+        const data = snap.val();
+
+        // Show/hide friend match room ID info based on type
+        if (data.type === "friendmatch") {
+          friendRoomInfo.style.display = "block";
+        } else {
+          friendRoomInfo.style.display = "none";
+        }
+
+        if(data.round === undefined || data.round < 1) {
+          await update(roomRef, { round: 1, score: { home: 0, away: 0 }, turn: "home", homeCard: null, awayCard: null });
+          return;
+        }
+
+        if(data.round !== round) {
+          await animateRound(`Round: ${data.round} / ${maxRounds}`);
+          round = data.round;
+        }
+
+        if(data.score) {
+          if(scoreHome !== data.score.home || scoreAway !== data.score.away) {
+            scoreHome = data.score.home;
+            scoreAway = data.score.away;
+            scoreboardEl.innerText = `Home: ${scoreHome} | Away: ${scoreAway}`;
+            scoreboardEl.style.color = "#28a745";
+            setTimeout(() => scoreboardEl.style.color = "white", 500);
+          }
+        }
+
+        if(data.homeCard) {
+          cardHomeEl.innerText = cardDisplay(data.homeCard.value);
+          animateCard(cardHomeEl);
+        } else {
+          cardHomeEl.innerText = "🂠";
+        }
+
+        if(data.awayCard) {
+          cardAwayEl.innerText = cardDisplay(data.awayCard.value);
+          animateCard(cardAwayEl);
+        } else {
+          cardAwayEl.innerText = "🂠";
+        }
+
+        if(data[`${role}Card`] && data.round === round) {
+          playBtn.disabled = true;
+          playBtn.innerText = "Waiting for opponent...";
+        } else {
+          updatePlayButton(data.turn || "home");
+        }
+
+        // Show result once per round
+        if (data.lastResult && data.lastResult.round !== lastSeenRound) {
+          lastSeenRound = data.lastResult.round;
+
+          let resultMsg = `Round ${data.lastResult.round}: `;
+          if (data.lastResult.winner === "home") resultMsg += "Home Wins!";
+          else if (data.lastResult.winner === "away") resultMsg += "Away Wins!";
+          else resultMsg += "Draw!";
+
+          await Swal.fire({
+            title: "Round Result",
+            text: `${resultMsg}\nHome: ${data.lastResult.homeCard} | Away: ${data.lastResult.awayCard}`,
+            icon: data.lastResult.winner ? "success" : "info",
+            timer: 3000,
+            showConfirmButton: false
+          });
+        }
+
+        if(round > maxRounds) {
+          endGame();
+        }
+      });
+
+      playBtn.addEventListener("click", async () => {
+        if(roundProcessing) return;
+        roundProcessing = true;
+        playBtn.disabled = true;
+
+        try {
+          const myCardValue = cardValues[Math.floor(Math.random() * cardValues.length)];
+
+          await update(ref(db, `rooms/${roomId}`), {
+            [`${role}Card`]: {
+              uid: myUid,
+              value: myCardValue
+            },
+            turn: role === "home" ? "away" : "home"
+          });
+
+          const snap = await get(ref(db, `rooms/${roomId}`));
+          const data = snap.val();
+
+          if(data.homeCard && data.awayCard && data.round === round) {
+            if(!data.score) data.score = { home: 0, away: 0 };
+
+            let roundWinner = null;
+            if(data.homeCard.value > data.awayCard.value) {
+              data.score.home += 1;
+              roundWinner = "home";
+            } else if(data.awayCard.value > data.homeCard.value) {
+              data.score.away += 1;
+              roundWinner = "away";
+            }
+
+            await update(ref(db, `rooms/${roomId}`), {
+              score: data.score,
+              round: round + 1,
+              homeCard: null,
+              awayCard: null,
+              turn: "home",
+              lastResult: {
+                round: round,
+                homeCard: data.homeCard.value,
+                awayCard: data.awayCard.value,
+                winner: roundWinner
+              }
+            });
+
+            round += 1;
+            if(round > maxRounds) {
+              setTimeout(endGame, 3000);
+            }
+          }
+        } catch (e) {
+          console.error("Error:", e);
+          await Swal.fire("Error playing card");
+          playBtn.disabled = false;
+        }
+        roundProcessing = false;
+      });
+
+      function endGame() {
+        playBtn.disabled = true;
+        // Determine winner
+        let msg = "";
+        let icon = "info";
+        if(scoreHome > scoreAway) {
+          msg = "Home Player Wins!";
+          icon = "success";
+        } else if(scoreAway > scoreHome) {
+          msg = "Away Player Wins!";
+          icon = "success";
+        } else {
+          msg = "It's a Draw!";
+          icon = "info";
+        }
+        Swal.fire({
+          title: "Game Over",
+          text: msg,
+          icon: icon,
+          confirmButtonText: "OK"
+        }).then(() => {
+          location.href = "search.html";
+        });
+      }
+    });
+  </script>
+</body>
+</html>

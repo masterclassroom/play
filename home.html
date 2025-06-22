@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://i.imgur.com/5G4MEbt.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    .top-bar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+    .top-bar h1 {
+      flex: 1;
+      text-align: center;
+      margin: 0;
+      font-size: 22px;
+      color: white;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s, background 0.2s;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .card:hover {
+      transform: scale(1.05);
+      background: rgba(0, 0, 0, 0.85);
+    }
+    .card a {
+      text-decoration: none;
+      color: white;
+      display: block;
+    }
+    .icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    .logout-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 24px;
+      background: crimson;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      background: #e60000;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <img id="myLogo" src="default.png" alt="Me" title="Profile-kaaga">
+    <h1>🏠 Home</h1>
+  </div>
+
+  <div class="grid">
+    <div class="card"><a href="information.html"><div class="icon">👤</div>My Information</a></div>
+    <div class="card"><a href="ranking.html"><div class="icon">🏆</div>Cup ranking </a></div>
+    <div class="card"><a href="room.html"><div class="icon">🤝</div>Friend Match</a></div>
+    <div class="card"><a href="online.html"><div class="icon">🌐</div>Online Match</a></div>
+    <div class="card"><a href="mystats.html"><div class="icon">📊</div>Records</a></div>
+    <div class="card"><a href="friends.html"><div class="icon">👥</div>Friends</a></div>
+    <div class="card"><a href="coins.html"><div class="icon">💰</div>Earn Coins</a></div>
+    <div class="card"><a href="Buycoins.html"><div class="icon">🛒</div>Buy Coins</a></div>
+    <div class="card"><a href="deletion.html"><div class="icon">❌</div>Account Deletion</a></div>
+    <div class="card"><a href="Notification.html"><div class="icon">🔔</div>Notification</a></div>
+    <div class="card"><a href="question.html"><div class="icon">❓</div>Q&A</a></div>
+    <div class="card"><a href="injury.html"><div class="icon">🩹</div>Help</a></div>
+  </div>
+
+  <button class="logout-btn" id="logbtn">🚪 Log Out</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const database = getDatabase(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return (window.location.href = "login.html");
+
+      const uid = user.uid;
+      const userRef = ref(database, `users/${uid}`);
+      const snap = await get(userRef);
+      const data = snap.val() || {};
+
+      // Haddii aan la claimed → siiyo 50 coins + claimed:true
+      if (!data.claimed) {
+        await update(userRef, {
+          coins: (data.coins || 0) + 50,
+          claimed: true
+        });
+        alert("🎉 Waad heshay 50 coins bilaash ah!");
+      }
+
+      // Haddii aan pinned jirin → redirect pin.html
+      if (data.pinned) return (window.location.href = "pin.html");
+
+      // Ku dar profile image
+      const logo = data.logo || "default";
+      document.getElementById("myLogo").src = `${logo}.png`;
+      document.getElementById("myLogo").onclick = () => {
+        window.location.href = `profile.html?uid=${uid}`;
+      };
+
+      // Logout
+      const logoutBtn = document.getElementById('logbtn');
+    logoutBtn.addEventListener('click', async () => {
+      await set(ref(database, `users/${user.uid}/isLoggedIn`), false);
+
+      // Haddii uu jiray users/uid/active
+      const outRef = ref(database, `users/${user.uid}/active`);
+      const snapshot = await get(outRef);
+      if (snapshot.exists()) {
+        await set(ref(database, `users/${user.uid}/pinned`), {
+          pinned: null
+        });
+      }
+
+      // Sign out
+      signOut(auth)
+        .then(() => {
+          alert("Signed out successfully");
+          window.location.href = "login.html";
+        })
+        .catch((error) => {
+          console.error("Error signing out: ", error.message);
+        });
+    });
+  });
+  </script>
+</body>
+</html>

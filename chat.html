@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html><html lang="so">  <head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
+  <title>Chat</title>  
+  <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      background: #1e272e;  
+      color: white;  
+      margin: 0;  
+      padding: 0;  
+      display: flex;  
+      flex-direction: column;  
+      height: 100vh;  
+    }  
+    .header {  
+      padding: 15px;  
+      background: #485460;  
+      display: flex;  
+      align-items: center;  
+      gap: 15px;  
+      cursor: pointer;  
+    }  
+    .header img {  
+      width: 50px;  
+      height: 50px;  
+      border-radius: 50%;  
+      object-fit: cover;  
+    }  
+    .chat-box {  
+      flex: 1;  
+      overflow-y: auto;  
+      padding: 15px;  
+      display: flex;  
+      flex-direction: column;  
+      gap: 10px;  
+    }  
+    .msg {  
+      max-width: 70%;  
+      padding: 10px;  
+      border-radius: 10px;  
+      word-wrap: break-word;  
+      position: relative;  
+    }  
+    .mine {  
+      background: #00cec9;  
+      align-self: flex-end;  
+    }  
+    .theirs {  
+      background: #636e72;  
+      align-self: flex-start;  
+    }  
+    .input-area {  
+      display: flex;  
+      border-top: 1px solid #333;  
+    }  
+    input {  
+      flex: 1;  
+      padding: 12px;  
+      border: none;  
+      outline: none;  
+      background: #2f3640;  
+      color: white;  
+    }  
+    button {  
+      padding: 12px 20px;  
+      background: #00b894;  
+      border: none;  
+      color: white;  
+      cursor: pointer;  
+    }  
+    button:hover {  
+      background: #00d29b;  
+    }  
+  </style>  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>  
+</head>  
+<body>  <div class="header" id="friendHeader">  
+    <img id="friendPic" src="default.png" alt="Friend">  
+    <div id="friendName">Loading...</div>  
+  </div>  <div class="chat-box" id="chatBox"></div>  <div class="input-area">  
+    <input type="text" id="messageInput" placeholder="Type a message...">  
+    <button id="sendBtn">Send</button>  
+  </div>  <script type="module">  
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";  
+    import { getDatabase, ref, push, onChildAdded, remove, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";  
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";  const firebaseConfig = {  
+  apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",  
+  authDomain: "exam-81b90.firebaseapp.com",  
+  databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",  
+  projectId: "exam-81b90",  
+  storageBucket: "exam-81b90.appspot.com",  
+  messagingSenderId: "461178422237",  
+  appId: "1:461178422237:web:8433ab42b524b0a17bac34"  
+};  
+
+const app = initializeApp(firebaseConfig);  
+const db = getDatabase(app);  
+const auth = getAuth();  
+
+const chatBox = document.getElementById('chatBox');  
+const input = document.getElementById('messageInput');  
+const sendBtn = document.getElementById('sendBtn');  
+const friendPic = document.getElementById('friendPic');  
+const friendName = document.getElementById('friendName');  
+const friendHeader = document.getElementById('friendHeader');  
+
+const urlParams = new URLSearchParams(location.search);  
+const friendUid = urlParams.get('uid');  
+let meUid = null;  
+let chatId = null;  
+let holdTimer;  
+
+if (!friendUid) location.href = 'friends.html';  
+
+onAuthStateChanged(auth, async (user) => {  
+  if (!user) return location.href = "login.html";  
+  meUid = user.uid;  
+
+  const snap = await get(ref(db, `users/${friendUid}`));  
+  const { username = "Friend", logo = "default" } = snap.val() || {};  
+  friendName.innerText = username;  
+  friendPic.src = `${logo}.png`;  
+  friendHeader.onclick = () => location.href = `profile.html?uid=${friendUid}`;  
+
+  chatId = meUid < friendUid ? `${meUid}_${friendUid}` : `${friendUid}_${meUid}`;  
+  const chatRef = ref(db, `chats/${chatId}`);  
+
+  onChildAdded(chatRef, (snap) => {  
+    const data = snap.val();  
+    const msg = document.createElement('div');  
+    msg.className = `msg ${data.from === meUid ? 'mine' : 'theirs'}`;  
+    msg.innerText = data.text;  
+
+    if (data.from === meUid) {  
+      const holdHandler = () => {  
+        Swal.fire({  
+          title: 'Delete Message?',  
+          text: "Do you want to delete this message?",  
+          icon: 'warning',  
+          showCancelButton: true,  
+          confirmButtonText: 'Yes, delete it!',  
+          cancelButtonText: 'Cancel'  
+        }).then(async (result) => {  
+          if (result.isConfirmed) {  
+            await remove(ref(db, `chats/${chatId}/${snap.key}`));  
+            msg.remove();  
+          }  
+        });  
+      };  
+
+      msg.ontouchstart = () => {  
+        holdTimer = setTimeout(holdHandler, 600);  
+      };  
+      msg.ontouchend = () => clearTimeout(holdTimer);  
+
+      msg.onmousedown = (e) => {  
+        if (e.button === 0) {  
+          holdTimer = setTimeout(holdHandler, 600);  
+        }  
+      };  
+      msg.onmouseup = () => clearTimeout(holdTimer);  
+      msg.onmouseleave = () => clearTimeout(holdTimer);  
+    }  
+
+    chatBox.appendChild(msg);  
+    chatBox.scrollTop = chatBox.scrollHeight;  
+  });  
+
+  sendBtn.onclick = async () => {  
+    const text = input.value.trim();  
+    if (text === '') return;  
+    const newMsg = {  
+      from: meUid,  
+      text,  
+      timestamp: Date.now()  
+    };  
+    await push(ref(db, `chats/${chatId}`), newMsg);  
+    input.value = '';  
+  };  
+});
+
+</script></body>
+
+</html>

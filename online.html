@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turub Match – Matchmaking</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { background: #000; color: white; font-family: 'Arial', sans-serif; text-align: center; padding: 20px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+    select, button {
+      font-size: 18px;
+      padding: 12px;
+      margin: 15px auto;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: block;
+      transition: all 0.3s ease;
+    }
+    select { background: #222; color: white; border: 1px solid #444; }
+    #createBtn { background: #28a745; color: white; }
+    #createBtn:hover { background: #218838; transform: translateY(-2px); }
+    #joinBtn { background: #007bff; color: white; }
+    #joinBtn:hover { background: #0069d9; transform: translateY(-2px); }
+    #coinsDisplay, #statusText, #roleInfo {
+      font-size: 20px;
+      margin: 20px;
+      color: #ffcc00;
+      font-weight: bold;
+    }
+    .loading { color: #aaa; font-style: italic; }
+    .error { color: #ff4444; }
+    .success { color: #00C851; }
+    .container {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #4CAF50;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .loading-spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 4px solid #007bff;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Online Turub Match</h1>
+    <div id="coinsDisplay">Coins: 0</div>
+
+    <select id="stakeCoins">
+      <option value="10">10 Coins</option>
+      <option value="20">20 Coins</option>
+      <option value="30">30 Coins</option>
+      <option value="40">40 Coins</option>
+      <option value="50">50 Coins</option>
+    </select>
+
+    <button id="createBtn">Create Turub Room</button>
+    <button id="joinBtn">Join Turub Room</button>
+    <button onclick="window.history.back()">Back</button>
+
+    <div class="loading-spinner" id="loadingSpinner"></div>
+    <div id="statusText"></div>
+    <div id="roleInfo"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, set, update, onValue, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    let myUid = null;
+    let myCoins = 0;
+
+    const stakeSelect = document.getElementById("stakeCoins");
+    const coinsDisplay = document.getElementById("coinsDisplay");
+    const statusText = document.getElementById("statusText");
+    const roleInfo = document.getElementById("roleInfo");
+    const createBtn = document.getElementById("createBtn");
+    const joinBtn = document.getElementById("joinBtn");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    function updateCoinsDisplay(coins) {
+      myCoins = coins;
+      coinsDisplay.innerText = `Coins: ${myCoins}`;
+    }
+
+    function setLoading(loading) {
+      createBtn.disabled = loading;
+      joinBtn.disabled = loading;
+      loadingSpinner.style.display = loading ? 'block' : 'none';
+    }
+
+    function showStatus(message, type = "") {
+      statusText.innerText = message;
+      statusText.className = type;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
+      myUid = user.uid;
+      const coinsSnap = await get(ref(db, `users/${myUid}/coins`));
+      updateCoinsDisplay(coinsSnap.exists() ? coinsSnap.val() : 0);
+    });
+
+    createBtn.addEventListener("click", async () => {
+      const stake = +stakeSelect.value;
+      if (myCoins < stake) return showStatus("❌ Not enough coins.", "error");
+
+      const roomSnap = await get(ref(db, `rooms/${myUid}`));
+      if (roomSnap.exists()) {
+        const r = roomSnap.val();
+        const result = await Swal.fire({
+          title: "Room Exists!",
+          text: `You already have a room with ${r.stake} coins stake.`,
+          showCancelButton: true,
+          confirmButtonText: "Join Room",
+          cancelButtonText: "Delete Room",
+          icon: "warning"
+        });
+
+        if (result.isConfirmed) {
+          location.href = `game.html?room=${myUid}&role=home&stake=${r.stake}`;
+        } else {
+          await remove(ref(db, `rooms/${myUid}`));
+          showStatus("✅ Room deleted.", "success");
+        }
+        return;
+      }
+
+      await set(ref(db, `rooms/${myUid}`), {
+        home: myUid,
+        away: null,
+        stake,
+        status: "waiting",
+        createdAt: Date.now()
+      });
+
+      await update(ref(db, `users/${myUid}`), { coins: myCoins - stake });
+      showStatus("🕓 Waiting for opponent to join...", "loading");
+      roleInfo.innerText = "You are Home (You start first)";
+
+      onValue(ref(db, `rooms/${myUid}/away`), (snap) => {
+        if (snap.exists() && snap.val()) {
+          location.href = `game.html?room=${myUid}&role=home&stake=${stake}`;
+        }
+      });
+    });
+
+    joinBtn.addEventListener("click", async () => {
+      const stake = +stakeSelect.value;
+      if (myCoins < stake) return showStatus("❌ Not enough coins.", "error");
+
+      const roomsSnap = await get(ref(db, "rooms"));
+      const rooms = roomsSnap.val() || {};
+      let found = false;
+
+      for (const id in rooms) {
+        const r = rooms[id];
+        if (r.status === "waiting" && !r.away && id !== myUid) {
+          await update(ref(db, `rooms/${id}`), {
+            away: myUid,
+            status: "playing"
+          });
+          await update(ref(db, `users/${myUid}`), { coins: myCoins - stake });
+          location.href = `game.html?room=${id}&role=away&stake=${stake}`;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        showStatus("❗ No available rooms. Try creating one.", "error");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ranking Players</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    #sortSelect, #searchInput {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      margin: 5px;
+      width: 260px;
+      max-width: 90%;
+    }
+    .user-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 10px auto;
+      max-width: 500px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .user-card:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #00cec9;
+    }
+    .user-info {
+      text-align: left;
+      flex: 1;
+    }
+    .rank-number {
+      font-weight: bold;
+      font-size: 18px;
+      color: #00cec9;
+    }
+    .button-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 20px;
+      border-radius: 12px;
+      z-index: 1000;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: 2px solid #74b9ff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: transparent;
+      margin: 10px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background-color: #0984e3;
+      border-color: #0984e3;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <h2>📊 Ranking Players</h2>
+
+  <select id="sortSelect">
+    <option value="wins">Sort by Wins</option>
+    <option value="played">Sort by Played</option>
+    <option value="totalcoinswon">Sort by Coins Won</option>
+  </select>
+
+  <input type="text" id="searchInput" placeholder="Search username...">
+
+  <div id="rankingList"></div>
+
+  <div class="button-container">
+    <button class="btn" onclick="location.href='mystats.html'">My Stats</button>
+    <button class="btn" onclick="location.href='home.html'">Home</button>
+    <button class="btn" id="myRankBtn">⭐ My Ranking</button>
+    
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    let allUsers = [];
+    let myUid = null;
+    let currentSortBy = "wins";
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        await Swal.fire("Login first");
+        location.href = "login.html";
+        return;
+      }
+
+      myUid = user.uid;
+      const usersRef = ref(db, "users");
+      const usersSnap = await get(usersRef);
+
+      if (!usersSnap.exists()) return;
+
+      usersSnap.forEach(childSnap => {
+        const uid = childSnap.key;
+        const data = childSnap.val();
+        if (data.stats && data.username) {
+          allUsers.push({
+            uid,
+            username: data.username,
+            logo: data.logo || "default",
+            ...data.stats
+          });
+        }
+      });
+
+      sortAndRender();
+    });
+
+    function sortAndRender() {
+      const sorted = [...allUsers].sort((a, b) => (b[currentSortBy] || 0) - (a[currentSortBy] || 0));
+      renderList(sorted);
+    }
+
+    function renderList(users) {
+      const container = document.getElementById("rankingList");
+      container.innerHTML = "";
+
+      users.forEach((user, index) => {
+        const div = document.createElement("div");
+        div.className = "user-card";
+        div.setAttribute("data-uid", user.uid);
+        div.setAttribute("onclick", `location.href='profile.html?uid=${user.uid}'`);
+
+        div.innerHTML = `
+          <img src="${user.logo}.png" class="avatar" alt="Avatar">
+          <div class="rank-number">${index + 1}</div>
+          <div class="user-info">
+            <strong>${user.username}</strong><br>
+            Wins: ${user.wins || 0} | Played: ${user.played || 0} | Losses: ${user.losses || 0} | Coins Won: ${user.totalcoinswon || 0}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById("sortSelect").addEventListener("change", e => {
+      currentSortBy = e.target.value;
+      sortAndRender();
+    });
+
+    document.getElementById("searchInput").addEventListener("input", e => {
+      const val = e.target.value.toLowerCase();
+      const filtered = allUsers
+        .filter(u => u.username.toLowerCase().includes(val))
+        .sort((a, b) => (b[currentSortBy] || 0) - (a[currentSortBy] || 0));
+      renderList(filtered);
+    });
+
+    document.getElementById("myRankBtn").addEventListener("click", () => {
+      const cards = document.querySelectorAll(".user-card");
+      for (let card of cards) {
+        if (card.getAttribute("data-uid") === myUid) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.border = "2px solid yellow";
+          setTimeout(() => card.style.border = "", 2000);
+          break;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
