@@ -80,15 +80,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
             signUpDate: new Date().toISOString()
         });
 
-        await sendEmailVerification(user);
-
         showSuccess("success_account_created");
-
-        if (localStorage.getItem("1")) {
-            localStorage.setItem("2", "true");
-        } else {
-            localStorage.setItem("1", "true");
-        }
 
         setTimeout(() => {
             window.location.href = "login.html";
@@ -208,11 +200,3 @@ function switchLanguage(lang) {
 // Default language and account limit checker
 switchLanguage(currentLanguage);
 checkLimit();
-
-function checkLimit() {
-    const signUpBtn = document.getElementById("signUpBtn");
-    if (localStorage.getItem("2")) {
-        showError("limited_reached");
-        signUpBtn.disabled = true;
-    }
-                                                      }
