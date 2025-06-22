@@ -76,7 +76,7 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
         const user = userCredential.user;
 
         await set(ref(database, `users/${user.uid}`), {
-            username, email, country, number, Pin: pin, pinned: true,
+            username, email, country, number, Pin: pin, pinned: true, logo: country,
             signUpDate: new Date().toISOString()
         });
 
