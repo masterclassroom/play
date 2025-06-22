@@ -79,6 +79,15 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
             username, email, country, number, Pin: pin, pinned: true, logo: country,
             signUpDate: new Date().toISOString()
         });
+      await set(ref(database, `users/${user.uid/stats}`) {
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        totalcoinswon: 0,
+          played:0
+      });
+        
+                
 
         showSuccess("success_account_created");
 
