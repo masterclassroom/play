@@ -138,7 +138,7 @@ document.getElementById("jecker").addEventListener("click", async () => {
       await set(pinRef, { pinned: null });
       showAlert("Pin is correct! Redirecting...", "success");
       setTimeout(() => {
-        window.location.href = "dashboard.html";
+        window.location.href = "home.html";
       }, 1500);
     } else {
       showAlert("Incorrect pin!", "error");
