@@ -180,7 +180,7 @@
 
       if(!roomId || !role) {
         await Swal.fire("Invalid game parameters");
-        return location.href = "search.html";
+        return location.href = "home.html";
       }
 
       roleEl.innerText = `Role: ${role}`;
@@ -199,7 +199,7 @@
       roomListenerUnsub = onValue(roomRef, async snap => {
         if(!snap.exists()) {
           await Swal.fire("Game ended or room deleted");
-          return location.href = "search.html";
+          return location.href = "home.html";
         }
         const data = snap.val();
 
