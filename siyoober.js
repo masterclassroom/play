@@ -76,16 +76,23 @@ document.getElementById('signUpBtn').addEventListener('click', async () => {
         const user = userCredential.user;
 
         await set(ref(database, `users/${user.uid}`), {
-            username, email, country, number, Pin: pin, pinned: true, logo: country,
-            signUpDate: new Date().toISOString()
-        });
-      await set(ref(database, `users/${user.uid}/stats`) {
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        totalcoinswon: 0,
-          played:0
-      });
+  username,
+  email,
+  country,
+  number,
+  Pin: pin,
+  pinned: true,
+  logo: country,
+  signUpDate: new Date().toISOString()
+});
+
+await set(ref(database, `users/${user.uid}/stats`), {
+  wins: 0,
+  losses: 0,
+  draws: 0,
+  totalcoinswon: 0,
+  played: 0
+});
         
                 
 
