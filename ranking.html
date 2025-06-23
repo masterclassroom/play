@@ -165,26 +165,32 @@
     }
 
     function renderList(users) {
-      const container = document.getElementById("rankingList");
-      container.innerHTML = "";
+  const container = document.getElementById("rankingList");
+  container.innerHTML = "";
 
-      users.forEach((user, index) => {
-        const div = document.createElement("div");
-        div.className = "user-card";
-        div.setAttribute("data-uid", user.uid);
-        div.setAttribute("onclick", `location.href='Profile.html?uid=${user.uid}'`);
+  users.forEach((user, index) => {
+    const div = document.createElement("div");
+    div.className = "user-card";
+    div.setAttribute("data-uid", user.uid);
+    div.setAttribute("onclick", `location.href='Profile.html?uid=${user.uid}'`);
 
-        div.innerHTML = `
-          <img src="${user.logo}.png" class="avatar" alt="Avatar">
-          <div class="rank-number">${index + 1}</div>
-          <div class="user-info">
-            <strong>${user.username}</strong><br>
-            Wins: ${user.wins || 0} | Played: ${user.played || 0} | draw: ${user.draws || 0} |  Losses: ${user.losses || 0} |  Coins Won: ${user.totalcoinswon || 0}
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
+    // Set medal emoji for top 3
+    let rankIcon = "";
+    if (index === 0) rankIcon = "🥇 ";
+    else if (index === 1) rankIcon = "🥈 ";
+    else if (index === 2) rankIcon = "🥉 ";
+
+    div.innerHTML = `
+      <img src="${user.logo}.png" class="avatar" alt="Avatar">
+      <div class="rank-number">${rankIcon}${index + 1}</div>
+      <div class="user-info">
+        <strong>${user.username}</strong><br>
+        Wins: ${user.wins || 0} | Played: ${user.played || 0} | draw: ${user.draws || 0} |  Losses: ${user.losses || 0} |  Coins Won: ${user.totalcoinswon || 0}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
 
     document.getElementById("sortSelect").addEventListener("change", e => {
       currentSortBy = e.target.value;
