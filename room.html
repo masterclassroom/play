@@ -69,10 +69,11 @@
         host: currentUser.uid,
         round: 0,
         stake: 10,
+        home: currentUser.uid,
         createdAt: Date.now(),
         type: "friendmatch"
       });
-      location.href = `game.html?room=${roomId}&role=home&stake=10`;
+      location.href = `kulan.html?room=${roomId}&role=home&stake=10`;
     };
 
     joinBtn.onclick = async () => {
@@ -99,16 +100,19 @@
       const logo = userSnap.val()?.logo || "default";
 
       Swal.fire({
-        title: `Join ${username}'s Room?`,
-        html: `<img src="${logo}.png" style="width:70px;height:70px;border-radius:50%"><p>${username}</p>`,
-        showCancelButton: true,
-        confirmButtonText: 'Join Game',
-        cancelButtonText: 'Cancel'
-      }).then(res => {
-        if (res.isConfirmed) {
-          location.href = `game.html?room=${roomId}&role=away&stake=10`;
-        }
-      });
+  title: `Join ${username}'s Room?`,
+  html: `<img src="${logo}.png" style="width:70px;height:70px;border-radius:50%"><p>${username}</p>`,
+  showCancelButton: true,
+  confirmButtonText: 'Join Game',
+  cancelButtonText: 'Cancel'
+}).then(async res => {
+  if (res.isConfirmed) {
+    await set(ref(db, `rooms/${roomId}/away`), currentUser.uid);
+    setTimeout(() => {
+    location.href = `kulan.html?room=${roomId}&role=away&stake=10`;
+    },1000);
+  }
+});
     };
   </script>
 </body>
