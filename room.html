@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Friend Match</title>
+  <title>Room Match</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
@@ -11,32 +11,59 @@
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
     }
-    button {
-      padding: 14px 30px;
-      font-size: 18px;
-      margin: 15px;
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 10px;
+    }
+    .copy-btn, .ready-btn {
+      padding: 10px 20px;
+      font-size: 16px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      background-color: #00cec9;
+    }
+    .copy-btn {
+      background-color: #3498db;
       color: white;
     }
-    button:hover {
-      background-color: #01a3a4;
+    .ready-btn {
+      background-color: #00cec9;
+      color: white;
+      margin-top: 15px;
+    }
+    #playersCount, #timer {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #f1c40f;
     }
   </style>
 </head>
 <body>
-  <h1>Friend Match</h1>
-  <button id="createBtn">Create Room</button>
-  <button id="joinBtn">Join Room</button>
-  <button onclick="window.history.back()">Back</button>
+  <h1>Room Match</h1>
+  <p>Room ID: <span id="roomIdText"></span></p>
+  <button class="copy-btn" onclick="copyRoomId()">Copy Room ID</button>
+  <button class="copy-btn" id="backBtn">Back</button>
+
+  <div>
+    <img id="homeProfile" src="default.png" alt="Home" />
+    <img id="awayProfile" src="default.png" alt="Away" />
+  </div>
+  <div>
+    <p id="homeName">Home: Waiting...</p>
+    <p id="awayName">Away: Waiting...</p>
+  </div>
+
+  <button class="ready-btn" id="readyBtn">I'm Ready</button>
+  <p id="playersCount">Players Ready: 0/2</p>
+  <p id="timer">Time Left: 120s</p>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -53,66 +80,186 @@
     const db = getDatabase(app);
     const auth = getAuth();
 
-    const createBtn = document.getElementById('createBtn');
-    const joinBtn = document.getElementById('joinBtn');
+    const urlParams = new URLSearchParams(location.search);
+    const roomId = urlParams.get("room");
+    const role = urlParams.get("role");
+
+    const roomIdText = document.getElementById("roomIdText");
+    const homeProfile = document.getElementById("homeProfile");
+    const awayProfile = document.getElementById("awayProfile");
+    const homeName = document.getElementById("homeName");
+    const awayName = document.getElementById("awayName");
+    const readyBtn = document.getElementById("readyBtn");
+    const playersCount = document.getElementById("playersCount");
+    const timerEl = document.getElementById("timer");
+    const backBtn = document.getElementById("backBtn");
+
+    roomIdText.innerText = roomId;
 
     let currentUser = null;
+    let seconds = 120;
+    let timerStarted = false;
+    let timerInterval = null;
 
-    onAuthStateChanged(auth, user => {
+    const roomRef = ref(db, `rooms/${roomId}`);
+
+    onAuthStateChanged(auth, async (user) => {
       if (!user) return location.href = "login.html";
       currentUser = user;
-    });
+      const myUid = currentUser.uid;
 
-    createBtn.onclick = async () => {
-      const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
-      await set(ref(db, `rooms/${roomId}`), {
-        host: currentUser.uid,
-        round: 0,
-        stake: 10,
-        home: currentUser.uid,
-        createdAt: Date.now(),
-        type: "friendmatch"
-      });
-      location.href = `kulan.html?room=${roomId}&role=home&stake=10`;
-    };
-
-    joinBtn.onclick = async () => {
-      const { value: roomId } = await Swal.fire({
-        title: 'Enter Room ID',
-        input: 'text',
-        inputLabel: 'Room Code',
-        inputPlaceholder: 'Enter 8-digit Room ID',
-        inputAttributes: { maxlength: 8 },
-        confirmButtonText: 'Check Room',
-        showCancelButton: true
-      });
-
-      if (!roomId) return;
-
-      const roomSnap = await get(ref(db, `rooms/${roomId}`));
-      if (!roomSnap.exists()) {
-        return Swal.fire("No room found", "", "error");
+      if (!roomId || !role) {
+        await Swal.fire("Invalid game parameters");
+        return location.href = "matchmaking.html";
       }
 
-      const hostUid = roomSnap.val().host;
-      const userSnap = await get(ref(db, `users/${hostUid}`));
-      const username = userSnap.val()?.username || "Unknown";
-      const logo = userSnap.val()?.logo || "default";
+      // Save current user role uid in room
+      await set(ref(db, `rooms/${roomId}/${role}`), myUid);
 
-      Swal.fire({
-  title: `Join ${username}'s Room?`,
-  html: `<img src="${logo}.png" style="width:70px;height:70px;border-radius:50%"><p>${username}</p>`,
-  showCancelButton: true,
-  confirmButtonText: 'Join Game',
-  cancelButtonText: 'Cancel'
-}).then(async res => {
-  if (res.isConfirmed) {
-    await set(ref(db, `rooms/${roomId}/away`), currentUser.uid);
-    setTimeout(() => {
-    location.href = `kulan.html?room=${roomId}&role=away&stake=10`;
-    },1000);
-  }
-});
+      // Set current user profile image and name
+      const meSnap = await get(ref(db, `users/${myUid}`));
+      if (meSnap.exists()) {
+        const me = meSnap.val();
+        const image = me.logo ? `./${me.logo}.png` : "default.png";
+        const name = me.username || "Aniga";
+        if (role === "home") {
+          homeProfile.src = image;
+          homeName.innerText = `Home: ${name}`;
+        } else {
+          awayProfile.src = image;
+          awayName.innerText = `Away: ${name}`;
+        }
+      }
+
+      // Watch opponent profile changes realtime
+      const otherRole = role === "home" ? "away" : "home";
+      onValue(ref(db, `rooms/${roomId}/${otherRole}`), async (snap) => {
+        const otherUid = snap.val();
+        if (otherUid) {
+          const otherSnap = await get(ref(db, `users/${otherUid}`));
+          if (otherSnap.exists()) {
+            const other = otherSnap.val();
+            const image = other.logo ? `./${other.logo}.png` : "default.png";
+            const name = other.username || "Saaxiib";
+            if (role === "home") {
+              awayProfile.src = image;
+              awayName.innerText = `Away: ${name}`;
+            } else {
+              homeProfile.src = image;
+              homeName.innerText = `Home: ${name}`;
+            }
+          }
+        }
+      });
+
+      // Listen to room data changes
+      onValue(roomRef, async (snap) => {
+        if (!snap.exists()) {
+          await Swal.fire("Match room closed");
+          location.href = "matchmaking.html";
+          return;
+        }
+        const data = snap.val();
+
+        // Check if current user still in the room
+        if (data.home !== myUid && data.away !== myUid) {
+          await Swal.fire({
+            icon: "warning",
+            title: "You are no longer in this game",
+            confirmButtonText: "OK"
+          });
+          location.href = "matchmaking.html";
+          return;
+        }
+
+        // Update players ready count
+        const r1 = data.homeReady ? 1 : 0;
+        const r2 = data.awayReady ? 1 : 0;
+        playersCount.innerText = `Players Ready: ${r1 + r2}/2`;
+
+        // Start timer if at least one player ready & timer not started
+        if ((r1 + r2) >= 1 && !timerStarted) {
+          timerStarted = true;
+          timerInterval = setInterval(() => {
+            seconds--;
+            if (seconds >= 0) {
+              timerEl.innerText = `Time Left: ${seconds}s`;
+            } else {
+              timerEl.innerText = "Time's up!";
+              clearInterval(timerInterval);
+
+              // If both ready, start game
+              if (data.homeReady && data.awayReady && data.type === "friendmatch") {
+                const myRole = data.host === currentUser.uid ? "home" : "away";
+                location.href = `game.html?room=${roomId}&role=${myRole}&stake=10`;
+              }
+            }
+          }, 1000);
+        }
+
+        // If both players ready & time > 0, redirect immediately
+        if (data.homeReady && data.awayReady && data.type === "friendmatch" && seconds > 0) {
+          clearInterval(timerInterval);
+          const myRole = data.host === currentUser.uid ? "home" : "away";
+          location.href = `game.html?room=${roomId}&role=${myRole}&stake=10`;
+        }
+      });
+
+      // Ready button click
+      readyBtn.onclick = async () => {
+        await set(ref(db, `rooms/${roomId}/${role}Ready`), true);
+        Swal.fire({
+          title: "Ready!",
+          text: "Waiting for opponent...",
+          icon: "info",
+          showCancelButton: true,
+          confirmButtonText: "Cancel",
+          cancelButtonText: "Close",
+          preConfirm: () => {
+            return set(ref(db, `rooms/${roomId}/${role}Ready`), false);
+          }
+        });
+      };
+
+      // Back button click
+      backBtn.onclick = async () => {
+        if (role === "away") {
+          const res = await Swal.fire({
+            title: "Are you sure?",
+            text: "Leave the room?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, leave"
+          });
+          if (res.isConfirmed) {
+            await set(ref(db, `rooms/${roomId}/away`), null);
+            await set(ref(db, `rooms/${roomId}/awayReady`), null);
+            setTimeout(() => {
+              history.back();
+            }, 1000);
+          }
+        } else if (role === "home") {
+          const res = await Swal.fire({
+            title: "Are you sure?",
+            text: "Close this room?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, close"
+          });
+          if (res.isConfirmed) {
+            await set(ref(db, `rooms/${roomId}`), null);
+            setTimeout(() => {
+              history.back();
+            }, 1000);
+          }
+        }
+      };
+    });
+
+    // Copy room ID to clipboard
+    window.copyRoomId = () => {
+      navigator.clipboard.writeText(roomId);
+      Swal.fire("Copied!", "Room ID copied to clipboard", "success");
     };
   </script>
 </body>

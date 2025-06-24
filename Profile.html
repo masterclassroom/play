@@ -62,6 +62,14 @@
     #messageBtn:hover {
       background-color: #a29bfe;
     }
+    #followBtn {
+      background-color: #fd79a8;
+      display: none;
+      margin-top: 10px;
+    }
+    #followBtn:hover {
+      background-color: #e84393;
+    }
     #avatarOptions {
       margin-top: 20px;
       display: none;
@@ -89,14 +97,13 @@
     <img src="avatars/default.png" alt="Avatar" class="avatar" id="avatarImg" title="User Avatar" />
 
     <div id="avatarOptions">
-      <img src="avatars/avatar1.png" data-avatar="Somaliland" alt="Somaliland">
-      <img src="avatars/avatar2.png" data-avatar="Somalia" alt="Somalia">
-      <img src="avatars/avatar3.png" data-avatar="Djibouti" alt="Djibouti">
-      <img src="avatars/avatar4.png" data-avatar="Ethiopia" alt="Ethiopia">
-      <img src="avatars/avatar4.png" data-avatar="Uganda" alt="Uganda">
-      <img src="avatars/avatar4.png" data-avatar="Kenya" alt="Kenya">
-      <img src="avatars/avatar4.png" data-avatar="default" alt="default">
-      
+      <img src="avatars/avatar1.png" data-avatar="avatars/avatar1" alt="Somaliland">
+      <img src="avatars/avatar2.png" data-avatar="avatars/avatar2" alt="Somalia">
+      <img src="avatars/avatar3.png" data-avatar="avatars/avatar3" alt="Djibouti">
+      <img src="avatars/avatar4.png" data-avatar="avatars/avatar4" alt="Ethiopia">
+      <img src="avatars/avatar5.png" data-avatar="avatars/avatar5" alt="Uganda">
+      <img src="avatars/avatar6.png" data-avatar="avatars/avatar6" alt="Kenya">
+      <img src="avatars/default.png" data-avatar="avatars/default" alt="default">
     </div>
 
     <h2 id="usernameText">Loading...</h2>
@@ -104,16 +111,18 @@
     <div class="stat" id="playedText">Played: 0</div>
     <div class="stat" id="lossesText">Losses: 0</div>
     <div class="stat" id="coinsText">Coins Won: 0</div>
+    <div class="stat" id="followersText">Followers: 0</div>
 
     <button id="sendRequestBtn">Send Friend Request</button>
     <button id="messageBtn" style="display: none;">Message</button>
+    <button id="followBtn">Follow</button>
     <button id="myFriendsBtn">My Friends</button>
     <button class="back-btn" onclick="history.back()">⬅️ Back</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, update, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -139,15 +148,18 @@
     const playedText = document.getElementById("playedText");
     const lossesText = document.getElementById("lossesText");
     const coinsText = document.getElementById("coinsText");
+    const followersText = document.getElementById("followersText");
 
     const sendRequestBtn = document.getElementById("sendRequestBtn");
     const messageBtn = document.getElementById("messageBtn");
     const myFriendsBtn = document.getElementById("myFriendsBtn");
+    const followBtn = document.getElementById("followBtn");
 
     let currentUserUid = null;
     let profileUserUid = uidParam;
     let isCurrentUser = false;
     let friendsList = [];
+    let isFollowing = false;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -173,7 +185,7 @@
       }
       const userData = userSnap.val();
       const stats = userData.stats || {};
-      const logo = userData.logo || "default";
+      const logo = userData.logo || "avatars/default";
 
       avatarImg.src = `${logo}.png`;
       usernameText.innerText = userData.username || "Unknown";
@@ -182,14 +194,34 @@
       lossesText.innerText = `Losses: ${stats.losses || 0}`;
       coinsText.innerText = `Coins Won: ${stats.totalcoinswon || 0}`;
 
+      // Load friends list
       const friendsRef = ref(db, `friends/${currentUserUid}`);
       const friendsSnap = await get(friendsRef);
       friendsList = friendsSnap.exists() ? Object.keys(friendsSnap.val()) : [];
 
+      // Check friend requests
       const requestRef = ref(db, `friendRequests/${profileUserUid}/${currentUserUid}`);
       const requestSnap = await get(requestRef);
       const alreadyRequested = requestSnap.exists();
 
+      // Followers realtime update and follow button logic
+      const followersRef = ref(db, `followers/${profileUserUid}`);
+      onValue(followersRef, (snapshot) => {
+        const followersData = snapshot.val() || {};
+        const followerCount = Object.keys(followersData).length;
+        followersText.innerText = `Followers: ${followerCount}`;
+
+        isFollowing = currentUserUid in followersData;
+
+        if (isCurrentUser) {
+          followBtn.style.display = "none";
+        } else {
+          followBtn.style.display = "inline-block";
+          followBtn.innerText = isFollowing ? "Unfollow" : "Follow";
+        }
+      });
+
+      // Control visibility of send request and message buttons
       if (isCurrentUser) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "none";
@@ -207,6 +239,7 @@
         messageBtn.style.display = "none";
       }
 
+      // Avatar change UI for current user
       if (isCurrentUser) {
         avatarImg.style.cursor = "pointer";
         avatarImg.title = "Click to change avatar";
@@ -252,6 +285,27 @@
       } catch (e) {
         console.error(e);
         Swal.fire("Failed to send friend request");
+      }
+    });
+
+    followBtn.addEventListener("click", async () => {
+      if (!currentUserUid || !profileUserUid || isCurrentUser) return;
+
+      const followerUserRef = ref(db, `followers/${profileUserUid}/${currentUserUid}`);
+
+      try {
+        if (isFollowing) {
+          // Unfollow
+          await remove(followerUserRef);
+          Swal.fire("You unfollowed this user.");
+        } else {
+          // Follow
+          await set(followerUserRef, true);
+          Swal.fire("You followed this user.");
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire("Failed to update follow status.");
       }
     });
 

@@ -233,13 +233,26 @@ if (otherUidSnap.exists()) {
     };
 
     // Game logic starts
-    if(roomListenerUnsub) roomListenerUnsub();
-    roomListenerUnsub = onValue(roomRef, async snap => {
-      if(!snap.exists()) {
-        await Swal.fire("Game ended or room deleted");
-        return location.href = "home.html";
-      }
-      const data = snap.val();
+roomListenerUnsub = onValue(roomRef, async snap => {
+  if(!snap.exists()) {
+    await Swal.fire("Game ended or room deleted");
+    return location.href = "room.html";
+  }
+  const data = snap.val();
+
+  // ✅ Check if myUid is still part of the room
+  if (data.home !== myUid && data.away !== myUid) {
+    await Swal.fire({
+      icon: "warning",
+      title: "You are no longer in this game",
+      confirmButtonText: "OK"
+    });
+    location.href = "room.html";
+    return;
+  }
+
+  // Halkan waxa ku socda code-kii hore
+  
 
       if (data.type === "friendmatch") {
         friendRoomInfo.style.display = "block";
