@@ -169,6 +169,11 @@
       }
 
       currentUserUid = user.uid;
+      followersText.style.cursor = "pointer";
+followersText.style.textDecoration = "underline";
+followersText.addEventListener("click", () => {
+  window.location.href = `followers.html?uid=${profileUserUid}`;
+});
 
       if (!profileUserUid) {
         await Swal.fire("User ID missing");

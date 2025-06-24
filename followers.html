@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Followers</title>
+  <style>
+    body {
+      background: #1e272e;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .follower-card {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      margin: 10px auto;
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 400px;
+      cursor: pointer;
+      justify-content: space-between;
+    }
+    .follower-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #00cec9;
+    }
+    .followed-text {
+      font-size: 14px;
+      color: #00cec9;
+    }
+  #backBtn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 20px;
+  background-color: #636e72;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1000;
+}
+#backBtn:hover {
+  background-color: #b2bec3;
+  color: black;
+}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <h2>Followers</h2>
+  <div id="followersList">Loading...</div>
+  <button id="backBtn">⬅️ Back</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const uidParam = new URLSearchParams(location.search).get("uid");
+    const followersList = document.getElementById("followersList");
+
+    let currentUserUid = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        await Swal.fire("Fadlan gali koontadaada");
+        location.href = "login.html";
+        return;
+      }
+      currentUserUid = user.uid;
+
+      if (!uidParam) {
+        followersList.innerText = "User ID lama helin";
+        return;
+      }
+
+      const followersRef = ref(db, `followers/${uidParam}`);
+      onValue(followersRef, async (snap) => {
+        followersList.innerHTML = "";
+        if (!snap.exists()) {
+          followersList.innerText = "Followers ma jiro.";
+          return;
+        }
+
+        const followers = Object.keys(snap.val());
+
+        for (const followerUid of followers) {
+          const userRef = ref(db, `users/${followerUid}`);
+          const userSnap = await get(userRef);
+          if (!userSnap.exists()) continue;
+
+          const userData = userSnap.val();
+          const name = userData.username || "Unknown";
+          const logo = userData.logo || "avatars/default";
+
+          const currentUserFollowingSnap = await get(ref(db, `followers/${followerUid}/${currentUserUid}`));
+          const isFollowedByMe = currentUserFollowingSnap.exists();
+
+          const card = document.createElement("div");
+          card.className = "follower-card";
+          card.innerHTML = `
+            <div class="follower-info">
+              <img src="${logo}.png" class="avatar" alt="${name}" />
+              <div>
+                <div>${name}</div>
+                ${isFollowedByMe ? `<div class="followed-text">Followed</div>` : ""}
+              </div>
+            </div>
+          `;
+          card.addEventListener("click", () => {
+            window.location.href = `profile.html?uid=${followerUid}`;
+          });
+
+          followersList.appendChild(card);
+        }
+      });
+    });
+  document.getElementById("backBtn").addEventListener("click", () => {
+  window.history.back();
+});
+  </script>
+
+</body>
+</html>
