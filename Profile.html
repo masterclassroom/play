@@ -97,13 +97,13 @@
     <img src="avatars/default.png" alt="Avatar" class="avatar" id="avatarImg" title="User Avatar" />
 
     <div id="avatarOptions">
-      <img src="avatars/avatar1.png" data-avatar="avatars/avatar1" alt="Somaliland">
-      <img src="avatars/avatar2.png" data-avatar="avatars/avatar2" alt="Somalia">
-      <img src="avatars/avatar3.png" data-avatar="avatars/avatar3" alt="Djibouti">
-      <img src="avatars/avatar4.png" data-avatar="avatars/avatar4" alt="Ethiopia">
-      <img src="avatars/avatar5.png" data-avatar="avatars/avatar5" alt="Uganda">
-      <img src="avatars/avatar6.png" data-avatar="avatars/avatar6" alt="Kenya">
-      <img src="avatars/default.png" data-avatar="avatars/default" alt="default">
+      <img src="avatars/avatar1.png" data-avatar="Somaliland" alt="Somaliland">
+      <img src="avatars/avatar2.png" data-avatar="Somalia" alt="Somalia">
+      <img src="avatars/avatar3.png" data-avatar="Djibouti" alt="Djibouti">
+      <img src="avatars/avatar4.png" data-avatar="Ethiopia" alt="Ethiopia">
+      <img src="avatars/avatar5.png" data-avatar="Uganda" alt="Uganda">
+      <img src="avatars/avatar6.png" data-avatar="Kenya" alt="Kenya">
+      <img src="avatars/default.png" data-avatar="default" alt="default">
     </div>
 
     <h2 id="usernameText">Loading...</h2>
@@ -190,7 +190,7 @@ followersText.addEventListener("click", () => {
       }
       const userData = userSnap.val();
       const stats = userData.stats || {};
-      const logo = userData.logo || "avatars/default";
+      const logo = userData.logo || "default";
 
       avatarImg.src = `${logo}.png`;
       usernameText.innerText = userData.username || "Unknown";
