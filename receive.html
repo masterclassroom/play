@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <title>Received Gifts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e272e;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .gift-card {
+      background: #2f3640;
+      margin: 15px auto;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .gift-card img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+    }
+    .gift-level {
+      font-weight: bold;
+      margin: 8px 0;
+    }
+    select, button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+    .claim-btn {
+      background-color: #00cec9;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .claim-btn:hover {
+      background-color: #55efc4;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <h2>🎁 Recieve gifts</h2>
+  <div id="giftList">Loading...</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const giftList = document.getElementById("giftList");
+
+    const giftValues = {
+      low: 100,
+      medium: 500,
+      high: 1000
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        Swal.fire("Please login first");
+        location.href = "login.html";
+        return;
+      }
+
+      const currentUserUid = user.uid;
+
+      const sendRef = ref(db, `send/${currentUserUid}`);
+      const sendSnap = await get(sendRef);
+
+      if (!sendSnap.exists()) {
+        giftList.innerText = "No gifts.";
+        return;
+      }
+
+      const data = sendSnap.val();
+      giftList.innerHTML = "";
+
+      for (const senderId in data) {
+        const giftData = data[senderId];
+        const giftLevel = giftData.gift;
+
+        const senderRef = ref(db, `users/${senderId}`);
+        const senderSnap = await get(senderRef);
+        const sender = senderSnap.val() || {};
+        const name = sender.displayname || "Unknown";
+        const username = sender.username || "unknown";
+        const avatar = `${sender.logo || "default"}.png`;
+
+        const card = document.createElement("div");
+        card.className = "gift-card";
+
+        card.innerHTML = `
+          <img src="${avatar}" alt="Avatar">
+          <div><strong>${name}</strong> (@${username})</div>
+          <div class="gift-level">🎁 ${giftLevel.toUpperCase()} Gift</div>
+          <select id="select-${senderId}">
+            <option value="coins">Claim as Coins</option>
+            <option value="gift">Claim as Gift</option>
+          </select>
+          <br>
+          <button class="claim-btn" id="claim-${senderId}">Claim</button>
+        `;
+
+        giftList.appendChild(card);
+
+        document.getElementById(`claim-${senderId}`).addEventListener("click", async () => {
+          const choice = document.getElementById(`select-${senderId}`).value;
+
+          const userRef = ref(db, `users/${currentUserUid}`);
+          const userSnap = await get(userRef);
+          const userData = userSnap.val() || {};
+          const currentGifts = userData.gifts || {};
+          const currentCoins = userData.coins || 0;
+
+          const value = giftValues[giftLevel] || 0;
+
+          let updates = {};
+          let msg = "";
+
+          if (choice === "coins") {
+            updates.coins = currentCoins + value;
+            msg = `✅ Waxaad heshay ${value} coins ah (${giftLevel} gift).`;
+          } else {
+            updates[`gifts/${giftLevel}`] = (currentGifts[giftLevel] || 0) + 1;
+            msg = `✅ you claimed 1 ${giftLevel} gift ah.`;
+          }
+
+          await update(userRef, updates);
+          await remove(ref(db, `send/${currentUserUid}/${senderId}`));
+          Swal.fire("You clamimed a gift!", msg, "success");
+          card.remove();
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

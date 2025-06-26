@@ -70,6 +70,14 @@
     #followBtn:hover {
       background-color: #e84393;
     }
+    #sendGiftBtn {
+      background-color: #fdcb6e;
+      display: none;
+    }
+    #sendGiftBtn:hover {
+      background-color: #ffeaa7;
+      color: black;
+    }
     #avatarOptions {
       margin-top: 20px;
       display: none;
@@ -116,6 +124,7 @@
     <button id="sendRequestBtn">Send Friend Request</button>
     <button id="messageBtn" style="display: none;">Message</button>
     <button id="followBtn">Follow</button>
+    <button id="sendGiftBtn">🎁 Send Gift</button>
     <button id="myFriendsBtn">My Friends</button>
     <button class="back-btn" onclick="history.back()">⬅️ Back</button>
   </div>
@@ -154,6 +163,7 @@
     const messageBtn = document.getElementById("messageBtn");
     const myFriendsBtn = document.getElementById("myFriendsBtn");
     const followBtn = document.getElementById("followBtn");
+    const sendGiftBtn = document.getElementById("sendGiftBtn");
 
     let currentUserUid = null;
     let profileUserUid = uidParam;
@@ -169,11 +179,12 @@
       }
 
       currentUserUid = user.uid;
+
       followersText.style.cursor = "pointer";
-followersText.style.textDecoration = "underline";
-followersText.addEventListener("click", () => {
-  window.location.href = `followers.html?uid=${profileUserUid}`;
-});
+      followersText.style.textDecoration = "underline";
+      followersText.addEventListener("click", () => {
+        window.location.href = `followers.html?uid=${profileUserUid}`;
+      });
 
       if (!profileUserUid) {
         await Swal.fire("User ID missing");
@@ -226,22 +237,29 @@ followersText.addEventListener("click", () => {
         }
       });
 
-      // Control visibility of send request and message buttons
+      // Control visibility of send request, message, send gift buttons
       if (isCurrentUser) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "none";
+        sendGiftBtn.style.display = "none";
       } else if (friendsList.includes(profileUserUid)) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "inline-block";
+        sendGiftBtn.style.display = "inline-block";
         messageBtn.onclick = () => {
           location.href = `chat.html?uid=${profileUserUid}`;
+        };
+        sendGiftBtn.onclick = () => {
+          location.href = `sendgift.html?user=${profileUserUid}`;
         };
       } else if (alreadyRequested) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "none";
+        sendGiftBtn.style.display = "none";
       } else {
         sendRequestBtn.style.display = "inline-block";
         messageBtn.style.display = "none";
+        sendGiftBtn.style.display = "none";
       }
 
       // Avatar change UI for current user
