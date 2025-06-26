@@ -68,7 +68,7 @@
     <div id="giftInfo">Gift Level: Low</div>
 
     <button id="sendBtn">Send Gift</button>
-    <button id="rec" onclick="window.history.back()">Recieve gifts</button>
+    <button id="rec" onclick="rec()">gifts</button>
     <br /><br />
     <button onclick="history.back()">⬅️ Back</button>
   </div>
@@ -211,6 +211,11 @@
         Swal.fire("Error sending gift.");
       }
     });
+  </script>
+  <script>
+    function rec() {
+      window.location.href = 'receive.html';
+    }
   </script>
 </body>
 </html>
