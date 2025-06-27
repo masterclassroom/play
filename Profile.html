@@ -280,7 +280,7 @@
           const selectedAvatar = img.getAttribute("data-avatar");
           try {
             await update(ref(db, `users/${currentUserUid}`), { logo: selectedAvatar });
-            avatarImg.src = `avatars/${selectedAvatar}.png`;
+            avatarImg.src = `${selectedAvatar}.png`;
             avatarOptions.style.display = "none";
             Swal.fire("Avatar updated!");
           } catch (e) {
