@@ -245,7 +245,7 @@
       } else if (friendsList.includes(profileUserUid)) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "inline-block";
-        sendGiftBtn.style.display = "inline-block";
+        sendGiftBtn.style.display = "block";
         messageBtn.onclick = () => {
           location.href = `chat.html?uid=${profileUserUid}`;
         };
