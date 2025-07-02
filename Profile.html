@@ -50,26 +50,16 @@
     button:hover {
       background-color: #74b9ff;
     }
-    #sendRequestBtn {
-      background-color: #00b894;
-    }
-    #sendRequestBtn:hover {
-      background-color: #00cec9;
-    }
-    #messageBtn {
-      background-color: #6c5ce7;
-    }
-    #messageBtn:hover {
-      background-color: #a29bfe;
-    }
+    #sendRequestBtn { background-color: #00b894; }
+    #sendRequestBtn:hover { background-color: #00cec9; }
+    #messageBtn { background-color: #6c5ce7; }
+    #messageBtn:hover { background-color: #a29bfe; }
     #followBtn {
       background-color: #fd79a8;
       display: none;
       margin-top: 10px;
     }
-    #followBtn:hover {
-      background-color: #e84393;
-    }
+    #followBtn:hover { background-color: #e84393; }
     #sendGiftBtn {
       background-color: #fdcb6e;
       display: none;
@@ -96,6 +86,29 @@
     #avatarOptions img:hover {
       border-color: #00cec9;
     }
+    .info-toggle {
+      color: #74b9ff;
+      cursor: pointer;
+      text-decoration: underline;
+      margin: 10px 0;
+      display: inline-block;
+    }
+    .hidden-info {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+    .hidden-info a {
+      display: block;
+      margin: 5px 0;
+      color: white;
+      text-decoration: none;
+    }
+    .hidden-info a:hover {
+      text-decoration: underline;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -103,7 +116,6 @@
 
   <div class="profile-card" id="profileCard">
     <img src="avatars/default.png" alt="Avatar" class="avatar" id="avatarImg" title="User Avatar" />
-
     <div id="avatarOptions">
       <img src="avatars/avatar1.png" data-avatar="Somaliland" alt="Somaliland">
       <img src="avatars/avatar2.png" data-avatar="Somalia" alt="Somalia">
@@ -113,13 +125,19 @@
       <img src="avatars/avatar6.png" data-avatar="Kenya" alt="Kenya">
       <img src="avatars/default.png" data-avatar="default" alt="default">
     </div>
-
     <h2 id="usernameText">Loading...</h2>
     <div class="stat" id="winsText">Wins: 0</div>
     <div class="stat" id="playedText">Played: 0</div>
     <div class="stat" id="lossesText">Losses: 0</div>
     <div class="stat" id="coinsText">Coins Won: 0</div>
     <div class="stat" id="followersText">Followers: 0</div>
+
+    <!-- Toggle for About and Social Links -->
+    <div class="info-toggle" id="toggleInfoBtn">▼ Show Profile Info</div>
+    <div class="hidden-info" id="profileInfo">
+      <div id="aboutSection"></div>
+      <div id="socialLinks"></div>
+    </div>
 
     <button id="sendRequestBtn">Send Friend Request</button>
     <button id="messageBtn" style="display: none;">Message</button>
@@ -158,18 +176,31 @@
     const lossesText = document.getElementById("lossesText");
     const coinsText = document.getElementById("coinsText");
     const followersText = document.getElementById("followersText");
+    const toggleInfoBtn = document.getElementById("toggleInfoBtn");
+    const profileInfo = document.getElementById("profileInfo");
+    const aboutSection = document.getElementById("aboutSection");
+    const socialLinks = document.getElementById("socialLinks");
 
     const sendRequestBtn = document.getElementById("sendRequestBtn");
     const messageBtn = document.getElementById("messageBtn");
     const myFriendsBtn = document.getElementById("myFriendsBtn");
     const followBtn = document.getElementById("followBtn");
     const sendGiftBtn = document.getElementById("sendGiftBtn");
+    const profileCard = document.getElementById("profileCard");
 
     let currentUserUid = null;
     let profileUserUid = uidParam;
     let isCurrentUser = false;
     let friendsList = [];
     let isFollowing = false;
+    let infoVisible = false;
+
+    // Toggle profile info visibility
+    toggleInfoBtn.addEventListener("click", () => {
+      infoVisible = !infoVisible;
+      profileInfo.style.display = infoVisible ? "block" : "none";
+      toggleInfoBtn.textContent = infoVisible ? "▲ Hide Profile Info" : "▼ Show Profile Info";
+    });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -210,125 +241,238 @@
       lossesText.innerText = `Losses: ${stats.losses || 0}`;
       coinsText.innerText = `Coins Won: ${stats.totalcoinswon || 0}`;
 
-      // Load friends list
+      // Show about if exists
+      if (userData.about) {
+        aboutSection.innerHTML = `<p style="margin: 15px 0; font-style: italic;">"${userData.about}"</p>`;
+      } else {
+        aboutSection.innerHTML = isCurrentUser 
+          ? '<p style="font-style: italic; color: #aaa;">No about info yet. <button onclick="document.getElementById(\'editAboutBtn\').click()">Add one</button></p>'
+          : '<p style="font-style: italic; color: #aaa;">No about info</p>';
+      }
+
+      // Show social links
+      const links = userData.links || {};
+      if (links.youtube || links.facebook || links.whatsapp) {
+        let linksHTML = '<div style="margin-top: 10px;">';
+        
+        if (links.youtube) {
+          linksHTML += `<a href="${links.youtube}" target="_blank" style="display: block; color: #fab1a0; margin: 5px 0;">📺 YouTube</a>`;
+        }
+        if (links.facebook) {
+          linksHTML += `<a href="${links.facebook}" target="_blank" style="display: block; color: #74b9ff; margin: 5px 0;">📘 Facebook</a>`;
+        }
+        if (links.whatsapp) {
+          const url = `https://wa.me/${links.whatsapp.number.replace(/\D/g, "")}?text=${encodeURIComponent(links.whatsapp.msg)}`;
+          linksHTML += `<a href="${url}" target="_blank" style="display: block; color: #55efc4; margin: 5px 0;">💬 WhatsApp</a>`;
+        }
+        
+        linksHTML += '</div>';
+        socialLinks.innerHTML = linksHTML;
+      } else {
+        socialLinks.innerHTML = isCurrentUser 
+          ? '<p style="color: #aaa;">No social links. <button onclick="document.getElementById(\'editSocialBtn\').click()">Add some</button></p>'
+          : '<p style="color: #aaa;">No social links</p>';
+      }
+
+      // Friends check
       const friendsRef = ref(db, `friends/${currentUserUid}`);
       const friendsSnap = await get(friendsRef);
       friendsList = friendsSnap.exists() ? Object.keys(friendsSnap.val()) : [];
 
-      // Check friend requests
+      // Friend request check
       const requestRef = ref(db, `friendRequests/${profileUserUid}/${currentUserUid}`);
       const requestSnap = await get(requestRef);
       const alreadyRequested = requestSnap.exists();
 
-      // Followers realtime update and follow button logic
       const followersRef = ref(db, `followers/${profileUserUid}`);
       onValue(followersRef, (snapshot) => {
         const followersData = snapshot.val() || {};
-        const followerCount = Object.keys(followersData).length;
+        const followerCount = 7Object.keys(followersData).length;
         followersText.innerText = `Followers: ${followerCount}`;
-
         isFollowing = currentUserUid in followersData;
 
-        if (isCurrentUser) {
-          followBtn.style.display = "none";
-        } else {
-          followBtn.style.display = "inline-block";
-          followBtn.innerText = isFollowing ? "Unfollow" : "Follow";
-        }
+        followBtn.style.display = isCurrentUser ? "none" : "inline-block";
+        followBtn.innerText = isFollowing ? "Unfollow" : "Follow";
       });
 
-      // Control visibility of send request, message, send gift buttons
       if (isCurrentUser) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "none";
         sendGiftBtn.style.display = "none";
+
+        // Edit About button
+        const editAboutBtn = document.createElement("button");
+        editAboutBtn.id = "editAboutBtn";
+        editAboutBtn.innerText = "✍️ Edit About";
+        profileCard.appendChild(editAboutBtn);
+        editAboutBtn.onclick = async () => {
+          const { value: about } = await Swal.fire({
+            title: "Your About",
+            input: "textarea",
+            inputValue: userData.about || "",
+            showCancelButton: true,
+          });
+          if (about !== undefined) {
+            await update(userRef, { about });
+            aboutSection.innerHTML = `<p style="margin: 15px 0; font-style: italic;">"${about}"</p>`;
+            Swal.fire("About updated");
+          }
+        };
+
+        // Edit Social Links
+        const editSocialBtn = document.createElement("button");
+        editSocialBtn.id = "editSocialBtn";
+        editSocialBtn.innerText = "🌐 Edit Social Links";
+        profileCard.appendChild(editSocialBtn);
+        editSocialBtn.onclick = async () => {
+          const { value: platform } = await Swal.fire({
+            title: "Choose platform",
+            input: "select",
+            inputOptions: {
+              youtube: "YouTube",
+              facebook: "Facebook",
+              whatsapp: "WhatsApp"
+            },
+            inputPlaceholder: "Select platform",
+            showCancelButton: true,
+          });
+
+          if (!platform) return;
+
+          if (platform === "whatsapp") {
+            const { value: action } = await Swal.fire({
+              title: "WhatsApp Number",
+              input: "radio",
+              inputOptions: {
+                use: `Use this phone (${userData.number || "Not set"})`,
+                new: "Add another number"
+              },
+              inputValidator: v => !v && "Choose one"
+            });
+
+            let number = userData.number;
+            if (action === "new") {
+              const { value: newNumber } = await Swal.fire({
+                title: "Enter Number",
+                input: "text",
+                inputLabel: "Include country code (e.g. +25261xxxxxx)",
+                inputPlaceholder: "+25261xxxxxx",
+                inputValidator: value => {
+                  if (!value) return "Required";
+                  if (!value.startsWith("+") || value.replace(/\D/g, "").length < 10) return "Invalid number";
+                  return null;
+                }
+              });
+              number = newNumber;
+            }
+
+            const { value: msg } = await Swal.fire({
+              title: "Enter Message",
+              input: "text",
+              inputPlaceholder: "e.g., Hello!",
+              inputValidator: val => !val ? "Required" : null
+            });
+
+            if (number && msg) {
+              await update(userRef, {
+                links: { ...links, whatsapp: { number, msg } }
+              });
+              const url = `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
+              socialLinks.innerHTML = `<div style="margin-top: 10px;"><a href="${url}" target="_blank" style="display: block; color: #55efc4; margin: 5px 0;">💬 WhatsApp</a></div>`;
+              Swal.fire("WhatsApp saved!");
+            }
+
+          } else {
+            const { value: link } = await Swal.fire({
+              title: `Enter ${platform} link`,
+              input: "url",
+              inputPlaceholder: `https://${platform}.com/yourprofile`,
+              inputValidator: value => {
+                if (!value) return "Required";
+                if (
+                  platform === "youtube" &&
+                  !value.startsWith("https://www.youtube.com/") &&
+                  !value.startsWith("https://youtube.com/")
+                ) {
+                  return "Only valid YouTube links allowed";
+                }
+                if (
+                  platform === "facebook" &&
+                  !value.startsWith("https://www.facebook.com/") &&
+                  !value.startsWith("https://facebook.com/")
+                ) {
+                  return "Only valid Facebook links allowed";
+                }
+                return null;
+              }
+            });
+
+            if (link) {
+              await update(userRef, {
+                links: { ...links, [platform]: link }
+              });
+              
+              // Update the displayed link
+              let linkHTML = socialLinks.innerHTML;
+              if (linkHTML.includes('No social links')) {
+                linkHTML = '<div style="margin-top: 10px;">';
+              } else {
+                linkHTML = linkHTML.replace('</div>', '');
+              }
+              
+              const icon = platform === "youtube" ? "📺" : "📘";
+              const color = platform === "youtube" ? "#fab1a0" : "#74b9ff";
+              linkHTML += `<a href="${link}" target="_blank" style="display: block; color: ${color}; margin: 5px 0;">${icon} ${platform.charAt(0).toUpperCase() + platform.slice(1)}</a></div>`;
+              socialLinks.innerHTML = linkHTML;
+              
+              Swal.fire(`${platform} link saved!`);
+            }
+          }
+        };
+
+        avatarImg.addEventListener("click", () => {
+          avatarOptions.style.display = avatarOptions.style.display === "flex" ? "none" : "flex";
+        });
+
+        avatarOptions.querySelectorAll("img").forEach(img => {
+          img.addEventListener("click", async () => {
+            const selectedAvatar = img.getAttribute("data-avatar");
+            await update(userRef, { logo: selectedAvatar });
+            avatarImg.src = `${selectedAvatar}.png`;
+            avatarOptions.style.display = "none";
+            Swal.fire("Avatar updated");
+          });
+        });
       } else if (friendsList.includes(profileUserUid)) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "inline-block";
         sendGiftBtn.style.display = "inline-block";
-        messageBtn.onclick = () => {
-          location.href = `chat.html?uid=${profileUserUid}`;
-        };
-        sendGiftBtn.onclick = () => {
-          location.href = `sendgift.html?user=${profileUserUid}`;
-        };
-      } else if (alreadyRequested) {
-        sendRequestBtn.style.display = "none";
-        messageBtn.style.display = "none";
-        sendGiftBtn.style.display = "none";
-      } else {
+        messageBtn.onclick = () => location.href = `chat.html?uid=${profileUserUid}`;
+        sendGiftBtn.onclick = () => location.href = `sendgift.html?user=${profileUserUid}`;
+      } else if (!alreadyRequested) {
         sendRequestBtn.style.display = "inline-block";
-        messageBtn.style.display = "none";
-        sendGiftBtn.style.display = "none";
-      }
-
-      // Avatar change UI for current user
-      if (isCurrentUser) {
-        avatarImg.style.cursor = "pointer";
-        avatarImg.title = "Click to change avatar";
-        avatarImg.addEventListener("click", () => {
-          avatarOptions.style.display = avatarOptions.style.display === "flex" ? "none" : "flex";
-        });
-        avatarOptions.style.display = "flex";
-        avatarOptions.querySelectorAll("img").forEach(img => {
-          img.addEventListener("click", async () => {
-            const selectedAvatar = img.getAttribute("data-avatar");
-            try {
-              await update(userRef, { logo: selectedAvatar });
-              avatarImg.src = `${selectedAvatar}.png`;
-              avatarOptions.style.display = "none";
-              Swal.fire("Avatar updated!");
-            } catch (e) {
-              console.error(e);
-              Swal.fire("Failed to update avatar");
-            }
-          });
-        });
-      } else {
-        avatarOptions.style.display = "none";
-        avatarImg.style.cursor = "default";
       }
     });
 
     sendRequestBtn.addEventListener("click", async () => {
-      try {
-        const requestRef = ref(db, `friendRequests/${profileUserUid}/${currentUserUid}`);
-        const requestSnap = await get(requestRef);
-        if (requestSnap.exists()) {
-          Swal.fire("Request already sent");
-          return;
-        }
-        await update(requestRef, {
-          status: "pending",
-          from: currentUserUid,
-          timestamp: Date.now()
-        });
-        sendRequestBtn.style.display = "none";
-        Swal.fire("Friend request sent!");
-      } catch (e) {
-        console.error(e);
-        Swal.fire("Failed to send friend request");
-      }
+      const requestRef = ref(db, `friendRequests/${profileUserUid}/${currentUserUid}`);
+      await update(requestRef, {
+        status: "pending",
+        from: currentUserUid,
+        timestamp: Date.now()
+      });
+      sendRequestBtn.style.display = "none";
+      Swal.fire("Request sent");
     });
 
     followBtn.addEventListener("click", async () => {
-      if (!currentUserUid || !profileUserUid || isCurrentUser) return;
-
-      const followerUserRef = ref(db, `followers/${profileUserUid}/${currentUserUid}`);
-
-      try {
-        if (isFollowing) {
-          // Unfollow
-          await remove(followerUserRef);
-          Swal.fire("You unfollowed this user.");
-        } else {
-          // Follow
-          await set(followerUserRef, true);
-          Swal.fire("You followed this user.");
-        }
-      } catch (error) {
-        console.error(error);
-        Swal.fire("Failed to update follow status.");
+      const followerRef = ref(db, `followers/${profileUserUid}/${currentUserUid}`);
+      if (isFollowing) {
+        await remove(followerRef);
+        Swal.fire("Unfollowed");
+      } else {
+        await set(followerRef, true);
+        Swal.fire("Followed");
       }
     });
 
@@ -336,6 +480,5 @@
       location.href = "friends.html";
     });
   </script>
-
 </body>
 </html>
