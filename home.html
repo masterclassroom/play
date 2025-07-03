@@ -141,7 +141,7 @@
 
       // Ku dar profile image
       const logo = data.logo || "default";
-      document.getElementById("myLogo").src = `${logo}.png`;
+      document.getElementById("myLogo").src = `avatars/${logo}.png`;
       document.getElementById("myLogo").onclick = () => {
         window.location.href = `Profile.html?uid=${uid}`;
       };

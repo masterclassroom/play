@@ -1,151 +1,433 @@
 <!DOCTYPE html>
-<html lang="so">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Profile</title>
   <style>
+    :root {
+      --primary: #3498db;
+      --secondary: #2ecc71;
+      --accent: #e74c3c;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --gray: #95a5a6;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white;
-      text-align: center;
-      padding: 30px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
     }
+    
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    
     .profile-card {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
     }
-    .avatar {
-      width: 100px;
-      height: 100px;
+    
+    .profile-header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  height: 160px; /* kor u qaaday */
+  position: relative;
+  padding-top: 100px; /* si avatar-ka uusan u noqon cidlo */
+  overflow: visible; /* muhiim si avatar-ka uusan u go'in */
+}
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
+      border: 4px solid white;
       object-fit: cover;
-      border: 3px solid #00cec9;
-      margin-bottom: 10px;
-      cursor: default;
-    }
-    h2 {
-      margin: 10px 0;
-    }
-    .stat {
-      margin: 8px 0;
-      font-size: 18px;
-    }
-    button {
-      margin: 10px 5px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      border: none;
+      position: absolute;
+      top: 10px; /* Changed from bottom to top */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ddd;
       cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 3;
+    }
+    
+    .profile-name-container {
+      position: relative;
+      width: 100%;
+      text-align: center;
+      z-index: 2;
+      margin-top: 20px;
+    }
+    
+    .profile-name {
+      font-size: 24px;
+      font-weight: 600;
       color: white;
-      background-color: #0984e3;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
       transition: background-color 0.3s;
     }
-    button:hover {
-      background-color: #74b9ff;
+    
+    .profile-name:hover {
+      background-color: rgba(255,255,255,0.2);
     }
-    #sendRequestBtn { background-color: #00b894; }
-    #sendRequestBtn:hover { background-color: #00cec9; }
-    #messageBtn { background-color: #6c5ce7; }
-    #messageBtn:hover { background-color: #a29bfe; }
-    #followBtn {
-      background-color: #fd79a8;
-      display: none;
-      margin-top: 10px;
+    
+    .profile-body {
+      padding: 20px;
+      text-align: center;
     }
-    #followBtn:hover { background-color: #e84393; }
-    #sendGiftBtn {
-      background-color: #fdcb6e;
-      display: none;
+    
+    .profile-bio {
+      color: var(--gray);
+      margin-bottom: 20px;
+      font-style: italic;
     }
-    #sendGiftBtn:hover {
-      background-color: #ffeaa7;
-      color: black;
-    }
-    #avatarOptions {
-      margin-top: 20px;
-      display: none;
+    
+    .profile-stats {
+      display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: 20px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
     }
-    #avatarOptions img {
-      width: 70px;
-      height: 70px;
+    
+    .stat-item {
+      text-align: center;
+      min-width: 80px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .profile-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #27ae60;
+    }
+    
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-accent:hover {
+      background: #c0392b;
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gray);
+      color: var(--dark);
+    }
+    
+    .btn-outline:hover {
+      background: #f0f0f0;
+    }
+    
+    .profile-details {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--dark);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background: #eee;
+      transition: all 0.3s;
+    }
+    
+    .social-link:hover {
+      background: #e0e0e0;
+      transform: translateY(-2px);
+    }
+    
+    .back-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    /* Modal styles for avatar selection */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .radio-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .radio-option:hover {
+      background: #f5f5f5;
+    }
+    
+    .radio-option img {
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       object-fit: cover;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.3s;
     }
-    #avatarOptions img:hover {
-      border-color: #00cec9;
-    }
-    .info-toggle {
-      color: #74b9ff;
-      cursor: pointer;
-      text-decoration: underline;
-      margin: 10px 0;
-      display: inline-block;
-    }
-    .hidden-info {
-      display: none;
-      margin-top: 10px;
-      padding: 10px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-    }
-    .hidden-info a {
-      display: block;
-      margin: 5px 0;
-      color: white;
-      text-decoration: none;
-    }
-    .hidden-info a:hover {
-      text-decoration: underline;
+    
+    @media (max-width: 600px) {
+      .profile-stats {
+        gap: 10px;
+      }
+      
+      .profile-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+      }
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-
-  <div class="profile-card" id="profileCard">
-    <img src="avatars/default.png" alt="Avatar" class="avatar" id="avatarImg" title="User Avatar" />
-    <div id="avatarOptions">
-      <img src="avatars/avatar1.png" data-avatar="Somaliland" alt="Somaliland">
-      <img src="avatars/avatar2.png" data-avatar="Somalia" alt="Somalia">
-      <img src="avatars/avatar3.png" data-avatar="Djibouti" alt="Djibouti">
-      <img src="avatars/avatar4.png" data-avatar="Ethiopia" alt="Ethiopia">
-      <img src="avatars/avatar5.png" data-avatar="Uganda" alt="Uganda">
-      <img src="avatars/avatar6.png" data-avatar="Kenya" alt="Kenya">
-      <img src="avatars/default.png" data-avatar="default" alt="default">
+  <div class="container">
+    <div class="profile-card">
+     
+      <div class="profile-header">
+        <img src="avatars/default.png" alt="Avatar" class="profile-avatar" id="avatarImg">
+        
+        <div class="profile-name-container">
+          <h1 class="profile-name" id="usernameText">Loading...</h1>
+        </div>
+      </div>
+      
+      <div class="profile-body">
+        <p class="profile-bio" id="aboutText">No bio yet</p>
+        
+        <div class="profile-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="winsText">0</div>
+            <div class="stat-label">Wins</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="playedText">0</div>
+            <div class="stat-label">Played</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="lossesText">0</div>
+            <div class="stat-label">Losses</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="coinsText">0</div>
+            <div class="stat-label">Coins won</div>
+          </div>
+          <div class="stat-item" id="followersItem" style="cursor: pointer;">
+            <div class="stat-value" id="followersText">0</div>
+            <div class="stat-label">Followers</div>
+          </div>
+        </div>
+        
+        <div class="profile-actions">
+          <button class="btn btn-primary" id="sendRequestBtn">
+            <i class="fas fa-user-plus"></i> Add Friend
+          </button>
+          <button class="btn btn-secondary" id="messageBtn" style="display: none;">
+            <i class="fas fa-envelope"></i> Message
+          </button>
+          <button class="btn btn-accent" id="followBtn" style="display: none;">
+            <i class="fas fa-user-plus"></i> Follow
+          </button>
+          <button class="btn btn-outline" id="sendGiftBtn" style="display: none;">
+            <i class="fas fa-gift"></i> Send Gift
+          </button>
+          <button class="btn btn-outline" id="myFriendsBtn">
+            <i class="fas fa-users"></i> My Friends
+          </button>
+        </div>
+        
+        <div class="profile-details">
+          <h3 class="section-title">Social Links</h3>
+          <div class="social-links" id="socialLinks">
+            <p style="color: #aaa;">No social links</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <h2 id="usernameText">Loading...</h2>
-    <div class="stat" id="winsText">Wins: 0</div>
-    <div class="stat" id="playedText">Played: 0</div>
-    <div class="stat" id="lossesText">Losses: 0</div>
-    <div class="stat" id="coinsText">Coins Won: 0</div>
-    <div class="stat" id="followersText">Followers: 0</div>
-
-    <!-- Toggle for About and Social Links -->
-    <div class="info-toggle" id="toggleInfoBtn">▼ Show Profile Info</div>
-    <div class="hidden-info" id="profileInfo">
-      <div id="aboutSection"></div>
-      <div id="socialLinks"></div>
-    </div>
-
-    <button id="sendRequestBtn">Send Friend Request</button>
-    <button id="messageBtn" style="display: none;">Message</button>
-    <button id="followBtn">Follow</button>
-    <button id="sendGiftBtn">🎁 Send Gift</button>
-    <button id="myFriendsBtn">My Friends</button>
-    <button class="back-btn" onclick="history.back()">⬅️ Back</button>
   </div>
+
+  <!-- Current Photos Modal -->
+  <div class="modal" id="currentPhotosModal">
+    <div class="modal-content">
+      <h3>Select Profile Picture</h3>
+      <p>Choose one of our current photos:</p>
+      
+      <div class="radio-options">
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="default" checked>
+          <img src="avatars/default.png" alt="default">
+          <span>default</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="Uganda" checked>
+          <img src="avatars/Uganda.png" alt="Uganda">
+          <span>Uganda</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="Somaliland">
+          <img src="avatars/Somaliland.png" alt="Somaliland">
+          <span>Somaliland</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="Somalia">
+          <img src="avatars/Somalia.png" alt="Somalia">
+          <span>Somalia</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="Ethiopia">
+          <img src="avatars/Ethiopia.png" alt="Ethiopia">
+          <span>Ethiopia</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="Kenya">
+          <img src="avatars/Kenya.png" alt="Kenya">
+          <span>Kenya</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="avatarOption" value="Djibouti">
+          <img src="avatars/Djibouti.png" alt="Djibouti">
+          <span>Djibouti</span>
+        </label>
+      </div>
+      
+      <button class="btn btn-primary" id="saveCurrentPhoto">
+        Save Photo
+      </button>
+      <button class="btn btn-outline" id="cancelCurrentPhoto">
+        Cancel
+      </button>
+    </div>
+  </div>        
+     
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -168,40 +450,36 @@
 
     const uidParam = new URLSearchParams(location.search).get("uid");
 
+    // DOM Elements
     const avatarImg = document.getElementById("avatarImg");
-    const avatarOptions = document.getElementById("avatarOptions");
     const usernameText = document.getElementById("usernameText");
+    const aboutText = document.getElementById("aboutText");
     const winsText = document.getElementById("winsText");
     const playedText = document.getElementById("playedText");
     const lossesText = document.getElementById("lossesText");
     const coinsText = document.getElementById("coinsText");
     const followersText = document.getElementById("followersText");
-    const toggleInfoBtn = document.getElementById("toggleInfoBtn");
-    const profileInfo = document.getElementById("profileInfo");
-    const aboutSection = document.getElementById("aboutSection");
+    const followersItem = document.getElementById("followersItem");
     const socialLinks = document.getElementById("socialLinks");
 
     const sendRequestBtn = document.getElementById("sendRequestBtn");
     const messageBtn = document.getElementById("messageBtn");
-    const myFriendsBtn = document.getElementById("myFriendsBtn");
     const followBtn = document.getElementById("followBtn");
     const sendGiftBtn = document.getElementById("sendGiftBtn");
-    const profileCard = document.getElementById("profileCard");
+    const myFriendsBtn = document.getElementById("myFriendsBtn");
+
+    // Modal elements
+    const currentPhotosModal = document.getElementById("currentPhotosModal");
+    const cancelCurrentPhoto = document.getElementById("cancelCurrentPhoto");
+    const saveCurrentPhoto = document.getElementById("saveCurrentPhoto");
 
     let currentUserUid = null;
     let profileUserUid = uidParam;
     let isCurrentUser = false;
     let friendsList = [];
     let isFollowing = false;
-    let infoVisible = false;
 
-    // Toggle profile info visibility
-    toggleInfoBtn.addEventListener("click", () => {
-      infoVisible = !infoVisible;
-      profileInfo.style.display = infoVisible ? "block" : "none";
-      toggleInfoBtn.textContent = infoVisible ? "▲ Hide Profile Info" : "▼ Show Profile Info";
-    });
-
+    // Initialize the profile
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         await Swal.fire("Please login first");
@@ -211,9 +489,8 @@
 
       currentUserUid = user.uid;
 
-      followersText.style.cursor = "pointer";
-      followersText.style.textDecoration = "underline";
-      followersText.addEventListener("click", () => {
+      // Set up followers click handler
+      followersItem.addEventListener("click", () => {
         window.location.href = `followers.html?uid=${profileUserUid}`;
       });
 
@@ -230,49 +507,22 @@
         await Swal.fire("User not found");
         return;
       }
+      
       const userData = userSnap.val();
       const stats = userData.stats || {};
       const logo = userData.logo || "default";
 
-      avatarImg.src = `${logo}.png`;
+      // Update profile info
+      avatarImg.src = `avatars/${logo}.png`;
       usernameText.innerText = userData.username || "Unknown";
-      winsText.innerText = `Wins: ${stats.wins || 0}`;
-      playedText.innerText = `Played: ${stats.played || 0}`;
-      lossesText.innerText = `Losses: ${stats.losses || 0}`;
-      coinsText.innerText = `Coins Won: ${stats.totalcoinswon || 0}`;
+      aboutText.innerText = userData.about || (isCurrentUser ? "Click to add your bio" : "No bio yet");
+      winsText.innerText = stats.wins || 0;
+      playedText.innerText = stats.played || 0;
+      lossesText.innerText = stats.losses || 0;
+      coinsText.innerText = stats.totalcoinswon || 0;
 
-      // Show about if exists
-      if (userData.about) {
-        aboutSection.innerHTML = `<p style="margin: 15px 0; font-style: italic;">"${userData.about}"</p>`;
-      } else {
-        aboutSection.innerHTML = isCurrentUser 
-          ? '<p style="font-style: italic; color: #aaa;">No about info yet. <button onclick="document.getElementById(\'editAboutBtn\').click()">Add one</button></p>'
-          : '<p style="font-style: italic; color: #aaa;">No about info</p>';
-      }
-
-      // Show social links
-      const links = userData.links || {};
-      if (links.youtube || links.facebook || links.whatsapp) {
-        let linksHTML = '<div style="margin-top: 10px;">';
-        
-        if (links.youtube) {
-          linksHTML += `<a href="${links.youtube}" target="_blank" style="display: block; color: #fab1a0; margin: 5px 0;">📺 YouTube</a>`;
-        }
-        if (links.facebook) {
-          linksHTML += `<a href="${links.facebook}" target="_blank" style="display: block; color: #74b9ff; margin: 5px 0;">📘 Facebook</a>`;
-        }
-        if (links.whatsapp) {
-          const url = `https://wa.me/${links.whatsapp.number.replace(/\D/g, "")}?text=${encodeURIComponent(links.whatsapp.msg)}`;
-          linksHTML += `<a href="${url}" target="_blank" style="display: block; color: #55efc4; margin: 5px 0;">💬 WhatsApp</a>`;
-        }
-        
-        linksHTML += '</div>';
-        socialLinks.innerHTML = linksHTML;
-      } else {
-        socialLinks.innerHTML = isCurrentUser 
-          ? '<p style="color: #aaa;">No social links. <button onclick="document.getElementById(\'editSocialBtn\').click()">Add some</button></p>'
-          : '<p style="color: #aaa;">No social links</p>';
-      }
+      // Update social links
+      updateSocialLinks(userData.links || {});
 
       // Friends check
       const friendsRef = ref(db, `friends/${currentUserUid}`);
@@ -284,176 +534,289 @@
       const requestSnap = await get(requestRef);
       const alreadyRequested = requestSnap.exists();
 
+      // Followers setup
       const followersRef = ref(db, `followers/${profileUserUid}`);
       onValue(followersRef, (snapshot) => {
         const followersData = snapshot.val() || {};
-        const followerCount = 7Object.keys(followersData).length;
-        followersText.innerText = `Followers: ${followerCount}`;
+        const followerCount = Object.keys(followersData).length;
+        followersText.innerText = followerCount;
         isFollowing = currentUserUid in followersData;
 
         followBtn.style.display = isCurrentUser ? "none" : "inline-block";
-        followBtn.innerText = isFollowing ? "Unfollow" : "Follow";
+        followBtn.innerHTML = isFollowing 
+          ? `<i class="fas fa-user-minus"></i> Unfollow` 
+          : `<i class="fas fa-user-plus"></i> Follow`;
       });
 
+      // Handle current user specific features
       if (isCurrentUser) {
         sendRequestBtn.style.display = "none";
         messageBtn.style.display = "none";
         sendGiftBtn.style.display = "none";
 
-        // Edit About button
-        const editAboutBtn = document.createElement("button");
-        editAboutBtn.id = "editAboutBtn";
-        editAboutBtn.innerText = "✍️ Edit About";
-        profileCard.appendChild(editAboutBtn);
-        editAboutBtn.onclick = async () => {
-          const { value: about } = await Swal.fire({
-            title: "Your About",
+        // Make bio editable
+        aboutText.style.cursor = "pointer";
+        aboutText.addEventListener("click", async () => {
+          const { value: newBio } = await Swal.fire({
+            title: "Edit Your Bio",
             input: "textarea",
             inputValue: userData.about || "",
             showCancelButton: true,
+            inputValidator: (value) => {
+              if (value && value.length > 30) {
+                return "Bio must be less than 30 characters";
+              }
+              return null;
+            }
           });
-          if (about !== undefined) {
-            await update(userRef, { about });
-            aboutSection.innerHTML = `<p style="margin: 15px 0; font-style: italic;">"${about}"</p>`;
-            Swal.fire("About updated");
+          
+          if (newBio !== undefined) {
+            await update(userRef, { about: newBio });
+            aboutText.innerText = newBio || "Click to add your bio";
+            Swal.fire("Bio updated!");
           }
-        };
+        });
 
-        // Edit Social Links
-        const editSocialBtn = document.createElement("button");
-        editSocialBtn.id = "editSocialBtn";
-        editSocialBtn.innerText = "🌐 Edit Social Links";
-        profileCard.appendChild(editSocialBtn);
-        editSocialBtn.onclick = async () => {
-          const { value: platform } = await Swal.fire({
-            title: "Choose platform",
-            input: "select",
-            inputOptions: {
-              youtube: "YouTube",
-              facebook: "Facebook",
-              whatsapp: "WhatsApp"
-            },
-            inputPlaceholder: "Select platform",
+        // Make username editable
+        usernameText.style.cursor = "pointer";
+        usernameText.addEventListener("click", async () => {
+          const { value: newUsername } = await Swal.fire({
+            title: "Change Username",
+            input: "text",
+            inputValue: userData.username || "",
             showCancelButton: true,
+            inputValidator: (value) => {
+              if (!value) return "Username is required";
+              if (value.length < 3) return "Username must be at least 3 characters";
+              if (value.length > 20) return "Username must be less than 20 characters";
+              return null;
+            }
           });
-
-          if (!platform) return;
-
-          if (platform === "whatsapp") {
-            const { value: action } = await Swal.fire({
-              title: "WhatsApp Number",
-              input: "radio",
-              inputOptions: {
-                use: `Use this phone (${userData.number || "Not set"})`,
-                new: "Add another number"
-              },
-              inputValidator: v => !v && "Choose one"
-            });
-
-            let number = userData.number;
-            if (action === "new") {
-              const { value: newNumber } = await Swal.fire({
-                title: "Enter Number",
-                input: "text",
-                inputLabel: "Include country code (e.g. +25261xxxxxx)",
-                inputPlaceholder: "+25261xxxxxx",
-                inputValidator: value => {
-                  if (!value) return "Required";
-                  if (!value.startsWith("+") || value.replace(/\D/g, "").length < 10) return "Invalid number";
-                  return null;
-                }
-              });
-              number = newNumber;
-            }
-
-            const { value: msg } = await Swal.fire({
-              title: "Enter Message",
-              input: "text",
-              inputPlaceholder: "e.g., Hello!",
-              inputValidator: val => !val ? "Required" : null
-            });
-
-            if (number && msg) {
-              await update(userRef, {
-                links: { ...links, whatsapp: { number, msg } }
-              });
-              const url = `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
-              socialLinks.innerHTML = `<div style="margin-top: 10px;"><a href="${url}" target="_blank" style="display: block; color: #55efc4; margin: 5px 0;">💬 WhatsApp</a></div>`;
-              Swal.fire("WhatsApp saved!");
-            }
-
-          } else {
-            const { value: link } = await Swal.fire({
-              title: `Enter ${platform} link`,
-              input: "url",
-              inputPlaceholder: `https://${platform}.com/yourprofile`,
-              inputValidator: value => {
-                if (!value) return "Required";
-                if (
-                  platform === "youtube" &&
-                  !value.startsWith("https://www.youtube.com/") &&
-                  !value.startsWith("https://youtube.com/")
-                ) {
-                  return "Only valid YouTube links allowed";
-                }
-                if (
-                  platform === "facebook" &&
-                  !value.startsWith("https://www.facebook.com/") &&
-                  !value.startsWith("https://facebook.com/")
-                ) {
-                  return "Only valid Facebook links allowed";
-                }
-                return null;
-              }
-            });
-
-            if (link) {
-              await update(userRef, {
-                links: { ...links, [platform]: link }
-              });
-              
-              // Update the displayed link
-              let linkHTML = socialLinks.innerHTML;
-              if (linkHTML.includes('No social links')) {
-                linkHTML = '<div style="margin-top: 10px;">';
-              } else {
-                linkHTML = linkHTML.replace('</div>', '');
-              }
-              
-              const icon = platform === "youtube" ? "📺" : "📘";
-              const color = platform === "youtube" ? "#fab1a0" : "#74b9ff";
-              linkHTML += `<a href="${link}" target="_blank" style="display: block; color: ${color}; margin: 5px 0;">${icon} ${platform.charAt(0).toUpperCase() + platform.slice(1)}</a></div>`;
-              socialLinks.innerHTML = linkHTML;
-              
-              Swal.fire(`${platform} link saved!`);
-            }
+          
+          if (newUsername !== undefined) {
+            await update(userRef, { username: newUsername });
+            usernameText.innerText = newUsername;
+            Swal.fire("Username updated!");
           }
-        };
+        });
 
+        // Make avatar clickable to show current photos modal
         avatarImg.addEventListener("click", () => {
-          avatarOptions.style.display = avatarOptions.style.display === "flex" ? "none" : "flex";
+          currentPhotosModal.style.display = "flex";
         });
 
-        avatarOptions.querySelectorAll("img").forEach(img => {
-          img.addEventListener("click", async () => {
-            const selectedAvatar = img.getAttribute("data-avatar");
-            await update(userRef, { logo: selectedAvatar });
-            avatarImg.src = `${selectedAvatar}.png`;
-            avatarOptions.style.display = "none";
-            Swal.fire("Avatar updated");
-          });
-        });
-      } else if (friendsList.includes(profileUserUid)) {
-        sendRequestBtn.style.display = "none";
-        messageBtn.style.display = "inline-block";
-        sendGiftBtn.style.display = "inline-block";
-        messageBtn.onclick = () => location.href = `chat.html?uid=${profileUserUid}`;
-        sendGiftBtn.onclick = () => location.href = `sendgift.html?user=${profileUserUid}`;
-      } else if (!alreadyRequested) {
-        sendRequestBtn.style.display = "inline-block";
+        // Add edit social links button
+        const editSocialBtn = document.createElement("button");
+        editSocialBtn.className = "btn btn-outline";
+        editSocialBtn.innerHTML = `<i class="fas fa-edit"></i> Edit Links`;
+        editSocialBtn.style.marginTop = "10px";
+        editSocialBtn.addEventListener("click", () => editSocialLinks(userData.links || {}));
+        socialLinks.parentNode.insertBefore(editSocialBtn, socialLinks.nextSibling);
+      } 
+      // Handle friend/follow buttons for other users
+      else {
+        if (friendsList.includes(profileUserUid)) {
+          sendRequestBtn.style.display = "none";
+          messageBtn.style.display = "inline-block";
+          sendGiftBtn.style.display = "inline-block";
+          messageBtn.onclick = () => location.href = `chat.html?uid=${profileUserUid}`;
+          sendGiftBtn.onclick = () => location.href = `sendgift.html?user=${profileUserUid}`;
+        } else if (!alreadyRequested) {
+          sendRequestBtn.style.display = "inline-block";
+        }
       }
     });
 
+    // Handle current photo selection
+    saveCurrentPhoto.addEventListener('click', async () => {
+      const selectedAvatar = document.querySelector('input[name="avatarOption"]:checked').value;
+      const userRef = ref(db, `users/${currentUserUid}`);
+      
+      await update(userRef, { logo: selectedAvatar });
+      avatarImg.src = `avatars/${selectedAvatar}.png`;
+      
+      Swal.fire('Avatar updated!');
+      currentPhotosModal.style.display = 'none';
+    });
+
+    cancelCurrentPhoto.addEventListener("click", () => {
+      currentPhotosModal.style.display = "none";
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === currentPhotosModal) {
+        currentPhotosModal.style.display = 'none';
+      }
+    });
+
+    // Update social links display
+    function updateSocialLinks(links) {
+      if (links.youtube || links.facebook || links.whatsapp) {
+        let linksHTML = '';
+        
+        if (links.youtube) {
+          linksHTML += `
+            <a href="${links.youtube}" target="_blank" class="social-link">
+              <i class="fab fa-youtube"></i> YouTube
+            </a>
+          `;
+        }
+        if (links.facebook) {
+          linksHTML += `
+            <a href="${links.facebook}" target="_blank" class="social-link">
+              <i class="fab fa-facebook"></i> Facebook
+            </a>
+          `;
+        }
+        if (links.whatsapp) {
+          const url = `https://wa.me/${links.whatsapp.number.replace(/\D/g, "")}?text=${encodeURIComponent(links.whatsapp.msg)}`;
+          linksHTML += `
+            <a href="${url}" target="_blank" class="social-link">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+          `;
+        }
+        
+        socialLinks.innerHTML = linksHTML;
+      } else {
+        socialLinks.innerHTML = isCurrentUser 
+          ? '<p style="color: #aaa;">No social links added yet</p>'
+          : '<p style="color: #aaa;">No social links available</p>';
+      }
+    }
+
+    // Edit social links
+    async function editSocialLinks(currentLinks) {
+      const { value: platform } = await Swal.fire({
+        title: "Edit Social Links",
+        input: "select",
+        inputOptions: {
+          youtube: "YouTube",
+          facebook: "Facebook",
+          whatsapp: "WhatsApp",
+          remove: "Remove a link"
+        },
+        inputPlaceholder: "Select platform",
+        showCancelButton: true,
+      });
+
+      if (!platform) return;
+
+      const userRef = ref(db, `users/${currentUserUid}`);
+
+      if (platform === "remove") {
+        if (!currentLinks.youtube && !currentLinks.facebook && !currentLinks.whatsapp) {
+          await Swal.fire("No links to remove");
+          return;
+        }
+
+        const options = {};
+        if (currentLinks.youtube) options.youtube = "YouTube";
+        if (currentLinks.facebook) options.facebook = "Facebook";
+        if (currentLinks.whatsapp) options.whatsapp = "WhatsApp";
+
+        const { value: toRemove } = await Swal.fire({
+          title: "Remove which link?",
+          input: "select",
+          inputOptions: options,
+          showCancelButton: true,
+        });
+
+        if (toRemove) {
+          const updatedLinks = { ...currentLinks };
+          delete updatedLinks[toRemove];
+          
+          await update(userRef, { links: updatedLinks });
+          updateSocialLinks(updatedLinks);
+          Swal.fire("Link removed!");
+        }
+      } 
+      else if (platform === "whatsapp") {
+        const { value: action } = await Swal.fire({
+          title: "WhatsApp Number",
+          input: "radio",
+          inputOptions: {
+            use: `Use this phone (${currentLinks.whatsapp?.number || "Not set"})`,
+            new: "Add another number"
+          },
+          inputValidator: v => !v && "Choose one"
+        });
+
+        let number = currentLinks.whatsapp?.number;
+        if (action === "new") {
+          const { value: newNumber } = await Swal.fire({
+            title: "Enter Number",
+            input: "text",
+            inputLabel: "Include country code (e.g. +25261xxxxxx)",
+            inputPlaceholder: "+25261xxxxxx",
+            inputValidator: value => {
+              if (!value) return "Required";
+              if (!value.startsWith("+") || value.replace(/\D/g, "").length < 10) return "Invalid number";
+              return null;
+            }
+          });
+          number = newNumber;
+        }
+
+        const { value: msg } = await Swal.fire({
+          title: "Enter Message",
+          input: "text",
+          inputPlaceholder: "e.g., Hello!",
+          inputValidator: val => !val ? "Required" : null
+        });
+
+        if (number && msg) {
+          const updatedLinks = {
+            ...currentLinks,
+            whatsapp: { number, msg }
+          };
+          
+          await update(userRef, { links: updatedLinks });
+          updateSocialLinks(updatedLinks);
+          Swal.fire("WhatsApp saved!");
+        }
+      } 
+      else {
+        const { value: link } = await Swal.fire({
+          title: `Enter ${platform} link`,
+          input: "url",
+          inputValue: currentLinks[platform] || "",
+          inputPlaceholder: `https://${platform}.com/yourprofile`,
+          inputValidator: value => {
+            if (!value) return "Required";
+            if (
+              platform === "youtube" &&
+              !value.startsWith("https://www.youtube.com/") &&
+              !value.startsWith("https://youtube.com/")
+            ) {
+              return "Only valid YouTube links allowed";
+            }
+            if (
+              platform === "facebook" &&
+              !value.startsWith("https://www.facebook.com/") &&
+              !value.startsWith("https://facebook.com/")
+            ) {
+              return "Only valid Facebook links allowed";
+            }
+            return null;
+          }
+        });
+
+        if (link) {
+          const updatedLinks = {
+            ...currentLinks,
+            [platform]: link
+          };
+          
+          await update(userRef, { links: updatedLinks });
+          updateSocialLinks(updatedLinks);
+          Swal.fire(`${platform} link saved!`);
+        }
+      }
+    }
+
+    // Event listeners for buttons
     sendRequestBtn.addEventListener("click", async () => {
       const requestRef = ref(db, `friendRequests/${profileUserUid}/${currentUserUid}`);
       await update(requestRef, {
@@ -462,7 +825,7 @@
         timestamp: Date.now()
       });
       sendRequestBtn.style.display = "none";
-      Swal.fire("Request sent");
+      Swal.fire("Friend request sent!");
     });
 
     followBtn.addEventListener("click", async () => {
