@@ -384,37 +384,37 @@
       <div class="radio-options">
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="default" checked>
-          <img src="avatars/default.png" alt="default">
+          <img src="default.png" alt="default">
           <span>default</span>
         </label>
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="Uganda" checked>
-          <img src="avatars/Uganda.png" alt="Uganda">
+          <img src="Uganda.png" alt="Uganda">
           <span>Uganda</span>
         </label>
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="Somaliland">
-          <img src="avatars/Somaliland.png" alt="Somaliland">
+          <img src="Somaliland.png" alt="Somaliland">
           <span>Somaliland</span>
         </label>
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="Somalia">
-          <img src="avatars/Somalia.png" alt="Somalia">
+          <img src="Somalia.png" alt="Somalia">
           <span>Somalia</span>
         </label>
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="Ethiopia">
-          <img src="avatars/Ethiopia.png" alt="Ethiopia">
+          <img src="Ethiopia.png" alt="Ethiopia">
           <span>Ethiopia</span>
         </label>
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="Kenya">
-          <img src="avatars/Kenya.png" alt="Kenya">
+          <img src="Kenya.png" alt="Kenya">
           <span>Kenya</span>
         </label>
         <label class="radio-option">
           <input type="radio" name="avatarOption" value="Djibouti">
-          <img src="avatars/Djibouti.png" alt="Djibouti">
+          <img src="Djibouti.png" alt="Djibouti">
           <span>Djibouti</span>
         </label>
       </div>
@@ -513,7 +513,7 @@
       const logo = userData.logo || "default";
 
       // Update profile info
-      avatarImg.src = `avatars/${logo}.png`;
+      avatarImg.src = `${logo}.png`;
       usernameText.innerText = userData.username || "Unknown";
       aboutText.innerText = userData.about || (isCurrentUser ? "Click to add your bio" : "No bio yet");
       winsText.innerText = stats.wins || 0;
@@ -633,7 +633,7 @@
       const userRef = ref(db, `users/${currentUserUid}`);
       
       await update(userRef, { logo: selectedAvatar });
-      avatarImg.src = `avatars/${selectedAvatar}.png`;
+      avatarImg.src = `${selectedAvatar}.png`;
       
       Swal.fire('Avatar updated!');
       currentPhotosModal.style.display = 'none';

@@ -165,7 +165,7 @@
         card.className = 'card';
         card.innerHTML = `
           <div class="info" onclick="location.href='profile.html?uid=${senderUid}'">
-            <img src="avatars/${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
+            <img src="${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
           </div>
           <div>
             <button class="accept">Accept</button>
@@ -207,7 +207,7 @@
             card.className = 'card';
             card.innerHTML = `
               <div class="info" onclick="location.href='profile.html?uid=${otherUid}'">
-                <img src="avatars/${logo}.png" onerror="this.src='default.png'"><div>${username} <span style="font-size:14px; color:#ccc;">(Pending)</span></div>
+                <img src="${logo}.png" onerror="this.src='default.png'"><div>${username} <span style="font-size:14px; color:#ccc;">(Pending)</span></div>
               </div>
               <button class="decline">Cancel</button>`;
 
@@ -242,7 +242,7 @@
         card.className = 'card';
         card.innerHTML = `
           <div class="info" onclick="location.href='profile.html?uid=${friendUid}'">
-            <img src="avatars/${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
+            <img src="${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
           </div>
           <div>
             <button class="remove">Remove</button>
