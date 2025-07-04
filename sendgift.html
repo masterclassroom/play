@@ -43,10 +43,15 @@
       text-align: left;
       font-size: 16px;
     }
-      #rec {
+    #rec {
       margin-top: 10px;
       font-weight: bold;
-      }
+    }
+  #bim {
+    margin-top: 10px;
+      font-weight: bold;
+  }
+    
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -68,14 +73,14 @@
     <div id="giftInfo">Gift Level: Low</div>
 
     <button id="sendBtn">Send Gift</button>
-    <button id="rec" onclick="rec()">gifts</button>
+    <button id="rec" onclick="rec()">recived gifts</button> <button id="bim" onclick="buy()"> buy or widthraw gift</button>
     <br /><br />
     <button onclick="history.back()">⬅️ Back</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -110,15 +115,12 @@
       giftInfo.innerText = `Gift Level: ${val.charAt(0).toUpperCase() + val.slice(1)}`;
     });
 
-    // Update gifts display
     function updateGiftsDisplay(giftsObj) {
-      // If no gifts object or empty, show none
       if (!giftsObj) {
         giftsList.innerText = "You have no gifts.";
         return;
       }
       let text = "Your Gifts:\n";
-      // Display count of each gift type
       text += `High: ${giftsObj.high || 0}\n`;
       text += `Medium: ${giftsObj.medium || 0}\n`;
       text += `Low: ${giftsObj.low || 0}`;
@@ -144,10 +146,7 @@
       const displayName = userData.displayname || "Unknown";
       const username = userData.username || "Unknown";
 
-      partnerName.innerHTML = `
-      
-        <small>@${username}</small>
-      `;
+      partnerName.innerHTML = `<small>@${username}</small>`;
       partnerImg.src = `${userData.logo || "default"}.png`;
 
       // Load sender info
@@ -155,8 +154,6 @@
       if (mySnap.exists()) {
         currentUserData = mySnap.val();
         coinText.innerText = `Coins: ${currentUserData.coins || 0}`;
-
-        // Gifts stored as object: { high: 1, medium: 2, low: 3 }
         updateGiftsDisplay(currentUserData.gifts);
       } else {
         giftsList.innerText = "Error loading gifts.";
@@ -165,8 +162,6 @@
 
     sendBtn.addEventListener("click", async () => {
       const selectedGift = giftSelect.value;
-
-      // Check if user has gifts and enough quantity for selected gift
       const gifts = currentUserData.gifts || {};
       const giftCount = gifts[selectedGift] || 0;
 
@@ -186,20 +181,16 @@
       if (!confirm.isConfirmed) return;
 
       try {
-        // Decrease selected gift count by 1
+        // Decrease gift from sender
         gifts[selectedGift] = giftCount - 1;
-
-        // Update gifts object in database
         await update(ref(db, `users/${currentUserUid}/gifts`), {
           [selectedGift]: gifts[selectedGift]
         });
-
-        // Update local copy and UI
         currentUserData.gifts = gifts;
         updateGiftsDisplay(gifts);
 
-        // Save gift record to receiver node
-        await set(ref(db, `send/${uid}/${currentUserUid}`), {
+        // Save gift to receiver using push (don't overwrite)
+        await push(ref(db, `send/${uid}/${currentUserUid}`), {
           gift: selectedGift,
           timestamp: Date.now()
         });
@@ -212,10 +203,15 @@
       }
     });
   </script>
+
   <script>
     function rec() {
       window.location.href = 'receive.html';
     }
+  function buy() {
+      window.location.href = 'gifts.html';
+    }
   </script>
+
 </body>
 </html>

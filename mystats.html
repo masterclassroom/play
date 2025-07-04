@@ -1,61 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Game Stats</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Game Stats & Rewards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
+      margin: 0; padding: 20px;
+      display: flex; flex-direction: column; align-items: center;
       min-height: 100vh;
-      margin: 0;
     }
-
-    .stats-card {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 30px;
+    .stats-card, .reward-card {
+      background: rgba(255,255,255,0.05);
       border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      text-align: center;
-      max-width: 350px;
+      max-width: 400px;
       width: 100%;
       margin-bottom: 20px;
+      padding: 25px;
+      text-align: center;
     }
-
-    .stats-card h2 {
+    h2 {
+      margin-top: 0;
       margin-bottom: 20px;
-      font-size: 26px;
-      border-bottom: 1px solid white;
-      padding-bottom: 10px;
     }
-
     .stat {
-      font-size: 18px;
-      margin: 10px 0;
+      background: rgba(255,255,255,0.1);
+      margin: 8px 0;
       padding: 10px;
-      background-color: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
+      font-size: 18px;
     }
-
-    .btn {
-      background-color: #00b894;
-      border: none;
-      color: white;
+    .progress-bar {
+      background: #333;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 20px;
+      margin: 10px 0;
+    }
+    .progress-fill {
+      background: #00b894;
+      height: 100%;
+      width: 0;
+      transition: width 0.5s ease-in-out;
+    }
+    button.btn {
+      margin-top: 12px;
       padding: 12px 24px;
       font-size: 16px;
       border-radius: 8px;
+      border: none;
       cursor: pointer;
-      transition: background 0.3s;
+      background-color: #00b894;
+      color: white;
+      transition: background-color 0.3s;
     }
-
-    .btn:hover {
+    button.btn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    button.btn:hover:not(:disabled) {
       background-color: #019374;
+    }
+    .back-btn {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #0984e3;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0 0 10px #0984e3;
+      transition: background-color 0.3s;
+    }
+    .back-btn:hover {
+      background-color: #74b9ff;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -65,16 +91,41 @@
     <h2>Your Game Stats</h2>
     <div class="stat">Matches Played: <span id="played">0</span></div>
     <div class="stat">Wins: <span id="wins">0</span></div>
-    <div class="stat"> draw: <span id="draw">0</span></div>
+    <div class="stat">Draws: <span id="draw">0</span></div>
     <div class="stat">Losses: <span id="losses">0</span></div>
     <div class="stat">Total Coins Won: <span id="coinswon">0</span></div>
   </div>
 
-  <button class="btn" onclick="window.history.back()">⬅️ Back</button>
+  <div class="reward-card">
+    <h2>Rewards Progress</h2>
+
+    <div>
+      <strong>Matches Played Reward (High Gift)</strong>
+      <div class="progress-bar"><div id="prog-r1" class="progress-fill"></div></div>
+      <div id="text-r1"></div>
+      <button id="btn-r1" class="btn" disabled>Claim</button>
+    </div>
+
+    <div>
+      <strong>Wins Reward (High Gift)</strong>
+      <div class="progress-bar"><div id="prog-r2" class="progress-fill"></div></div>
+      <div id="text-r2"></div>
+      <button id="btn-r2" class="btn" disabled>Claim</button>
+    </div>
+
+    <div>
+      <strong>Coins Won Reward (Low Gift)</strong>
+      <div class="progress-bar"><div id="prog-r3" class="progress-fill"></div></div>
+      <div id="text-r3"></div>
+      <button id="btn-r3" class="btn" disabled>Claim</button>
+    </div>
+  </div>
+
+  <button class="back-btn" onclick="window.history.back()">⬅️ Back</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -91,29 +142,88 @@
     const db = getDatabase(app);
     const auth = getAuth();
 
+    const thresholds = {
+      r1: 100, // matches played
+      r2: 50,  // wins
+      r3: 400  // coins won
+    };
+
+    const playedEl = document.getElementById("played");
+    const winsEl = document.getElementById("wins");
+    const drawEl = document.getElementById("draw");
+    const lossesEl = document.getElementById("losses");
+    const coinsWonEl = document.getElementById("coinswon");
+
+    const progR1 = document.getElementById("prog-r1");
+    const progR2 = document.getElementById("prog-r2");
+    const progR3 = document.getElementById("prog-r3");
+
+    const textR1 = document.getElementById("text-r1");
+    const textR2 = document.getElementById("text-r2");
+    const textR3 = document.getElementById("text-r3");
+
+    const btnR1 = document.getElementById("btn-r1");
+    const btnR2 = document.getElementById("btn-r2");
+    const btnR3 = document.getElementById("btn-r3");
+
     onAuthStateChanged(auth, async user => {
       if (!user) {
-        await Swal.fire("You must login first");
-        return location.href = "login.html";
+        await Swal.fire("Please login first");
+        location.href = "login.html";
+        return;
       }
 
       const uid = user.uid;
+
       try {
-        const statsSnap = await get(ref(db, `users/${uid}/stats`));
-        if (statsSnap.exists()) {
-          const stats = statsSnap.val();
-          document.getElementById("played").innerText = stats.played || 0;
-          document.getElementById("wins").innerText = stats.wins || 0;
-          document.getElementById("losses").innerText = stats.losses || 0;
-          document.getElementById("coinswon").innerText = stats.totalcoinswon || 0;
-          document.getElementById("draw").innerText = stats.draws || 0;
-    
-        } else {
-          Swal.fire("No stats found yet.");
+        const [statsSnap, giftsSnap, claimedSnap, progressSnap] = await Promise.all([
+          get(ref(db, `users/${uid}/stats`)),
+          get(ref(db, `users/${uid}/gifts`)),
+          get(ref(db, `users/${uid}/claimedRewards`)),
+          get(ref(db, `users/${uid}/rewardProgress`))
+        ]);
+
+        const stats = statsSnap.val() || {};
+        const gifts = giftsSnap.val() || {};
+        const claimed = claimedSnap.val() || {};
+        const progress = progressSnap.val() || {};
+
+        playedEl.innerText = stats.played || 0;
+        winsEl.innerText = stats.wins || 0;
+        drawEl.innerText = stats.draws || 0;
+        lossesEl.innerText = stats.losses || 0;
+        coinsWonEl.innerText = stats.totalcoinswon || 0;
+
+        function updateRewardUI(rId, progressCount, threshold, currentValue, giftType, btnEl, textEl, progressEl) {
+          const nextTarget = threshold * (progressCount + 1);
+          const percent = Math.min(100, (currentValue / nextTarget) * 100);
+          progressEl.style.width = percent + "%";
+
+          textEl.innerText = `Progress: ${currentValue} / ${nextTarget}`;
+
+          const canClaim = currentValue >= nextTarget && !claimed[`${rId}_${progressCount + 1}`];
+          btnEl.disabled = !canClaim;
+
+          btnEl.onclick = async () => {
+            if (!canClaim) return;
+            const updates = {};
+            updates[`gifts/${giftType}`] = (gifts[giftType] || 0) + 1;
+            updates[`claimedRewards/${rId}_${progressCount + 1}`] = true;
+            updates[`rewardProgress/${rId}`] = progressCount + 1;
+
+            await update(ref(db, `users/${uid}`), updates);
+            Swal.fire("Reward claimed!", `You received 1 ${giftType} gift.`);
+            btnEl.disabled = true;
+          };
         }
+
+        updateRewardUI("r1", progress.r1 || 0, thresholds.r1, stats.played || 0, "high", btnR1, textR1, progR1);
+        updateRewardUI("r2", progress.r2 || 0, thresholds.r2, stats.wins || 0, "high", btnR2, textR2, progR2);
+        updateRewardUI("r3", progress.r3 || 0, thresholds.r3, stats.totalcoinswon || 0, "low", btnR3, textR3, progR3);
+
       } catch (error) {
-        console.error("Stats error:", error);
-        Swal.fire("Error loading stats.");
+        console.error(error);
+        Swal.fire("Error loading data.");
       }
     });
   </script>

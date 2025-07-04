@@ -1,72 +1,142 @@
-<!DOCTYPE html>
-<html lang="so">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Received Gifts</title>
+  <title>🏱 Received Gifts</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #1e272e;
-      color: white;
+      margin: 0;
       padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f6fa;
+      color: #2f3640;
       text-align: center;
-    }
-    .gift-card {
-      background: #2f3640;
-      margin: 15px auto;
-      padding: 15px;
-      border-radius: 10px;
-      max-width: 400px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
-    .gift-card img {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-    }
-    .gift-level {
-      font-weight: bold;
-      margin: 8px 0;
-    }
-    select, button {
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 6px;
-    }
-    .claim-btn {
-      background-color: #00cec9;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .claim-btn:hover {
-      background-color: #55efc4;
-    }
-        .btn-back {
-      background-color: #00cec9;
-      color: white;
-      border: none;
-      cursor: pointer;
-     postion: fixed;
+    }h2 {
+  margin-bottom: 20px;
+  color: #0984e3;
+}
 
-    }
-    .btn-back:hover {
-      background-color: #55efc4;
-    }
+.gift-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: left;
+  transition: transform 0.3s ease;
+}
+
+.gift-card:hover {
+  transform: translateY(-4px);
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.profile img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0984e3;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info strong {
+  font-size: 17px;
+  color: #2d3436;
+}
+
+.profile-info small {
+  color: #636e72;
+  font-size: 14px;
+}
+
+.gift-date {
+  color: #636e72;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.gift-level {
+  margin: 10px 0;
+  font-weight: bold;
+  color: #d63031;
+}
+
+select, .claim-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+select {
+  background-color: #dfe6e9;
+}
+
+.claim-btn {
+  background-color: #00b894;
+  color: white;
+  cursor: pointer;
+}
+
+.claim-btn:hover {
+  background-color: #55efc4;
+}
+
+.btn-back {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0984e3;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-back:hover {
+  background-color: #74b9ff;
+}
+
+.summary {
+  background: #dff9fb;
+  padding: 10px 15px;
+  border-radius: 10px;
+  max-width: 300px;
+  margin: 10px auto 30px auto;
+  font-size: 16px;
+  color: #130f40;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
-
-  <h2>🎁 Recieve gifts</h2>
+<body>  <h2>🏱 Received Gifts</h2>
+  <div id="summary" class="summary">Total Gifts: 0</div>
   <div id="giftList">Loading...</div>
-  <button class="btn-back" onclick="window.history.back()">Back</button>
-
-  <script type="module">
+  <button class="btn-back" onclick="history.back()">⬅️ Back</button>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -83,13 +153,14 @@
     const db = getDatabase(app);
     const auth = getAuth();
 
-    const giftList = document.getElementById("giftList");
-
     const giftValues = {
       low: 100,
       medium: 500,
       high: 1000
     };
+
+    const giftList = document.getElementById("giftList");
+    const summary = document.getElementById("summary");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -98,77 +169,94 @@
         return;
       }
 
-      const currentUserUid = user.uid;
-
-      const sendRef = ref(db, `send/${currentUserUid}`);
-      const sendSnap = await get(sendRef);
+      const uid = user.uid;
+      const sendSnap = await get(ref(db, `send/${uid}`));
 
       if (!sendSnap.exists()) {
-        giftList.innerText = "No gifts.";
+        giftList.innerText = "No gifts received.";
+        summary.innerText = "Total Gifts: 0";
         return;
       }
 
-      const data = sendSnap.val();
+      const sendData = sendSnap.val();
       giftList.innerHTML = "";
+      let totalGifts = 0;
 
-      for (const senderId in data) {
-        const giftData = data[senderId];
-        const giftLevel = giftData.gift;
+      for (const senderId in sendData) {
+        const giftsFromSender = sendData[senderId];
 
-        const senderRef = ref(db, `users/${senderId}`);
-        const senderSnap = await get(senderRef);
+        const senderSnap = await get(ref(db, `users/${senderId}`));
         const sender = senderSnap.val() || {};
         const name = sender.displayname || "Unknown";
         const username = sender.username || "unknown";
         const avatar = `${sender.logo || "default"}.png`;
 
-        const card = document.createElement("div");
-        card.className = "gift-card";
+        for (const giftId in giftsFromSender) {
+          totalGifts++;
+          const giftInfo = giftsFromSender[giftId];
+          const giftLevel = giftInfo.gift;
+          const dateText = new Date(giftInfo.timestamp).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true
+          });
 
-        card.innerHTML = `
-          <img src="${avatar}" alt="Avatar">
-          <div><strong>${name}</strong> (@${username})</div>
-          <div class="gift-level">🎁 ${giftLevel.toUpperCase()} Gift</div>
-          <select id="select-${senderId}">
-            <option value="coins">Claim as Coins</option>
-            <option value="gift">Claim as Gift</option>
-          </select>
-          <br>
-          <button class="claim-btn" id="claim-${senderId}">Claim</button>
-        `;
+          const card = document.createElement("div");
+          card.className = "gift-card";
 
-        giftList.appendChild(card);
+          card.innerHTML = `
+            <div class="profile">
+              <img src="${avatar}" alt="Avatar">
+              <div class="profile-info">
+                <strong>${name}</strong>
+                <small>@${username}</small>
+              </div>
+            </div>
+            <div class="gift-date">📅 ${dateText}</div>
+            <div class="gift-level">🏱 ${giftLevel.toUpperCase()} Gift</div>
+            <select id="select-${senderId}-${giftId}">
+              <option value="coins">Claim as Coins</option>
+              <option value="gift">Claim as Gift</option>
+            </select>
+            <button class="claim-btn" id="claim-${senderId}-${giftId}">Claim</button>
+          `;
 
-        document.getElementById(`claim-${senderId}`).addEventListener("click", async () => {
-          const choice = document.getElementById(`select-${senderId}`).value;
+          giftList.appendChild(card);
 
-          const userRef = ref(db, `users/${currentUserUid}`);
-          const userSnap = await get(userRef);
-          const userData = userSnap.val() || {};
-          const currentGifts = userData.gifts || {};
-          const currentCoins = userData.coins || 0;
+          document.getElementById(`claim-${senderId}-${giftId}`).addEventListener("click", async () => {
+            const choice = document.getElementById(`select-${senderId}-${giftId}`).value;
 
-          const value = giftValues[giftLevel] || 0;
+            const userSnap = await get(ref(db, `users/${uid}`));
+            const userData = userSnap.val() || {};
+            const currentGifts = userData.gifts || {};
+            const currentCoins = userData.coins || 0;
 
-          let updates = {};
-          let msg = "";
+            const value = giftValues[giftLevel] || 0;
+            const updates = {};
+            let message = "";
 
-          if (choice === "coins") {
-            updates.coins = currentCoins + value;
-            msg = `✅ Waxaad heshay ${value} coins ah (${giftLevel} gift).`;
-          } else {
-            updates[`gifts/${giftLevel}`] = (currentGifts[giftLevel] || 0) + 1;
-            msg = `✅ you claimed 1 ${giftLevel} gift ah.`;
-          }
+            if (choice === "coins") {
+              updates.coins = currentCoins + value;
+              message = `You received ${value} coins from a ${giftLevel} gift.`;
+            } else {
+              updates[`gifts/${giftLevel}`] = (currentGifts[giftLevel] || 0) + 1;
+              message = `You claimed 1 ${giftLevel} gift to your gift inventory.`;
+            }
 
-          await update(userRef, updates);
-          await remove(ref(db, `send/${currentUserUid}/${senderId}`));
-          Swal.fire("You clamimed a gift!", msg, "success");
-          card.remove();
-        });
+            await update(ref(db, `users/${uid}`), updates);
+            await remove(ref(db, `send/${uid}/${senderId}/${giftId}`));
+            Swal.fire("Gift Claimed!", message, "success");
+            card.remove();
+            totalGifts--;
+            summary.innerText = `Total Gifts: ${totalGifts}`;
+          });
+        }
       }
-    });
-  </script>
 
-</body>
+      summary.innerText = `Total Gifts: ${totalGifts}`;
+    });
+  </script></body>
 </html>
