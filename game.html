@@ -1,101 +1,146 @@
-<!DOCTYPE html>
-<html lang="so">
+<!DOCTYPE html><html lang="so">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Game - 5 Rounds</title>
+  <title>Number Guess Battle</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-      user-select: none;
-    }
-    #role { font-weight: bold; color: #ffcc00; margin-bottom: 20px; font-size: 24px;}
-    #round {
-      margin-bottom: 10px;
-      font-size: 20px;
-      transition: opacity 0.5s ease;
-      opacity: 1;
-      display: inline-block;
-      min-width: 140px;
-    }
-    #round.fade { opacity: 0; }
-    #cardHome, #cardAway {
-      font-size: 100px;
-      display: inline-block;
-      width: 150px;
-      height: 180px;
-      border: 3px solid white;
-      border-radius: 15px;
-      line-height: 180px;
-      margin: 10px;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      opacity: 1;
-      cursor: default;
-      user-select: none;
-    }
-    #cardHome.animate, #cardAway.animate {
-      transform: scale(1.1);
-      opacity: 0.8;
-    }
-    #scoreboard {
-      margin: 20px 0;
-      font-size: 22px;
-      transition: color 0.5s ease;
-    }
-    #friendRoomInfo {
-      margin: 15px auto 30px;
-      font-size: 20px;
-      display: none;
-    }
-    #friendRoomInfo button {
-      margin-left: 10px;
-      padding: 6px 12px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 6px;
-      border: none;
-      background-color: #00cec9;
-      color: white;
-      transition: background-color 0.3s;
-    }
-    #friendRoomInfo button:hover {
-      background-color: #01a3a4;
-    }
-    #cardChoices button {
-      margin: 5px;
-      padding: 10px 15px;
-      font-size: 20px;
-      border-radius: 8px;
-      background: #444;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
+  /* Body Styling */
+body {
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  padding: 20px;
+  user-select: none;
+  min-height: 100vh;
+  margin: 0;
+}
 
+/* Role Title */
+#role {
+  font-weight: bold;
+  color: #ffdd57;
+  margin-bottom: 20px;
+  font-size: 26px;
+  text-shadow: 1px 1px 4px #000;
+}
+
+/* Round Text */
+#round {
+  margin-bottom: 10px;
+  font-size: 22px;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: 1;
+}
+
+#round.fade {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* Scoreboard */
+#scoreboard {
+  margin: 20px 0;
+  font-size: 24px;
+  color: #00ffc6;
+  text-shadow: 0 0 5px #00ffc6;
+  transition: all 0.3s ease;
+}
+
+/* Guess Button Area */
+#guessChoices {
+  margin-top: 20px;
+}
+
+/* Guess Buttons */
+#guessChoices button {
+  margin: 8px;
+  padding: 12px 20px;
+  font-size: 22px;
+  border-radius: 12px;
+  background: #292929;
+  color: #fff;
+  border: 2px solid #00ffc6;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,255,198,0.2);
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+#guessChoices button:hover {
+  background: #00ffc6;
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Profile Container */
+.profile {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin: 30px 0;
+}
+
+/* Each Profile Box */
+.profileBox {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.profileBox:hover {
+  transform: scale(1.05);
+}
+
+/* Profile Image */
+.profileBox img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid #00ffc6;
+  box-shadow: 0 0 10px #00ffc6;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Profile Name */
+.profileBox p {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Score Animation */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.score-animate {
+  animation: pop 0.4s ease;
+}
+  </style>
+ 
+</head>
+<body>  
   <div id="role">Loading role...</div>
   <div id="round">Round: 1 / 5</div>
-  <div id="friendRoomInfo">
-    Room ID: <span id="roomIdText"></span>
-    <button id="copyBtn">📋 Copy</button>
-  </div>
-  <div>
-    <div id="cardHome">🂠</div>
-    <div id="cardAway">🂠</div>
-    <div>
-      <img id="homeProfile" src="" alt="Home Profile" style="width:80px; height:80px; border-radius:50%; border:2px solid white; margin:10px;">
-      <img id="awayProfile" src="" alt="Away Profile" style="width:80px; height:80px; border-radius:50%; border:2px solid white; margin:10px;">
+  <div class="profile">
+    <div class="profileBox">
+      <img id="homeProfile" src="" alt="Home Profile">
+      <p id="homeName"></p>
+    </div>
+    <div class="profileBox">
+      <img id="awayProfile" src="" alt="Away Profile">
+      <p id="awayName"></p>
     </div>
   </div>
   <div id="scoreboard">Home: 0 | Away: 0</div>
-  <div id="cardChoices" style="display: none; margin: 20px;"></div>
+  <div id="guessChoices" style="display: none;"></div>  
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -119,315 +164,236 @@
     const urlParams = new URLSearchParams(location.search);
     const roomId = urlParams.get("room");
     const role = urlParams.get("role");
-    const stake = +urlParams.get("stake");
 
     const roleEl = document.getElementById("role");
     const roundEl = document.getElementById("round");
-    const cardHomeEl = document.getElementById("cardHome");
-    const cardAwayEl = document.getElementById("cardAway");
     const scoreboardEl = document.getElementById("scoreboard");
-    const friendRoomInfo = document.getElementById("friendRoomInfo");
-    const roomIdText = document.getElementById("roomIdText");
-    const copyBtn = document.getElementById("copyBtn");
+    const guessChoices = document.getElementById("guessChoices");
     const homeProfile = document.getElementById("homeProfile");
     const awayProfile = document.getElementById("awayProfile");
-    const cardChoices = document.getElementById("cardChoices");
+    const homeName = document.getElementById("homeName");
+    const awayName = document.getElementById("awayName");
 
     let myUid = null;
     let round = 1;
     const maxRounds = 5;
     let scoreHome = 0;
     let scoreAway = 0;
-    let roundProcessing = false;
     let lastSeenRound = 0;
 
-    const cardValues = [2,3,4,5,6,7,8,9,10,11,12,13,14];
-
-    function cardDisplay(val) {
-      return val === 11 ? "J" : val === 12 ? "Q" : val === 13 ? "K" : val === 14 ? "A" : val.toString();
-    }
-
-    function updatePlayButton(turn) {
-      if(turn === role && !roundProcessing) showCardChoices();
-      else hideCardChoices();
-    }
-
-    function animateCard(cardEl) {
-      cardEl.classList.add("animate");
-      setTimeout(() => cardEl.classList.remove("animate"), 400);
-    }
-
-    async function animateRound(newRoundText) {
-      roundEl.classList.add("fade");
-      await new Promise(r => setTimeout(r, 500));
-      roundEl.innerText = newRoundText;
-      roundEl.classList.remove("fade");
-    }
-
-    function showCardChoices() {
-      cardChoices.innerHTML = "<p>Choose your card:</p>";
-      cardValues.sort(() => 0.5 - Math.random());
-      const randomCards = cardValues.slice(0, 5);
-
-      randomCards.forEach(val => {
-        const cardBtn = document.createElement("button");
-        cardBtn.innerText = cardDisplay(val);
-        cardBtn.onclick = () => playSelectedCard(val);
-        cardChoices.appendChild(cardBtn);
-      });
-
-      cardChoices.style.display = "block";
-    }
-
-    function hideCardChoices() {
-      cardChoices.style.display = "none";
-    }
-
-    async function playSelectedCard(myCardValue) {
-      if(roundProcessing) return;
-      roundProcessing = true;
-      hideCardChoices();
-
-      try {
-        await update(ref(db, `rooms/${roomId}`), {
-          [`${role}Card`]: { uid: myUid, value: myCardValue },
-          turn: role === "home" ? "away" : "home"
-        });
-      } catch (e) {
-        console.error("Error playing card:", e);
-        await Swal.fire("Error playing card");
-        showCardChoices();
-      }
-
-      roundProcessing = false;
-    }
-
-    async function checkRoundResult(data) {
-      if(!data.homeCard || !data.awayCard) return;
-      if(data.lastResult && data.lastResult.round === data.round) return; // Already processed
-
-      const homeVal = data.homeCard.value;
-      const awayVal = data.awayCard.value;
-      let winner = null;
-      if(homeVal > awayVal) winner = "home";
-      else if(awayVal > homeVal) winner = "away";
-
-      await update(ref(db, `rooms/${roomId}`), {
-        lastResult: {
-          round: data.round,
-          winner,
-          homeCard: cardDisplay(homeVal),
-          awayCard: cardDisplay(awayVal)
-        },
-        score: {
-          home: (data.score?.home || 0) + (winner === "home" ? 1 : 0),
-          away: (data.score?.away || 0) + (winner === "away" ? 1 : 0)
-        },
-        homeCard: null,
-        awayCard: null,
-        round: data.round + 1,
-        turn: "home"
-      });
-    }
-
     onAuthStateChanged(auth, async (user) => {
-      if(!user) return location.href = "login.html";
+      if (!user) return location.href = "login.html";
       myUid = user.uid;
-      if(!roomId || !role) {
-        await Swal.fire("Invalid game parameters");
+      if (!roomId || !role) return location.href = "home.html";
+
+      roleEl.innerText = `Role: ${role}`;
+
+      const roomRef = ref(db, `rooms/${roomId}`);
+      const roomSnap = await get(roomRef);
+      if (!roomSnap.exists()) return location.href = "room.html";
+      const roomData = roomSnap.val();
+
+      // Security: Check if current user is part of the room
+      if ((role === "home" && roomData.home !== myUid) || (role === "away" && roomData.away !== myUid)) {
+        await Swal.fire("You are not part of this game", "Redirecting to home...", "warning");
         return location.href = "home.html";
       }
 
-      roleEl.innerText = `Role: ${role}`;
-      const roomRef = ref(db, `rooms/${roomId}`);
-
-      // Load own profile pic
-      const meSnap = await get(ref(db, `users/${myUid}`));
-      if (meSnap.exists()) {
-        const me = meSnap.val();
-        const imagePath = me.logo ? `./${me.logo}.png` : "default.png";
-        if (role === "home") homeProfile.src = imagePath;
-        else awayProfile.src = imagePath;
+      // Load profiles
+      const homeSnap = await get(ref(db, `users/${roomData.home}`));
+      const awaySnap = await get(ref(db, `users/${roomData.away}`));
+      if (homeSnap.exists()) {
+        const home = homeSnap.val();
+        homeProfile.src = home.logo ? `./${home.logo}.png` : "default.png";
+        homeName.innerText = home.username || "Home";
       }
-
-      // Load opponent profile pic
-      const otherRole = role === "home" ? "away" : "home";
-      const otherUidSnap = await get(ref(db, `rooms/${roomId}/${otherRole}`));
-      if (otherUidSnap.exists()) {
-        const otherUid = otherUidSnap.val();
-        const otherUserSnap = await get(ref(db, `users/${otherUid}`));
-        if (otherUserSnap.exists()) {
-          const otherUser = otherUserSnap.val();
-          const otherImagePath = otherUser.logo ? `./${otherUser.logo}.png` : "default.png";
-          if (role === "home") awayProfile.src = otherImagePath;
-          else homeProfile.src = otherImagePath;
-        }
+      if (awaySnap.exists()) {
+        const away = awaySnap.val();
+        awayProfile.src = away.logo ? `./${away.logo}.png` : "default.png";
+        awayName.innerText = away.username || "Away";
       }
-
-      roomIdText.innerText = roomId;
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(roomId).then(() => {
-          copyBtn.innerText = "✅ Copied!";
-          setTimeout(() => copyBtn.innerText = "📋 Copy", 2000);
-        });
-      };
 
       onValue(roomRef, async snap => {
-        if(!snap.exists()) {
-          await Swal.fire("Game ended or room deleted");
-          return location.href = "room.html";
-        }
+        if (!snap.exists()) return location.href = "room.html";
 
         const data = snap.val();
 
-        if(data.home !== myUid && data.away !== myUid) {
-          await Swal.fire("You are no longer in this game");
-          return location.href = "room.html";
-        }
-
-        if(data.type === "friendmatch") friendRoomInfo.style.display = "block";
-        else friendRoomInfo.style.display = "none";
-
-        if(data.round === undefined || data.round < 1) {
-          await update(roomRef, { round: 1, score: { home: 0, away: 0 }, turn: "home", homeCard: null, awayCard: null });
+        if (!data.round) {
+          await update(roomRef, { round: 1, score: { home: 0, away: 0 } });
           return;
         }
 
-        if(data.round !== round) {
-          await animateRound(`Round: ${data.round} / ${maxRounds}`);
+        if (data.round !== round) {
           round = data.round;
+          roundEl.classList.add("fade");
+          await new Promise(r => setTimeout(r, 500));
+          roundEl.innerText = `Round: ${round} / ${maxRounds}`;
+          roundEl.classList.remove("fade");
         }
 
-        if(data.score) {
-          if(scoreHome !== data.score.home || scoreAway !== data.score.away) {
-            scoreHome = data.score.home;
-            scoreAway = data.score.away;
-            scoreboardEl.innerText = `Home: ${scoreHome} | Away: ${scoreAway}`;
-            scoreboardEl.style.color = "#28a745";
-            setTimeout(() => scoreboardEl.style.color = "white", 500);
-          }
+        if (data.score) {
+          scoreHome = data.score.home || 0;
+          scoreAway = data.score.away || 0;
+          scoreboardEl.innerText = `Home: ${scoreHome} | Away: ${scoreAway}`;
         }
 
-        cardHomeEl.innerText = data.homeCard ? cardDisplay(data.homeCard.value) : "🂠";
-        cardAwayEl.innerText = data.awayCard ? cardDisplay(data.awayCard.value) : "🂠";
-
-        if(data.homeCard) animateCard(cardHomeEl);
-        if(data.awayCard) animateCard(cardAwayEl);
-
-        if(data[`${role}Card`] && data.round === round) {
-          hideCardChoices();
+        if (!data[`${role}Guess`] && round <= maxRounds) {
+          showGuessChoices();
         } else {
-          updatePlayButton(data.turn || "home");
+          guessChoices.style.display = "none";
         }
 
-        // Check if round is finished and update scores
-        await checkRoundResult(data);
+        // Only home creates target and calculates round result
+        if (
+          role === "home" &&
+          data.homeGuess && data.awayGuess &&
+          data.round === round &&
+          (!data.lastResult || data.lastResult.round !== round)
+        ) {
+          const target = Math.floor(Math.random() * 10) + 1;
+          const diffHome = Math.abs(data.homeGuess.value - target);
+          const diffAway = Math.abs(data.awayGuess.value - target);
 
-        if (data.lastResult && data.lastResult.round !== lastSeenRound) {
-          lastSeenRound = data.lastResult.round;
-          let resultMsg = `Round ${data.lastResult.round}: `;
-          if (data.lastResult.winner === "home") resultMsg += "Home Wins!";
-          else if (data.lastResult.winner === "away") resultMsg += "Away Wins!";
-          else resultMsg += "Draw!";
+          let winner = null;
+          if (diffHome < diffAway) winner = "home";
+          else if (diffAway < diffHome) winner = "away";
 
-          await Swal.fire({
-            title: "Round Result",
-            text: `${resultMsg}\nHome: ${data.lastResult.homeCard} | Away: ${data.lastResult.awayCard}`,
-            icon: data.lastResult.winner ? "success" : "info"
+          await update(roomRef, {
+            lastResult: {
+              round,
+              winner,
+              target,
+              home: data.homeGuess.value,
+              away: data.awayGuess.value
+            },
+            score: {
+              home: scoreHome + (winner === "home" ? 1 : 0),
+              away: scoreAway + (winner === "away" ? 1 : 0)
+            },
+            round: round + 1,
+            homeGuess: null,
+            awayGuess: null
           });
         }
 
-        if(round > maxRounds) {
-          await endGame();
+        if (data.lastResult && data.lastResult.round !== lastSeenRound) {
+          lastSeenRound = data.lastResult.round;
+          const result = data.lastResult;
+          let msg = `🎯 Target: ${result.target}\nHome: ${result.home} | Away: ${result.away}`;
+          let title = result.winner ? `${result.winner.toUpperCase()} Wins the Round!` : "It's a Draw!";
+
+          await Swal.fire({ title, text: msg, icon: result.winner ? "success" : "info" });
+        }
+
+        if (round > maxRounds) {
+          document.querySelectorAll("#guessChoices button").forEach(btn => btn.disabled = true);
+          setTimeout(() => {
+  endGame();
+}, 2000);
         }
       });
-
     });
 
- let gameEnded = false;
+    function showGuessChoices() {
+      guessChoices.innerHTML = "<p>Choose a number (1-10):</p>";
+      for (let i = 1; i <= 10; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = i;
+        btn.onclick = () => selectGuess(i);
+        guessChoices.appendChild(btn);
+      }
+      guessChoices.style.display = "block";
+    }
+
+    async function selectGuess(val) {
+      guessChoices.style.display = "none";
+      await update(ref(db, `rooms/${roomId}`), {
+        [`${role}Guess`]: { uid: myUid, value: val }
+      });
+    }
+let gameEnded = false;
 
 async function endGame() {
   if (gameEnded) return;
   gameEnded = true;
 
-  let msg = "";
-  let icon = "info";
-  let userWon = false;
-
-  if(scoreHome > scoreAway) {
-    msg = "Home Player Wins!";
-    icon = "success";
-    userWon = (role === "home");
-  } else if(scoreAway > scoreHome) {
-    msg = "Away Player Wins!";
-    icon = "success";
-    userWon = (role === "away");
-  } else {
-    msg = "It's a Draw!";
-    icon = "info";
-  }
-
   const roomRef = ref(db, `rooms/${roomId}`);
   const roomSnap = await get(roomRef);
+  if (!roomSnap.exists()) return;
+
   const roomData = roomSnap.val();
+  const homeUid = roomData.home;
+  const awayUid = roomData.away;
+  const stake = roomData.stake || 10;
+  const roomType = roomData.type || "normal"; // default to normal
+  const isFriendMatch = roomType === "friendmatch";
 
-  if(roomData?.type === "friendmatch") {
-    const youMsg = userWon ? "You Win!" : (msg === "It's a Draw!" ? "It's a Draw!" : "You Lose!");
+  let winner = null;
+  if (scoreHome > scoreAway) winner = "home";
+  else if (scoreAway > scoreHome) winner = "away";
+  const isDraw = winner === null;
 
-    await Swal.fire({
-      title: youMsg,
-      text: `Final Score - Home: ${scoreHome} | Away: ${scoreAway}`,
-      icon: userWon ? "success" : "error",
-      confirmButtonText: "OK"
-    });
+  // ✅ Step 1: Show final result via SweetAlert
 
-    await update(roomRef, { 
-      homeReady: null,
-      awayReady: null,
-      score: null,
-      round: null,
-      turn: null,
-    });
-     window.history.back();
-
-  } else {
-    const userStatsRef = ref(db, `users/${myUid}/stats`);
+  // ✅ Step 2: Update stats if NOT friendmatch
+  if (!isFriendMatch) {
+    const homeStatsRef = ref(db, `users/${homeUid}/stats`);
+    const awayStatsRef = ref(db, `users/${awayUid}/stats`);
 
     try {
-      const statsSnap = await get(userStatsRef);
-      let stats = statsSnap.exists() ? statsSnap.val() : { played:0, wins:0, losses:0, coins:0, coinswon:0 };
+      const [homeSnap, awaySnap] = await Promise.all([
+        get(homeStatsRef),
+        get(awayStatsRef)
+      ]);
 
-      stats.played = (stats.played || 0) + 1;
+      const homeStats = homeSnap.exists() ? homeSnap.val() : {
+        played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0
+      };
+      const awayStats = awaySnap.exists() ? awaySnap.val() : {
+        played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0
+      };
 
-      if(userWon) {
-        stats.wins = (stats.wins || 0) + 1;
-        stats.coins = (stats.coins || 0) + stake * 2;
-        stats.totalcoinswon = (stats.totalcoinswon || 0) + stake * 2;
-      } else if(msg === "It's a Draw!") {
-        stats.draws = (stats.draws || 0) + 1;
+      // Update played
+      homeStats.played += 1;
+      awayStats.played += 1;
+
+      if (winner === "home") {
+        homeStats.wins += 1;
+        homeStats.coins += stake * 2;
+        homeStats.totalcoinswon += stake * 2;
+        awayStats.losses += 1;
+      } else if (winner === "away") {
+        awayStats.wins += 1;
+        awayStats.coins += stake * 2;
+        awayStats.totalcoinswon += stake * 2;
+        homeStats.losses += 1;
       } else {
-        stats.losses = (stats.losses || 0) + 1;
+        homeStats.draws += 1;
+        awayStats.draws += 1;
       }
 
-      await update(userStatsRef, stats);
-
-      await Swal.fire({
-        title: msg,
-        text: `Final Score - Home: ${scoreHome} | Away: ${scoreAway}`,
-        icon: icon,
-        confirmButtonText: "OK"
-      });
-
-      await remove(roomRef);
-      location.href = "search.html";
-
-    } catch(e) {
-      console.error("Stats update error:", e);
-      await Swal.fire("Error", "Error updating stats", "error");
-      location.href = "search.html";
+      await Promise.all([
+        update(homeStatsRef, homeStats),
+        update(awayStatsRef, awayStats)
+      ]);
+    } catch (err) {
+      console.error("⚠️ Stats update error:", err);
     }
   }
+
+  // ✅ Step 3: Redirect to endgame page
+  const endParams = new URLSearchParams({
+    room: roomId,
+    role,
+    type: roomType,
+    winner: isDraw ? "draw" : winner,
+    scoreHome,
+    scoreAway
+  });
+
+  location.href = `endgame.html?${endParams.toString()}`;
 }
+
   </script>
-  
-     
+</body>
+</html>

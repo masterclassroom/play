@@ -1,121 +1,275 @@
-<!DOCTYPE html>  <html lang="so">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />  
-  <title>Match making</title>  
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>  
-  <style>  
-    body {  
-      background: #0f2027;  
-      color: white;  
-      font-family: Arial, sans-serif;  
-      text-align: center;  
-      padding: 40px;  
-    }  
-    button {  
-      padding: 14px 30px;  
-      font-size: 18px;  
-      margin: 15px;  
-      border: none;  
-      border-radius: 10px;  
-      cursor: pointer;  
-      background-color: #00cec9;  
-      color: white;  
-    }  
-    button:hover {  
-      background-color: #01a3a4;  
-    }  
-  </style>  
-</head>  
-<body>  
-  <h1>Friend Match</h1>  
-  <button id="createBtn">Create Room</button>  
-  <button id="joinBtn">Join Room</button>  
-  <button onclick="window.history.back()">Back</button>    <script type="module">  
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";  
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";  
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";  
-  
-    const firebaseConfig = {  
-      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",  
-      authDomain: "exam-81b90.firebaseapp.com",  
-      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",  
-      projectId: "exam-81b90",  
-      storageBucket: "exam-81b90.appspot.com",  
-      messagingSenderId: "461178422237",  
-      appId: "1:461178422237:web:8433ab42b524b0a17bac34"  
-    };  
-  
-    const app = initializeApp(firebaseConfig);  
-    const db = getDatabase(app);  
-    const auth = getAuth();  
-  
-    const createBtn = document.getElementById('createBtn');  
-    const joinBtn = document.getElementById('joinBtn');  
-  
-    let currentUser = null;  
-  
-    onAuthStateChanged(auth, user => {  
-      if (!user) return location.href = "login.html";  
-      currentUser = user;  
-    });  
-  
-    createBtn.onclick = async () => {  
-      const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();  
-      await set(ref(db, `rooms/${roomId}`), {  
-        host: currentUser.uid,  
-        round: 0,  
-        stake: 10,  
-        home: currentUser.uid,  
-        createdAt: Date.now(),  
-        type: "friendmatch"  
-      });  
-      location.href = `room.html?room=${roomId}&role=home&stake=10`;  
-    };  
-  
-joinBtn.onclick = async () => {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Match making</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background: #0f2027;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .card {
+      background-color: whitesmoke;
+      color: #333;
+      padding: 30px;
+      margin: 20px auto;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    .card h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 16px;
+    }
+
+    .back-button {
+      padding: 14px 30px;
+      font-size: 18px;
+      margin-top: 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #a1bec4;
+      color: white;
+    }
+
+    .back-button:hover {
+      background-color: #7fa3b3;
+    }
+
+    /* SweetAlert buttons style */
+    .swal2-popup {
+      width: 98% !important;
+      max-width: 600px !important;
+    }
+
+    .swal2-styled.swal2-confirm,
+    .swal2-styled.swal2-cancel {
+      background-color: #a1bec4 !important;
+      color: white !important;
+    }
+
+    .swal2-styled.swal2-confirm:hover,
+    .swal2-styled.swal2-cancel:hover {
+      background-color: #7fa3b3 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="createCard">
+    <h1>Create a Room</h1>
+    <p>You can create a room with an 8-digit code. Anyone with the code can join and play with you.</p>
+  </div>
+
+  <div class="card" id="joinCard">
+    <h1>Search a Room</h1>
+    <p>If you have a code, you can join your friend's game room directly.</p>
+  </div>
+
+  <button class="back-button" onclick="window.history.back()">Back</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, user => {
+      if (!user) return location.href = "login.html";
+      currentUser = user;
+    });
+
+    // Create Room with optional password
+    document.getElementById("createCard").onclick = async () => {
+      const { value: pwData } = await Swal.fire({
+        title: 'Protect Room?',
+        html: `
+          <p>Do you want to protect this room with a password?</p>
+          <input type="checkbox" id="pwCheck"> Yes
+          <div id="pwInputDiv" style="margin-top: 10px; display: none;">
+            <input type="password" id="pwInput" placeholder="Enter password" class="swal2-input">
+          </div>
+        `,
+        confirmButtonText: "Next",
+        showCancelButton: true,
+        background: 'whitesmoke',
+        color: '#333',
+        didOpen: () => {
+          const pwCheck = document.getElementById("pwCheck");
+          const pwInputDiv = document.getElementById("pwInputDiv");
+          pwCheck.addEventListener("change", () => {
+            pwInputDiv.style.display = pwCheck.checked ? "block" : "none";
+          });
+        },
+        preConfirm: () => {
+          const checked = document.getElementById("pwCheck").checked;
+          const pw = document.getElementById("pwInput")?.value.trim();
+
+          if (checked && !pw) {
+            Swal.showValidationMessage("Password needed");
+            return false;
+          }
+          return { checked, pw };
+        }
+      });
+
+      if (!pwData) return; // Cancelled
+
+      const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
+      const roomData = {
+        host: currentUser.uid,
+        round: 0,
+        stake: 10,
+        home: currentUser.uid,
+        createdAt: Date.now(),
+        type: "friendmatch"
+      };
+
+      if (pwData.checked) {
+        roomData.password = pwData.pw;
+        roomData.passworded = true;
+      }
+
+      await set(ref(db, `rooms/${roomId}`), roomData);
+      location.href = `room.html?room=${roomId}&role=home`;
+    };
+
+    // Join Room / Search Room
+    document.getElementById("joinCard").onclick = async () => {
+
+  // Step 1: Ask for Room ID with validation + async check
   const { value: roomId } = await Swal.fire({
-    title: 'Enter Room ID',
-    input: 'text',
-    inputLabel: 'Room Code',
-    inputPlaceholder: 'Enter 8-digit Room ID',
+    title: "Enter Room ID",
+    input: "text",
+    inputLabel: "Room Code",
+    inputPlaceholder: "Enter 8-digit Room ID",
     inputAttributes: { maxlength: 8 },
-    confirmButtonText: 'Check Room',
-    showCancelButton: true
+    confirmButtonText: "Search",
+    showCancelButton: true,
+    background: 'whitesmoke',
+    color: '#333',
+    inputValidator: (value) => {
+      if (!value) return "Please enter a Room ID";
+      if (!/^\d{8}$/.test(value)) return "Room ID must be exactly 8 digits";
+    },
+    preConfirm: async (value) => {
+      const roomSnap = await get(ref(db, `rooms/${value}`));
+      if (!roomSnap.exists()) {
+        Swal.showValidationMessage('Room not found');
+        return false;
+      }
+      return value;
+    }
   });
 
-  if (!roomId) return;
+  if (!roomId) return; // Cancelled
 
+  // Fetch room data after validation
   const roomSnap = await get(ref(db, `rooms/${roomId}`));
-  if (!roomSnap.exists()) {
-    return Swal.fire("No room found", "", "error");
-  }
-
-  const roomData = roomSnap.val(); // ✅ WAXAA LA DARAA
+  const roomData = roomSnap.val();
   const hostUid = roomData.host;
 
   const userSnap = await get(ref(db, `users/${hostUid}`));
   const username = userSnap.val()?.username || "Unknown";
   const logo = userSnap.val()?.logo || "default";
 
-  Swal.fire({
-    title: `Join ${username}'s Room?`,
+  const enterConfirm = await Swal.fire({
+    title: `Room Found - Owner: ${username}`,
     html: `<img src="${logo}.png" style="width:70px;height:70px;border-radius:50%"><p>${username}</p>`,
-    showCancelButton: true,
-    confirmButtonText: 'Join Game',
-    cancelButtonText: 'Cancel'
-  }).then(async res => {
-    if (res.isConfirmed) {
-      if (!roomData.away) {
-        await set(ref(db, `rooms/${roomId}/away`), currentUser.uid);
-        setTimeout(() => {
-          location.href = `room.html?room=${roomId}&role=away&stake=10`;
-        }, 1000);
-      } else {
-        Swal.fire("Someone already joined", "", "info");
-      }
-    }
+    confirmButtonText: "Enter",
+    background: 'whitesmoke',
+    color: '#333',
   });
+
+  if (!enterConfirm.isConfirmed) return;
+
+  // If room has password, ask with validation message
+  if (roomData.passworded === true) {
+    const { value: enteredPw } = await Swal.fire({
+      title: "This room is protected",
+      input: "password",
+      inputPlaceholder: "Enter room password",
+      showCancelButton: true,
+      confirmButtonText: "Check",
+      background: 'whitesmoke',
+      color: '#333',
+      preConfirm: (pw) => {
+        if (!pw) {
+          Swal.showValidationMessage('Password required');
+          return false;
+        }
+        if (pw !== roomData.password) {
+          Swal.showValidationMessage('Incorrect password');
+          return false;
+        }
+        return pw;
+      }
+    });
+
+    if (!enteredPw) return; // Cancelled or no password entered
+
+    // Set away + passwordAway and redirect
+    if (!roomData.away) {
+      await set(ref(db, `rooms/${roomId}/away`), currentUser.uid);
+      await set(ref(db, `rooms/${roomId}/passwordAway`), true);
+      location.href = `room.html?room=${roomId}&role=away`;
+    } else {
+      Swal.fire({
+        title: "This room is full",
+        background: 'whitesmoke',
+        color: '#333',
+      });
+    }
+
+  } else {
+    // No password room
+    if (!roomData.away) {
+      await set(ref(db, `rooms/${roomId}/away`), currentUser.uid);
+      location.href = `room.html?room=${roomId}&role=away`;
+    } else {
+      Swal.fire({
+        title: "This room is full",
+        background: 'whitesmoke',
+        color: '#333',
+      });
+    }
+  }
 };
-  </script>  </body>  
-</html> 
+  </script>
+</body>
+</html>

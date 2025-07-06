@@ -57,7 +57,7 @@
     <p id="awayName">Away: Waiting...</p>
   </div>
 
-  <button class="ready-btn" id="readyBtn">I'm Ready</button>
+  <button class="ready-btn" id="readyBtn">Ready</button>
   <p id="playersCount">Players Ready: 0/2</p>
   <p id="timer">Time Left: 120s</p>
 
@@ -103,18 +103,75 @@
 
     const roomRef = ref(db, `rooms/${roomId}`);
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return location.href = "login.html";
-      currentUser = user;
-      const myUid = currentUser.uid;
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return location.href = "login.html";
+  currentUser = user;
+  const myUid = currentUser.uid;
 
-      if (!roomId || !role) {
-        await Swal.fire("Invalid game parameters");
-        return location.href = "matchmaking.html";
-      }
+  if (!roomId || !role) {
+    await Swal.fire("Invalid game parameters");
+    return location.href = "home.html";
+  }
 
-      // Save current user role uid in room
-      await set(ref(db, `rooms/${roomId}/${role}`), myUid);
+  // Haddii role = away, hubi home user jira
+  if (role === "away") {
+    const homeSnap = await get(ref(db, `rooms/${roomId}/home`));
+    if (!homeSnap.exists() || !homeSnap.val()) {
+      await Swal.fire({
+        icon: "error",
+        title: "No creator room found",
+        text: "The game room creator has left or the room is invalid."
+      });
+      await set(ref(db, `rooms/${roomId}`), null);
+      return location.href = "home.html";
+    }
+
+    // Hubi haddii userka hadda jiro room-ka as away
+    const awaySnap = await get(ref(db, `rooms/${roomId}/away`));
+    if (!awaySnap.exists() || awaySnap.val() !== myUid) {
+      await Swal.fire({
+        icon: "error",
+        title: "Access denied",
+        text: "You are no part of the room."
+      });
+      await set(ref(db, `rooms/${roomId}/away`), null);
+      return location.href = "home.html";
+    }
+
+    // Hubi haddii passwordAway jiro
+    const passSnap = await get(ref(db, `rooms/${roomId}/passwordAway`));
+    if (!passSnap.exists() || !passSnap.val()) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Password needed",
+        text: "Password is required to join as away player."
+      });
+      await set(ref(db, `rooms/${roomId}/away`), null);
+      
+      return location.href = "matchmaking.html";
+    }
+  }
+
+  // Haddii role = home, hubi userku yahay home
+  if (role === "home") {
+    const homeSnap = await get(ref(db, `rooms/${roomId}/home`));
+    if (!homeSnap.exists() || homeSnap.val() !== myUid) {
+      await Swal.fire({
+        icon: "error",
+        title: "Access denied",
+        text: "You are not the room creator."
+      });
+      await set(ref(db, `rooms/${roomId}/home`), null);
+      return location.href = "home.html";
+    }
+  }
+
+  // Halkan sii wad code-ka hore
+  // ...
+
+
+  // Markaad halkan joogtid, user-ka waa sax, sii wad code-kaaga
+  // ...
 
       // Set current user profile image and name
       const meSnap = await get(ref(db, `users/${myUid}`));
