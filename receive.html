@@ -134,7 +134,10 @@ select {
 <body>  <h2>🏱 Received Gifts</h2>
   <div id="summary" class="summary">Total Gifts: 0</div>
   <div id="giftList">Loading...</div>
-  <button class="btn-back" onclick="history.back()">⬅️ Back</button>  <script type="module">
+  <button class="btn-back" onclick="window.location.href='home.html'">⬅️ Back</button>
+  <script src="g.js"></script>
+  
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";

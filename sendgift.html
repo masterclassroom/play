@@ -23,15 +23,16 @@
       width: 80px;
       height: 80px;
       border-radius: 50%;
+      cursor: pointer;
     }
     select, button {
       padding: 10px;
       font-size: 16px;
-      margin-top: 15px;
+      margin-top: 10px;
       border-radius: 6px;
       cursor: pointer;
     }
-    #giftInfo {
+    #giftInfo, #rec, #bim {
       margin-top: 10px;
       font-weight: bold;
     }
@@ -43,15 +44,9 @@
       text-align: left;
       font-size: 16px;
     }
-    #rec {
-      margin-top: 10px;
-      font-weight: bold;
+    #partnerName {
+      cursor: pointer;
     }
-  #bim {
-    margin-top: 10px;
-      font-weight: bold;
-  }
-    
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -73,145 +68,209 @@
     <div id="giftInfo">Gift Level: Low</div>
 
     <button id="sendBtn">Send Gift</button>
-    <button id="rec" onclick="rec()">recived gifts</button> <button id="bim" onclick="buy()"> buy or widthraw gift</button>
+    <button onclick="loadFriends()">👥 My Friends</button>
+    <button id="rec" onclick="rec()">Received Gifts</button>
+    <button id="bim" onclick="buy()">Buy or Withdraw Gift</button>
     <br /><br />
     <button onclick="history.back()">⬅️ Back</button>
   </div>
+  <script src="g.js"></script>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-      authDomain: "exam-81b90.firebaseapp.com",
-      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-      projectId: "exam-81b90",
-      storageBucket: "exam-81b90.appspot.com",
-      messagingSenderId: "461178422237",
-      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+  const firebaseConfig = {
+    apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+    authDomain: "exam-81b90.firebaseapp.com",
+    databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+    projectId: "exam-81b90",
+    storageBucket: "exam-81b90.appspot.com",
+    messagingSenderId: "461178422237",
+    appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth();
+
+  const uid = new URLSearchParams(location.search).get("user");
+
+  const giftSelect = document.getElementById("giftSelect");
+  const giftInfo = document.getElementById("giftInfo");
+  const partnerName = document.getElementById("partnerName");
+  const partnerImg = document.getElementById("partnerImg");
+  const coinText = document.getElementById("coinText");
+  const giftsList = document.getElementById("giftsList");
+  const sendBtn = document.getElementById("sendBtn");
+
+  let currentUserUid;
+  let currentUserData = {};
+
+  giftSelect.addEventListener("change", () => {
+    const val = giftSelect.value;
+    giftInfo.innerText = `Gift Level: ${val.charAt(0).toUpperCase() + val.slice(1)}`;
+  });
+
+  function updateGiftsDisplay(giftsObj) {
+    if (!giftsObj) {
+      giftsList.innerText = "You have no gifts.";
+      return;
+    }
+    let text = "Your Gifts:\n";
+    text += `High: ${giftsObj.high || 0}\n`;
+    text += `Medium: ${giftsObj.medium || 0}\n`;
+    text += `Low: ${giftsObj.low || 0}`;
+    giftsList.innerText = text;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      Swal.fire("Fadlan gal account-ka");
+      location.href = "login.html";
+      return;
+    }
+
+    currentUserUid = user.uid;
+
+    // Load target user info
+    const userSnap = await get(ref(db, `users/${uid}`));
+    if (!userSnap.exists()) {
+      Swal.fire("User not found");
+      return;
+    }
+    const userData = userSnap.val();
+    const username = userData.username || "Unknown";
+
+    partnerName.innerText = username;
+    partnerImg.src = `${userData.logo || "avatars/default"}.png`;
+
+    // Clickable profile redirects
+    partnerImg.onclick = () => {
+      window.location.href = `profile.html?uid=${uid}`;
+    };
+    partnerName.onclick = () => {
+      window.location.href = `profile.html?uid=${uid}`;
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth();
+    // Load sender info
+    const mySnap = await get(ref(db, `users/${currentUserUid}`));
+    if (mySnap.exists()) {
+      currentUserData = mySnap.val();
+      coinText.innerText = `Coins: ${currentUserData.coins || 0}`;
+      updateGiftsDisplay(currentUserData.gifts);
+    } else {
+      giftsList.innerText = "Error loading gifts.";
+    }
+  });
 
-    const uid = new URLSearchParams(location.search).get("user");
+  sendBtn.addEventListener("click", async () => {
+    const selectedGift = giftSelect.value;
+    const gifts = currentUserData.gifts || {};
+    const giftCount = gifts[selectedGift] || 0;
 
-    const giftSelect = document.getElementById("giftSelect");
-    const giftInfo = document.getElementById("giftInfo");
-    const partnerName = document.getElementById("partnerName");
-    const partnerImg = document.getElementById("partnerImg");
-    const coinText = document.getElementById("coinText");
-    const giftsList = document.getElementById("giftsList");
-    const sendBtn = document.getElementById("sendBtn");
-
-    let currentUserUid;
-    let currentUserData = {};
-
-    giftSelect.addEventListener("change", () => {
-      const val = giftSelect.value;
-      giftInfo.innerText = `Gift Level: ${val.charAt(0).toUpperCase() + val.slice(1)}`;
-    });
-
-    function updateGiftsDisplay(giftsObj) {
-      if (!giftsObj) {
-        giftsList.innerText = "You have no gifts.";
-        return;
-      }
-      let text = "Your Gifts:\n";
-      text += `High: ${giftsObj.high || 0}\n`;
-      text += `Medium: ${giftsObj.medium || 0}\n`;
-      text += `Low: ${giftsObj.low || 0}`;
-      giftsList.innerText = text;
+    if (giftCount < 1) {
+      Swal.fire(`You don't have any ${selectedGift} gifts!`);
+      return;
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        Swal.fire("Fadlan gal account-ka");
-        location.href = "login.html";
-        return;
-      }
-
-      currentUserUid = user.uid;
-
-      // Load target user info
-      const userSnap = await get(ref(db, `users/${uid}`));
-      if (!userSnap.exists()) {
-        Swal.fire("User not found");
-        return;
-      }
-      const userData = userSnap.val();
-      const displayName = userData.displayname || "Unknown";
-      const username = userData.username || "Unknown";
-
-      partnerName.innerHTML = `<strongr>${username}</strong>`;
-      partnerImg.src = `${userData.logo || "default"}.png`;
-
-      // Load sender info
-      const mySnap = await get(ref(db, `users/${currentUserUid}`));
-      if (mySnap.exists()) {
-        currentUserData = mySnap.val();
-        coinText.innerText = `Coins: ${currentUserData.coins || 0}`;
-        updateGiftsDisplay(currentUserData.gifts);
-      } else {
-        giftsList.innerText = "Error loading gifts.";
-      }
+    const confirm = await Swal.fire({
+      title: `Send ${selectedGift} gift?`,
+      text: `This will use 1 ${selectedGift} gift from your balance.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, send it!"
     });
 
-    sendBtn.addEventListener("click", async () => {
-      const selectedGift = giftSelect.value;
-      const gifts = currentUserData.gifts || {};
-      const giftCount = gifts[selectedGift] || 0;
+    if (!confirm.isConfirmed) return;
 
-      if (giftCount < 1) {
-        Swal.fire(`You don't have any ${selectedGift} gifts!`);
-        return;
-      }
+    try {
+      // Decrease gift from sender
+      gifts[selectedGift] = giftCount - 1;
+      await update(ref(db, `users/${currentUserUid}/gifts`), {
+        [selectedGift]: gifts[selectedGift]
+      });
+      currentUserData.gifts = gifts;
+      updateGiftsDisplay(gifts);
 
-      const confirm = await Swal.fire({
-        title: `Send ${selectedGift} gift?`,
-        text: `This will use 1 ${selectedGift} gift from your balance.`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Yes, send it!"
+      // Save gift to receiver
+      await push(ref(db, `send/${uid}/${currentUserUid}`), {
+        gift: selectedGift,
+        timestamp: Date.now()
       });
 
-      if (!confirm.isConfirmed) return;
+      Swal.fire(`You sent a ${selectedGift} gift!`);
 
-      try {
-        // Decrease gift from sender
-        gifts[selectedGift] = giftCount - 1;
-        await update(ref(db, `users/${currentUserUid}/gifts`), {
-          [selectedGift]: gifts[selectedGift]
-        });
-        currentUserData.gifts = gifts;
-        updateGiftsDisplay(gifts);
+    } catch (e) {
+      console.error(e);
+      Swal.fire("Error sending gift.");
+    }
+  });
 
-        // Save gift to receiver using push (don't overwrite)
-        await push(ref(db, `send/${uid}/${currentUserUid}`), {
-          gift: selectedGift,
-          timestamp: Date.now()
-        });
-
-        Swal.fire(`You sent a ${selectedGift} gift!`);
-
-      } catch (e) {
-        console.error(e);
-        Swal.fire("Error sending gift.");
+  // Load Friends
+  window.loadFriends = async function () {
+    try {
+      const friendsRef = ref(db, `friends/${currentUserUid}`);
+      const snapshot = await get(friendsRef);
+      if (!snapshot.exists()) {
+        Swal.fire("No friends found.");
+        return;
       }
-    });
-  </script>
 
-  <script>
-    function rec() {
-      window.location.href = 'receive.html';
+      const data = snapshot.val();
+      const friendUIDs = Object.keys(data);
+      if (friendUIDs.length === 0) {
+        Swal.fire("You don't have any friends yet.");
+        return;
+      }
+
+      const friendSnaps = await Promise.all(
+        friendUIDs.map(uid => get(ref(db, `users/${uid}`)))
+      );
+
+      const html = friendSnaps.map((snap, i) => {
+        const u = snap.val();
+        const name = u.username || "Unknown";
+        const logo = u.logo || "avatars/default";
+        return `
+          <div style="margin: 10px; display: flex; align-items: center; gap: 10px;">
+            <img src="${logo}.png" style="width:40px;height:40px;border-radius:50%" />
+            <span style="flex: 1;">${name}</span>
+            <button onclick="changeTargetUID('${friendUIDs[i]}')">🎁 Select</button>
+          </div>
+        `;
+      }).join("");
+
+      Swal.fire({
+        title: "Choose a Friend",
+        html,
+        showConfirmButton: false,
+        width: 400,
+      });
+
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error loading friends.");
     }
+  };
+
+  // Change UID to selected friend
+  window.changeTargetUID = function (newUid) {
+    const url = new URL(location.href);
+    url.searchParams.set("user", newUid);
+    window.location.href = url.toString();
+  };
+</script>
+
+<script>
+  function rec() {
+    window.location.href = 'receive.html';
+  }
   function buy() {
-      window.location.href = 'gifts.html';
-    }
-  </script>
+    window.location.href = 'gifts.html';
+  }
+</script>
 
 </body>
 </html>

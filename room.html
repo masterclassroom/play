@@ -40,6 +40,23 @@
       font-size: 18px;
       color: #f1c40f;
     }
+    .opponent-container {
+      position: relative;
+      display: inline-block;
+    }
+    #inviteBtn {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -50,8 +67,13 @@
 
   <div>
     <img id="homeProfile" src="default.png" alt="Home" />
-    <img id="awayProfile" src="default.png" alt="Away" />
+    
+    <div class="opponent-container">
+      <img id="awayProfile" src="default.png" alt="Away" />
+      <button id="inviteBtn" title="Invite Friend">+</button>
+    </div>
   </div>
+
   <div>
     <p id="homeName">Home: Waiting...</p>
     <p id="awayName">Away: Waiting...</p>
@@ -61,9 +83,11 @@
   <p id="playersCount">Players Ready: 0/2</p>
   <p id="timer">Time Left: 120s</p>
 
+  <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -93,6 +117,8 @@
     const playersCount = document.getElementById("playersCount");
     const timerEl = document.getElementById("timer");
     const backBtn = document.getElementById("backBtn");
+    const inviteBtn = document.getElementById("inviteBtn");
+    const notifySound = document.getElementById("notifySound");
 
     roomIdText.innerText = roomId;
 
@@ -100,80 +126,43 @@
     let seconds = 120;
     let timerStarted = false;
     let timerInterval = null;
-
     const roomRef = ref(db, `rooms/${roomId}`);
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return location.href = "login.html";
-  currentUser = user;
-  const myUid = currentUser.uid;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
+      currentUser = user;
+      const myUid = currentUser.uid;
 
-  if (!roomId || !role) {
-    await Swal.fire("Invalid game parameters");
-    return location.href = "home.html";
-  }
+      if (!roomId || !role) {
+        await Swal.fire("Invalid game parameters");
+        return location.href = "home.html";
+      }
 
-  // Haddii role = away, hubi home user jira
-  if (role === "away") {
-    const homeSnap = await get(ref(db, `rooms/${roomId}/home`));
-    if (!homeSnap.exists() || !homeSnap.val()) {
-      await Swal.fire({
-        icon: "error",
-        title: "No creator room found",
-        text: "The game room creator has left or the room is invalid."
-      });
-      await set(ref(db, `rooms/${roomId}`), null);
-      return location.href = "home.html";
-    }
+      // Role check & validation
+      if (role === "away") {
+        const homeSnap = await get(ref(db, `rooms/${roomId}/home`));
+        if (!homeSnap.exists()) {
+          await Swal.fire("Room creator left");
+          await set(ref(db, `rooms/${roomId}`), null);
+          return location.href = "home.html";
+        }
 
-    // Hubi haddii userka hadda jiro room-ka as away
-    const awaySnap = await get(ref(db, `rooms/${roomId}/away`));
-    if (!awaySnap.exists() || awaySnap.val() !== myUid) {
-      await Swal.fire({
-        icon: "error",
-        title: "Access denied",
-        text: "You are no part of the room."
-      });
-      await set(ref(db, `rooms/${roomId}/away`), null);
-      return location.href = "home.html";
-    }
+        const awaySnap = await get(ref(db, `rooms/${roomId}/away`));
+        if (!awaySnap.exists() || awaySnap.val() !== myUid) {
+          await Swal.fire("You are no part of the room");
+          return location.href = "home.html";
+        }
+      }
 
-    // Hubi haddii passwordAway jiro
-    const passSnap = await get(ref(db, `rooms/${roomId}/passwordAway`));
-    if (!passSnap.exists() || !passSnap.val()) {
-      await Swal.fire({
-        icon: "warning",
-        title: "Password needed",
-        text: "Password is required to join as away player."
-      });
-      await set(ref(db, `rooms/${roomId}/away`), null);
-      
-      return location.href = "matchmaking.html";
-    }
-  }
+      if (role === "home") {
+        const homeSnap = await get(ref(db, `rooms/${roomId}/home`));
+        if (!homeSnap.exists() || homeSnap.val() !== myUid) {
+          await Swal.fire("Access denied");
+          return location.href = "home.html";
+        }
+      }
 
-  // Haddii role = home, hubi userku yahay home
-  if (role === "home") {
-    const homeSnap = await get(ref(db, `rooms/${roomId}/home`));
-    if (!homeSnap.exists() || homeSnap.val() !== myUid) {
-      await Swal.fire({
-        icon: "error",
-        title: "Access denied",
-        text: "You are not the room creator."
-      });
-      await set(ref(db, `rooms/${roomId}/home`), null);
-      return location.href = "home.html";
-    }
-  }
-
-  // Halkan sii wad code-ka hore
-  // ...
-
-
-  // Markaad halkan joogtid, user-ka waa sax, sii wad code-kaaga
-  // ...
-
-      // Set current user profile image and name
+      // Load my profile
       const meSnap = await get(ref(db, `users/${myUid}`));
       if (meSnap.exists()) {
         const me = meSnap.val();
@@ -188,10 +177,12 @@ onAuthStateChanged(auth, async (user) => {
         }
       }
 
-      // Watch opponent profile changes realtime
+      // Opponent profile & invite button visibility
       const otherRole = role === "home" ? "away" : "home";
       onValue(ref(db, `rooms/${roomId}/${otherRole}`), async (snap) => {
         const otherUid = snap.val();
+        inviteBtn.style.display = otherUid ? "none" : "block";
+
         if (otherUid) {
           const otherSnap = await get(ref(db, `users/${otherUid}`));
           if (otherSnap.exists()) {
@@ -206,35 +197,39 @@ onAuthStateChanged(auth, async (user) => {
               homeName.innerText = `Home: ${name}`;
             }
           }
+        } else {
+          if (role === "home") {
+            awayProfile.src = "default.png";
+            awayName.innerText = "Away: Waiting...";
+          } else {
+            homeProfile.src = "default.png";
+            homeName.innerText = "Home: Waiting...";
+          }
         }
       });
 
-      // Listen to room data changes
+      // Listen invites for current user
+      
+
+      // Room data changes: ready players count & timer
       onValue(roomRef, async (snap) => {
         if (!snap.exists()) {
           await Swal.fire("Match room closed");
           location.href = "matchmaking.html";
           return;
         }
-        const data = snap.val();
 
-        // Check if current user still in the room
+        const data = snap.val();
         if (data.home !== myUid && data.away !== myUid) {
-          await Swal.fire({
-            icon: "warning",
-            title: "You are no longer in this game",
-            confirmButtonText: "OK"
-          });
+          await Swal.fire("You are no longer in this game");
           location.href = "matchmaking.html";
           return;
         }
 
-        // Update players ready count
         const r1 = data.homeReady ? 1 : 0;
         const r2 = data.awayReady ? 1 : 0;
         playersCount.innerText = `Players Ready: ${r1 + r2}/2`;
 
-        // Start timer if at least one player ready & timer not started
         if ((r1 + r2) >= 1 && !timerStarted) {
           timerStarted = true;
           timerInterval = setInterval(() => {
@@ -245,7 +240,6 @@ onAuthStateChanged(auth, async (user) => {
               timerEl.innerText = "Time's up!";
               clearInterval(timerInterval);
 
-              // If both ready, start game
               if (data.homeReady && data.awayReady && data.type === "friendmatch") {
                 const myRole = data.host === currentUser.uid ? "home" : "away";
                 location.href = `game.html?room=${roomId}&role=${myRole}&stake=10`;
@@ -254,66 +248,95 @@ onAuthStateChanged(auth, async (user) => {
           }, 1000);
         }
 
-        // If both players ready & time > 0, redirect immediately
-        if (data.homeReady && data.awayReady && data.type === "friendmatch" && seconds > 0) {
+        if (data.homeReady && data.awayReady && seconds > 0 && data.type === "friendmatch") {
           clearInterval(timerInterval);
           const myRole = data.host === currentUser.uid ? "home" : "away";
           location.href = `game.html?room=${roomId}&role=${myRole}&stake=10`;
         }
       });
 
-      // Ready button click
+      // Ready button
       readyBtn.onclick = async () => {
         await set(ref(db, `rooms/${roomId}/${role}Ready`), true);
         Swal.fire({
           title: "Ready!",
           text: "Waiting for opponent...",
           icon: "info",
-          showCancelButton: true,
           confirmButtonText: "Cancel",
-          cancelButtonText: "Close",
           preConfirm: () => {
             return set(ref(db, `rooms/${roomId}/${role}Ready`), false);
           }
         });
       };
 
-      // Back button click
+      // Back button
       backBtn.onclick = async () => {
         if (role === "away") {
           const res = await Swal.fire({
-            title: "Are you sure?",
-            text: "Leave the room?",
+            title: "Leave room?",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, leave"
+            confirmButtonText: "Yes"
           });
           if (res.isConfirmed) {
             await set(ref(db, `rooms/${roomId}/away`), null);
             await set(ref(db, `rooms/${roomId}/awayReady`), null);
-            setTimeout(() => {
-              history.back();
-            }, 1000);
+            history.back();
           }
-        } else if (role === "home") {
+        } else {
           const res = await Swal.fire({
-            title: "Are you sure?",
-            text: "Close this room?",
+            title: "Close this room?",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, close"
+            confirmButtonText: "Yes"
           });
           if (res.isConfirmed) {
             await set(ref(db, `rooms/${roomId}`), null);
-            setTimeout(() => {
-              history.back();
-            }, 1000);
+            history.back();
           }
         }
       };
+
+      // Invite button click: show friends list from friends/{myUid}
+      inviteBtn.onclick = async () => {
+        const friendsSnap = await get(ref(db, `friends/${myUid}`));
+        if (!friendsSnap.exists()) {
+          return Swal.fire("You have no friends to invite");
+        }
+        const friendsData = friendsSnap.val();
+
+        // Load detailed user data for each friend
+        let html = "";
+        for (const friendUid in friendsData) {
+          const userSnap = await get(ref(db, `users/${friendUid}`));
+          if (userSnap.exists()) {
+            const u = userSnap.val();
+            const img = u.logo ? `./${u.logo}.png` : "default.png";
+            const name = u.username || "Unknown";
+            html += `
+              <div style="display:flex;align-items:center;margin:10px 0;">
+                <img src="${img}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;">
+                <span style="flex:1;">${name}</span>
+                <button onclick="sendInvite('${friendUid}')" style="padding:5px 10px;">Invite</button>
+              </div>
+            `;
+          }
+        }
+        Swal.fire({ title: "Invite a Friend", html, showConfirmButton: false });
+      };
+
+      // Send invite function
+      window.sendInvite = async (toUid) => {
+        await set(ref(db, `invites/${toUid}/${currentUser.uid}`), {
+          roomId,
+          from: currentUser.uid,
+          timestamp: Date.now()
+        });
+        Swal.fire("Invite sent!");
+      };
     });
 
-    // Copy room ID to clipboard
+    // Copy Room ID to clipboard
     window.copyRoomId = () => {
       navigator.clipboard.writeText(roomId);
       Swal.fire("Copied!", "Room ID copied to clipboard", "success");

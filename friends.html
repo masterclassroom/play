@@ -3,118 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Friends</title>
+  <title>Friends & Invites</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #141e30;
+      background: #0f2027;
       color: white;
       padding: 20px;
-      max-width: 600px;
-      margin: auto;
     }
     h2 {
-      margin-top: 30px;
       text-align: center;
+      margin-bottom: 20px;
     }
-    .card {
-      background: rgba(255,255,255,0.1);
-      margin: 10px 0;
-      padding: 12px;
+    .friend-card {
+      background: #1e2a38;
       border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .info {
+    .friend-info {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
       cursor: pointer;
     }
-    .info img {
+    .friend-info img {
       width: 60px;
       height: 60px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid #00cec9;
     }
-    .info div {
+    .friend-name {
       font-size: 18px;
     }
-    button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      margin-left: 8px;
+    .invite-info {
+      text-align: right;
     }
-    .accept {
+    .invite-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #f1c40f;
+    }
+    .invite-info button {
+      padding: 6px 12px;
+      border: none;
       background: #00b894;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 5px;
+      display: block;
     }
-    .accept:hover {
-      background: #00d29b;
-    }
-    .decline {
-      background: #d63031;
-    }
-    .decline:hover {
-      background: #ff4d4d;
-    }
-    .remove {
-      background: #0984e3;
-    }
-    .remove:hover {
-      background: #74b9ff;
-    }
-    .no-data {
+    .no-friends {
       text-align: center;
-      margin: 10px;
       color: #aaa;
+      margin-top: 20px;
       font-style: italic;
-    }
-    .go-profile {
-      width: 100%;
-      padding: 12px;
-      background: #00cec9;
-      color: white;
-      border: none;
-      margin-top: 30px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: none;
-    }
-   .go-back  {
-      width: 100%;
-      padding: 12px;
-      background: #00cec9;
-      color: white;
-      border: none;
-      margin-top: 30px;
-      border-radius: 8px;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-  <h2>Friend Requests</h2>
-  <div id="requests"><p class="no-data">Loading...</p></div>
-
-  <h2>Pending Requests</h2>
-  <div id="pending"><p class="no-data">Loading...</p></div>
-
-  <h2>Your Friends</h2>
-  <div id="friends"><p class="no-data">Loading...</p></div>
-
-  <button class="go-profile" id="goProfileBtn">Go to My Profile</button>
-  <button class="go-back" onclick="goBack()">Back</button>
+  <h2>Friends</h2>
+  <div id="friendsList">Loading...</div>
+  <script src="g.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -131,143 +91,79 @@
     const db = getDatabase(app);
     const auth = getAuth();
 
-    let meUid = null;
-    const reqDiv = document.getElementById('requests');
-    const frDiv = document.getElementById('friends');
-    const pendingDiv = document.getElementById('pending');
-    const goProfileBtn = document.getElementById('goProfileBtn');
+    const friendsList = document.getElementById("friendsList");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return location.href = "login.html";
-      meUid = user.uid;
+      const myUid = user.uid;
 
-      goProfileBtn.onclick = () => location.href = `Profile.html?uid=${meUid}`;
-      goProfileBtn.style.display = "block";
+      const friendsSnap = await get(ref(db, `friends/${myUid}`));
+      friendsList.innerHTML = "";
 
-      loadRequests();
-      loadPendingRequests();
-      loadFriends();
-    });
-
-    async function loadRequests() {
-      const snap = await get(ref(db, `friendRequests/${meUid}`));
-      reqDiv.innerHTML = '';
-      if (!snap.exists()) {
-        reqDiv.innerHTML = '<p class="no-data">No requests</p>';
+      if (!friendsSnap.exists()) {
+        friendsList.innerHTML = `<p class="no-friends">Wali saaxiibyo lama helin.</p>`;
         return;
       }
 
-      for (const senderUid in snap.val()) {
-        const userSnap = await get(ref(db, `users/${senderUid}`));
-        const { username = "Unknown", logo = "default" } = userSnap.val() || {};
+      const invitesSnap = await get(ref(db, `invites/${myUid}`));
+      const invitesData = invitesSnap.exists() ? invitesSnap.val() : {};
 
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="info" onclick="location.href='Profile.html?uid=${senderUid}'">
-            <img src="${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
-          </div>
-          <div>
-            <button class="accept">Accept</button>
-            <button class="decline">Decline</button>
-          </div>`;
-
-        card.querySelector('.accept').onclick = async () => {
-          await set(ref(db, `friends/${meUid}/${senderUid}`), true);
-          await set(ref(db, `friends/${senderUid}/${meUid}`), true);
-          await remove(ref(db, `friendRequests/${meUid}/${senderUid}`));
-          Swal.fire("Accepted!");
-          loadRequests();
-          loadFriends();
-        };
-
-        card.querySelector('.decline').onclick = async () => {
-          await remove(ref(db, `friendRequests/${meUid}/${senderUid}`));
-          Swal.fire("Declined");
-          loadRequests();
-        };
-
-        reqDiv.appendChild(card);
-      }
-    }
-
-    async function loadPendingRequests() {
-      const allUsersSnap = await get(ref(db, 'friendRequests'));
-      pendingDiv.innerHTML = '';
-      let found = false;
-
-      if (allUsersSnap.exists()) {
-        const allRequests = allUsersSnap.val();
-        for (const otherUid in allRequests) {
-          if (allRequests[otherUid][meUid]) {
-            const userSnap = await get(ref(db, `users/${otherUid}`));
-            const { username = "Unknown", logo = "default" } = userSnap.val() || {};
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-              <div class="info" onclick="location.href='Profile.html?uid=${otherUid}'">
-                <img src="${logo}.png" onerror="this.src='default.png'"><div>${username} <span style="font-size:14px; color:#ccc;">(Pending)</span></div>
-              </div>
-              <button class="decline">Cancel</button>`;
-
-            card.querySelector('.decline').onclick = async () => {
-              await remove(ref(db, `friendRequests/${otherUid}/${meUid}`));
-              Swal.fire("Cancelled");
-              loadPendingRequests();
-            };
-
-            pendingDiv.appendChild(card);
-            found = true;
-          }
-        }
-      }
-
-      if (!found) pendingDiv.innerHTML = '<p class="no-data">No pending requests</p>';
-    }
-
-    async function loadFriends() {
-      const snap = await get(ref(db, `friends/${meUid}`));
-      frDiv.innerHTML = '';
-      if (!snap.exists()) {
-        frDiv.innerHTML = '<p class="no-data">No friends</p>';
-        return;
-      }
-
-      for (const friendUid in snap.val()) {
+      for (const friendUid in friendsSnap.val()) {
         const userSnap = await get(ref(db, `users/${friendUid}`));
-        const { username = "Unknown", logo = "default" } = userSnap.val() || {};
+        const user = userSnap.exists() ? userSnap.val() : {};
+        const name = user.username || "Friend";
+        const img = user.logo ? `${user.logo}.png` : "default.png";
 
-        const card = document.createElement('div');
-        card.className = 'card';
+        const isInvited = invitesData[friendUid];
+        const roomId = isInvited?.roomId;
+
+        const card = document.createElement("div");
+        card.className = "friend-card";
         card.innerHTML = `
-          <div class="info" onclick="location.href='Profile.html?uid=${friendUid}'">
-            <img src="${logo}.png" onerror="this.src='default.png'"><div>${username}</div>
+          <div class="friend-info" onclick="location.href='Profile.html?uid=${friendUid}'">
+            <img src="${img}" onerror="this.src='default.png'">
+            <div class="friend-name">${name}</div>
           </div>
-          <div>
-            <button class="remove">Remove</button>
-            <button class="accept">Chat</button>
-          </div>`;
+          <div class="invite-info">
+            ${roomId 
+              ? `<p>Invited to Match</p>
+                 <button class="joinBtn">Join</button>
+                 <button class="messageBtn">Message</button>`
+              : `<p>No Invite</p>
+                 <button class="messageBtn">Message</button>`
+            }
+          </div>
+        `;
 
-        card.querySelector('.remove').onclick = async () => {
-          await remove(ref(db, `friends/${meUid}/${friendUid}`));
-          await remove(ref(db, `friends/${friendUid}/${meUid}`));
-          Swal.fire("Removed");
-          loadFriends();
-        };
+        if (roomId) {
+          card.querySelector(".joinBtn").onclick = async () => {
+            const roomSnap = await get(ref(db, `rooms/${roomId}`));
+            if (!roomSnap.exists()) {
+              await Swal.fire("Room-ka ma jiro");
+              await remove(ref(db, `invites/${myUid}/${friendUid}`));
+              return;
+            }
 
-        card.querySelector('.accept').onclick = () => {
+            const room = roomSnap.val();
+            if (room.home && room.away) {
+              await Swal.fire("Room-ka waa buuxaa");
+              await remove(ref(db, `invites/${myUid}/${friendUid}`));
+              return;
+            }
+
+            await set(ref(db, `rooms/${roomId}/away`), myUid);
+            await remove(ref(db, `invites/${myUid}/${friendUid}`));
+            location.href = `room.html?room=${roomId}&role=away`;
+          };
+        }
+
+        card.querySelector(".messageBtn").onclick = () => {
           location.href = `chat.html?uid=${friendUid}`;
         };
 
-        frDiv.appendChild(card);
+        friendsList.appendChild(card);
       }
-    }
-  </script>
-  <script>
-  function goBack() {
-    window.history.back();
-  }
+    });
   </script>
 </body>
-</html> 
+</html>

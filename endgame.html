@@ -57,7 +57,7 @@
   </style>
 </head>
 <body>
-  <h1 id="resultTitle">Ciyaarta way dhammaatay</h1>
+  <h1 id="resultTitle">Game ended</h1>
   <p class="score" id="finalScore">Score: Home 0 - Away 0</p>
   <div class="profile-box">
     <div class="profile">
@@ -96,86 +96,114 @@
     const scoreHome = params.get("scoreHome");
     const scoreAway = params.get("scoreAway");
 
-    let roomType = "normal";
+    const btns = document.getElementById("btns");
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) return location.href = "login.html";
-      const uid = user.uid;
+    // ✅ Haddii URL params maqan yihiin
+    if (!roomId || !role || scoreHome === null || scoreAway === null) {
+      const div = document.createElement("div");
+      div.innerText = "No data found";
+      div.style.marginTop = "30px";
+      div.style.fontSize = "22px";
+      div.style.color = "red";
+      document.body.appendChild(div);
 
-      // Set result title and score
-      document.getElementById("finalScore").innerText = `Score: Home ${scoreHome} - Away ${scoreAway}`;
-      document.getElementById("resultTitle").innerText =
-        winner === "draw" ? "It's a Draw!" : `${winner.toUpperCase()} Wins!`;
+      const homeBtn = document.createElement("button");
+      homeBtn.innerText = "Home";
+      homeBtn.onclick = () => {
+        location.href = "home.html";
+      };
+      btns.appendChild(homeBtn);
+    } else {
+      onAuthStateChanged(auth, async user => {
+        if (!user) return location.href = "login.html";
 
-      const roomSnap = await get(ref(db, `rooms/${roomId}`));
-      if (!roomSnap.exists()) return;
-      const data = roomSnap.val();
-      roomType = data?.type || "normal";
+        document.getElementById("finalScore").innerText = `Score: Home ${scoreHome} - Away ${scoreAway}`;
+        document.getElementById("resultTitle").innerText =
+          winner === "draw" ? "It's a Draw!" : `${winner.toUpperCase()} Wins!`;
 
-      const homeSnap = await get(ref(db, `users/${data.home}`));
-      const awaySnap = await get(ref(db, `users/${data.away}`));
-      if (homeSnap.exists()) {
-        const home = homeSnap.val();
-        document.getElementById("homeName").innerText = home.username || "Home";
-        document.getElementById("homeImg").src = home.logo ? `./${home.logo}.png` : "default.png";
-      }
-      if (awaySnap.exists()) {
-        const away = awaySnap.val();
-        document.getElementById("awayName").innerText = away.username || "Away";
-        document.getElementById("awayImg").src = away.logo ? `./${away.logo}.png` : "default.png";
-      }
+        const roomSnap = await get(ref(db, `rooms/${roomId}`));
 
-      const btns = document.getElementById("btns");
+        // ✅ Haddii room ref jirin
+        if (!roomSnap.exists()) {
+          const div = document.createElement("div");   
+          div.style.marginTop = "30px";
+          div.style.fontSize = "22px";
+          div.style.color = "red";
+          document.body.appendChild(div);
 
-      // ========== FRIENDMATCH ==========
-      if (roomType === "friendmatch") {
-        const rematch = document.createElement("button");
-        rematch.innerText = "Rematch";
-        rematch.onclick = async () => {
-          if (role === "home") {
-            const resetFields = {
-              round: 1,
-              score: { home: 0, away: 0 },
-              homeGuess: null,
-              awayGuess: null,
-              lastResult: null,
-              awayReady: null,
-              homeReady: null
-            };
-            await update(ref(db, `rooms/${roomId}`), resetFields);
-            location.href = `room.html?room=${roomId}&role=home`;
-          } else {
-            location.href = `room.html?room=${roomId}&role=away`;
-            // away just goes back
-          }
-        };
+          const homeBtn = document.createElement("button");
+          homeBtn.innerText = "Home";
+          homeBtn.onclick = () => {
+            location.href = "home.html";
+          };
+          btns.appendChild(homeBtn);
+          return;
+        }
 
-        const exit = document.createElement("button");
-        exit.innerText = "Exit";
-        exit.onclick = async () => {
-          if (role === "home") {
-            await remove(ref(db, `rooms/${roomId}`));
-          }
-          location.href = "home.html";
-        };
+        const data = roomSnap.val();
+        const roomType = data?.type || "normal";
 
-        btns.appendChild(rematch);
-        btns.appendChild(exit);
-      }
+        const homeSnap = await get(ref(db, `users/${data.home}`));
+        const awaySnap = await get(ref(db, `users/${data.away}`));
+        if (homeSnap.exists()) {
+          const home = homeSnap.val();
+          document.getElementById("homeName").innerText = home.username || "Home";
+          document.getElementById("homeImg").src = home.logo ? `./${home.logo}.png` : "default.png";
+        }
+        if (awaySnap.exists()) {
+          const away = awaySnap.val();
+          document.getElementById("awayName").innerText = away.username || "Away";
+          document.getElementById("awayImg").src = away.logo ? `./${away.logo}.png` : "default.png";
+        }
 
-      // ========== NORMAL MATCH ==========
-      else {
-        const next = document.createElement("button");
-        next.innerText = "Next";
-        next.onclick = async () => {
-          if (role === "home") {
-            await remove(ref(db, `rooms/${roomId}`));
-          }
-          location.href = "online.html";
-        };
-        btns.appendChild(next);
-      }
-    });
+        // ========== FRIENDMATCH ==========
+        if (roomType === "friendmatch") {
+          const rematch = document.createElement("button");
+          rematch.innerText = "Rematch";
+          rematch.onclick = async () => {
+            if (role === "home") {
+              const resetFields = {
+                round: 1,
+                score: { home: 0, away: 0 },
+                homeGuess: null,
+                awayGuess: null,
+                lastResult: null,
+                awayReady: null,
+                homeReady: null
+              };
+              await update(ref(db, `rooms/${roomId}`), resetFields);
+              location.href = `room.html?room=${roomId}&role=home`;
+            } else {
+              location.href = `room.html?room=${roomId}&role=away`;
+            }
+          };
+
+          const exit = document.createElement("button");
+          exit.innerText = "Exit";
+          exit.onclick = async () => {
+            if (role === "home") {
+              await remove(ref(db, `rooms/${roomId}`));
+            }
+            location.href = "home.html";
+          };
+
+          btns.appendChild(rematch);
+          btns.appendChild(exit);
+        } else {
+          // ========== NORMAL MATCH ==========
+          const next = document.createElement("button");
+          next.innerText = "Next";
+          next.onclick = async () => {
+            if (role === "home") {
+              await remove(ref(db, `rooms/${roomId}`));
+            }
+            location.href = "online.html";
+          };
+          btns.appendChild(next);
+        }
+      });
+    }
   </script>
+  <script src="g.js"></script>
 </body>
 </html>

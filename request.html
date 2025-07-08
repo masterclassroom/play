@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Friend Requests</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background: #0f2027;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding-bottom: 100px;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .card {
+      background: #1c1c1c;
+      margin: 10px 15px;
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #00cec9;
+    }
+    .user div {
+      font-size: 16px;
+    }
+    .btns button {
+      margin-left: 5px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+    .accept {
+      background: #00b894;
+    }
+    .decline {
+      background: #d63031;
+    }
+    .cancel {
+      background: #ff7675;
+    }
+    .no-data {
+      text-align: center;
+      color: #aaa;
+      margin-top: 10px;
+    }
+    .fixed-buttons {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    .fixed-buttons button {
+      background: #0984e3;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Requests Received</h2>
+  <div id="receivedDiv"><p class="no-data">Loading...</p></div>
+
+  <h2>Pending Requests</h2>
+  <div id="pendingDiv"><p class="no-data">Loading...</p></div>
+
+  <div class="fixed-buttons">
+    <button onclick="location.href='home.html'">Back</button>
+    <button onclick="location.href='friends.html'">Friends</button>
+  </div>
+  <script src="g.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
+      authDomain: "exam-81b90.firebaseapp.com",
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
+      projectId: "exam-81b90",
+      storageBucket: "exam-81b90.appspot.com",
+      messagingSenderId: "461178422237",
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const receivedDiv = document.getElementById("receivedDiv");
+    const pendingDiv = document.getElementById("pendingDiv");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
+      const meUid = user.uid;
+
+      loadReceived(meUid);
+      loadPending(meUid);
+    });
+
+    async function loadReceived(meUid) {
+      const snap = await get(ref(db, `friendRequests/${meUid}`));
+      receivedDiv.innerHTML = "";
+      if (!snap.exists()) {
+        receivedDiv.innerHTML = `<p class="no-data">No requests received</p>`;
+        return;
+      }
+
+      for (const fromUid in snap.val()) {
+        const userSnap = await get(ref(db, `users/${fromUid}`));
+        const user = userSnap.exists() ? userSnap.val() : {};
+        const name = user.username || "Friend";
+        const img = user.logo ? `${user.logo}.png` : "default.png";
+
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <div class="user" onclick="location.href='Profile.html?uid=${fromUid}'">
+            <img src="${img}" onerror="this.src='default.png'">
+            <div>${name}</div>
+          </div>
+          <div class="btns">
+            <button class="accept">Accept</button>
+            <button class="decline">Decline</button>
+          </div>
+        `;
+
+        div.querySelector(".accept").onclick = async () => {
+          await set(ref(db, `friends/${meUid}/${fromUid}`), true);
+          await set(ref(db, `friends/${fromUid}/${meUid}`), true);
+          await remove(ref(db, `friendRequests/${meUid}/${fromUid}`));
+          Swal.fire("Accepted!");
+          loadReceived(meUid);
+        };
+
+        div.querySelector(".decline").onclick = async () => {
+          await remove(ref(db, `friendRequests/${meUid}/${fromUid}`));
+          Swal.fire("Declined");
+          loadReceived(meUid);
+        };
+
+        receivedDiv.appendChild(div);
+      }
+    }
+
+    async function loadPending(meUid) {
+      const all = await get(ref(db, "friendRequests"));
+      pendingDiv.innerHTML = "";
+      if (!all.exists()) {
+        pendingDiv.innerHTML = `<p class="no-data">No pending</p>`;
+        return;
+      }
+
+      let found = false;
+      for (const otherUid in all.val()) {
+        if (all.val()[otherUid][meUid]) {
+          const userSnap = await get(ref(db, `users/${otherUid}`));
+          const user = userSnap.exists() ? userSnap.val() : {};
+          const name = user.username || "User";
+          const img = user.logo ? `${user.logo}.png` : "default.png";
+
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <div class="user" onclick="location.href='Profile.html?uid=${otherUid}'">
+              <img src="${img}" onerror="this.src='default.png'">
+              <div>${name}</div>
+            </div>
+            <div class="btns">
+              <button class="cancel">Cancel</button>
+            </div>
+          `;
+
+          div.querySelector(".cancel").onclick = async () => {
+            await remove(ref(db, `friendRequests/${otherUid}/${meUid}`));
+            Swal.fire("Cancelled");
+            loadPending(meUid);
+          };
+
+          pendingDiv.appendChild(div);
+          found = true;
+        }
+      }
+
+      if (!found) {
+        pendingDiv.innerHTML = `<p class="no-data">No pending</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
