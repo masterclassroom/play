@@ -98,9 +98,7 @@ await set(ref(database, `users/${user.uid}/stats`), {
 
         showSuccess("success_account_created");
 
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 2000);
+        
 
     } catch (error) {
         showErrorMessage(error);
