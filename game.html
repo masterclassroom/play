@@ -1,399 +1,1012 @@
-<!DOCTYPE html><html lang="so">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Number Guess Battle</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-  /* Body Styling */
-body {
-  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-  color: #fff;
-  font-family: 'Segoe UI', sans-serif;
-  text-align: center;
-  padding: 20px;
-  user-select: none;
-  min-height: 100vh;
-  margin: 0;
-}
+<!DOCTYPE html>  
+<html lang="so">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>Tic Tac Toe Battle</title>  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>  
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>  
+  <style>  
+    /* Body Styling */  
+    body {  
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);  
+      color: #fff;  
+      font-family: 'Segoe UI', sans-serif;  
+      text-align: center;  
+      padding: 20px;  
+      user-select: none;  
+      min-height: 100vh;  
+      margin: 0;  
+      display: flex;  
+      flex-direction: column;  
+      align-items: center;  
+      overflow-x: hidden;  
+    }  
+    
+    /* Role Title */  
+    #role {  
+      font-weight: bold;  
+      color: #ffdd57;  
+      margin-bottom: 10px;  
+      font-size: 26px;  
+      text-shadow: 1px 1px 4px #000;  
+    }  
 
-/* Role Title */
-#role {
-  font-weight: bold;
-  color: #ffdd57;
-  margin-bottom: 20px;
-  font-size: 26px;
-  text-shadow: 1px 1px 4px #000;
-}
+    /* Round Text */  
+    #round {  
+      margin-bottom: 10px;  
+      font-size: 22px;  
+      transition: opacity 0.5s ease, transform 0.5s ease;  
+      opacity: 1;  
+    }  
 
-/* Round Text */
-#round {
-  margin-bottom: 10px;
-  font-size: 22px;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  opacity: 1;
-}
+    #round.fade {  
+      opacity: 0;  
+      transform: scale(0.95);  
+    }  
 
-#round.fade {
-  opacity: 0;
-  transform: scale(0.95);
-}
+    /* Scoreboard */  
+    #scoreboard {  
+      margin: 20px 0;  
+      font-size: 24px;  
+      color: #00ffc6;  
+      text-shadow: 0 0 5px #00ffc6;  
+      transition: all 0.3s ease;  
+    }  
 
-/* Scoreboard */
-#scoreboard {
-  margin: 20px 0;
-  font-size: 24px;
-  color: #00ffc6;
-  text-shadow: 0 0 5px #00ffc6;
-  transition: all 0.3s ease;
-}
+    /* Tic Tac Toe Board */  
+    #gameBoard {  
+      display: grid;  
+      grid-template-columns: repeat(3, 1fr);  
+      grid-gap: 10px;  
+      max-width: 300px;  
+      margin: 20px auto;  
+      background: rgba(255, 255, 255, 0.05);  
+      padding: 15px;  
+      border-radius: 12px;  
+      box-shadow: 0 0 20px rgba(0, 255, 198, 0.3);  
+      position: relative;  
+      transition: opacity 0.5s ease;  
+    }  
 
-/* Guess Button Area */
-#guessChoices {
-  margin-top: 20px;
-}
+    .cell {  
+      aspect-ratio: 1;  
+      background: rgba(255, 255, 255, 0.08);  
+      border: 2px solid #00ffc6;  
+      border-radius: 8px;  
+      display: flex;  
+      align-items: center;  
+      justify-content: center;  
+      font-size: 36px;  
+      font-weight: bold;  
+      cursor: pointer;  
+      transition: all 0.3s ease;  
+      box-shadow: 0 4px 8px rgba(0, 255, 198, 0.2);  
+      position: relative;  
+      overflow: hidden;  
+    }  
 
-/* Guess Buttons */
-#guessChoices button {
-  margin: 8px;
-  padding: 12px 20px;
-  font-size: 22px;
-  border-radius: 12px;
-  background: #292929;
-  color: #fff;
-  border: 2px solid #00ffc6;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,255,198,0.2);
-  transition: transform 0.2s ease, background 0.3s ease;
-}
+    .cell.x {  
+      color: #ff6b6b;  
+      text-shadow: 0 0 10px #ff6b6b;  
+    }  
 
-#guessChoices button:hover {
-  background: #00ffc6;
-  color: #000;
-  transform: scale(1.1);
-}
+    .cell.o {  
+      color: #4ecdc4;  
+      text-shadow: 0 0 10px #4ecdc4;  
+    }  
 
-/* Profile Container */
-.profile {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 40px;
-  margin: 30px 0;
-}
+    .cell:hover {  
+      background: rgba(0, 255, 198, 0.1);  
+      transform: scale(1.05);  
+    }  
 
-/* Each Profile Box */
-.profileBox {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 20px;
-  border-radius: 16px;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-  transition: transform 0.3s ease;
-}
+    .cell.disabled {  
+      cursor: not-allowed;  
+      opacity: 0.7;  
+    }  
 
-.profileBox:hover {
-  transform: scale(1.05);
-}
+    .cell.placed {  
+      animation: dropIn 0.4s ease-out;  
+    }  
 
-/* Profile Image */
-.profileBox img {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  border: 3px solid #00ffc6;
-  box-shadow: 0 0 10px #00ffc6;
-  transition: box-shadow 0.3s ease;
-}
+    @keyframes dropIn {  
+      0% {  
+        transform: scale(0) rotate(-180deg);  
+        opacity: 0;  
+      }  
+      60% {  
+        transform: scale(1.1) rotate(10deg);  
+      }  
+      100% {  
+        transform: scale(1) rotate(0deg);  
+        opacity: 1;  
+      }  
+    }  
 
-/* Profile Name */
-.profileBox p {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: bold;
-}
+    .winning-cell {  
+      background: rgba(0, 255, 198, 0.3);  
+      animation: pulse 1s infinite, glow 1.5s ease-in-out infinite alternate;  
+    }  
 
-/* Score Animation */
-@keyframes pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
+    @keyframes pulse {  
+      0% { transform: scale(1); }  
+      50% { transform: scale(1.05); }  
+      100% { transform: scale(1); }  
+    }  
 
-.score-animate {
-  animation: pop 0.4s ease;
-}
-  </style>
- 
-</head>
-<body>  
-  <div id="role">Loading role...</div>
-  <div id="round">Round: 1 / 5</div>
-  <div class="profile">
-    <div class="profileBox">
-      <img id="homeProfile" src="" alt="Home Profile">
-      <p id="homeName"></p>
-    </div>
-    <div class="profileBox">
-      <img id="awayProfile" src="" alt="Away Profile">
-      <p id="awayName"></p>
-    </div>
-  </div>
-  <div id="scoreboard">Home: 0 | Away: 0</div>
-  <div id="guessChoices" style="display: none;"></div>  
-<script src="g.js"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, update, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    @keyframes glow {  
+      from { box-shadow: 0 0 10px #00ffc6; }  
+      to { box-shadow: 0 0 20px #00ffc6, 0 0 30px #00ffc6; }  
+    }  
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",
-      authDomain: "exam-81b90.firebaseapp.com",
-      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",
-      projectId: "exam-81b90",
-      storageBucket: "exam-81b90.appspot.com",
-      messagingSenderId: "461178422237",
-      appId: "1:461178422237:web:8433ab42b524b0a17bac34"
-    };
+    .win-line {  
+      position: absolute;  
+      background: #ffdd57;  
+      border-radius: 3px;  
+      box-shadow: 0 0 15px #ffdd57;  
+      z-index: 1;  
+      transform-origin: left center;  
+      animation: drawLine 0.8s ease-out forwards;  
+    }  
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth();
+    @keyframes drawLine {  
+      0% {  
+        transform: scaleX(0);  
+        opacity: 0;  
+      }  
+      100% {  
+        transform: scaleX(1);  
+        opacity: 1;  
+      }  
+    }  
 
-    const urlParams = new URLSearchParams(location.search);
-    const roomId = urlParams.get("room");
-    const role = urlParams.get("role");
+    /* Profile Container */  
+    .profile {  
+      display: flex;  
+      justify-content: center;  
+      flex-wrap: wrap;  
+      gap: 40px;  
+      margin: 20px 0;  
+    }  
 
-    const roleEl = document.getElementById("role");
-    const roundEl = document.getElementById("round");
-    const scoreboardEl = document.getElementById("scoreboard");
-    const guessChoices = document.getElementById("guessChoices");
-    const homeProfile = document.getElementById("homeProfile");
-    const awayProfile = document.getElementById("awayProfile");
-    const homeName = document.getElementById("homeName");
-    const awayName = document.getElementById("awayName");
+    /* Each Profile Box */  
+    .profileBox {  
+      text-align: center;  
+      background: rgba(255, 255, 255, 0.05);  
+      padding: 10px 20px;  
+      border-radius: 16px;  
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);  
+      transition: all 0.3s ease;  
+      min-width: 150px;  
+      transform: scale(0.95);  
+    }  
 
-    let myUid = null;
-    let round = 1;
-    const maxRounds = 5;
-    let scoreHome = 0;
-    let scoreAway = 0;
-    let lastSeenRound = 0;
+    .profileBox.active {  
+      box-shadow: 0 0 25px rgba(0, 255, 198, 0.9);  
+      transform: scale(1.1);  
+    }  
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return location.href = "login.html";
-      myUid = user.uid;
-      if (!roomId || !role) return location.href = "home.html";
+    /* Profile Image */  
+    .profileBox img {  
+      width: 80px;  
+      height: 80px;  
+      border-radius: 50%;  
+      border: 3px solid #00ffc6;  
+      box-shadow: 0 0 10px #00ffc6;  
+      transition: box-shadow 0.3s ease;  
+    }  
 
-      roleEl.innerText = `Role: ${role}`;
+    /* Profile Name */  
+    .profileBox p {  
+      margin-top: 10px;  
+      font-size: 18px;  
+      font-weight: bold;  
+    }  
 
-      const roomRef = ref(db, `rooms/${roomId}`);
-      const roomSnap = await get(roomRef);
-      if (!roomSnap.exists()) return location.href = "room.html";
-      const roomData = roomSnap.val();
+    /* Score Animation */  
+    @keyframes pop {  
+      0% { transform: scale(1); }  
+      50% { transform: scale(1.2); }  
+      100% { transform: scale(1); }  
+    }  
 
-      // Security: Check if current user is part of the room
-      if ((role === "home" && roomData.home !== myUid) || (role === "away" && roomData.away !== myUid)) {
-        await Swal.fire("You are not part of this game", "Redirecting to home...", "warning");
-        return location.href = "home.html";
-      }
+    .score-animate {  
+      animation: pop 0.4s ease;  
+    }  
 
-      // Load profiles
-      const homeSnap = await get(ref(db, `users/${roomData.home}`));
-      const awaySnap = await get(ref(db, `users/${roomData.away}`));
-      if (homeSnap.exists()) {
-        const home = homeSnap.val();
-        homeProfile.src = home.logo ? `./${home.logo}.png` : "default.png";
-        homeName.innerText = home.username || "Home";
-      }
-      if (awaySnap.exists()) {
-        const away = awaySnap.val();
-        awayProfile.src = away.logo ? `./${away.logo}.png` : "default.png";
-        awayName.innerText = away.username || "Away";
-      }
+    /* Status Message */  
+    #status {  
+      margin: 15px 0;  
+      font-size: 18px;  
+      min-height: 25px;  
+      color: #ffdd57;  
+      transition: all 0.3s ease;  
+    }  
 
-      onValue(roomRef, async snap => {
-        if (!snap.exists()) return location.href = "room.html";
+    /* Action Buttons */  
+    .action-buttons {  
+      margin-top: 20px;  
+      display: flex;  
+      gap: 15px;  
+      justify-content: center;  
+    }  
 
-        const data = snap.val();
+    .action-buttons button {  
+      padding: 10px 20px;  
+      font-size: 16px;  
+      border-radius: 8px;  
+      background: #292929;  
+      color: #fff;  
+      border: 2px solid #00ffc6;  
+      cursor: pointer;  
+      box-shadow: 0 4px 8px rgba(0,255,198,0.2);  
+      transition: transform 0.2s ease, background 0.3s ease;  
+    }  
 
-        if (!data.round) {
-          await update(roomRef, { round: 1, score: { home: 0, away: 0 } });
-          return;
-        }
+    .action-buttons button:hover {  
+      background: #00ffc6;  
+      color: #000;  
+      transform: scale(1.05);  
+    }  
 
-        if (data.round !== round) {
-          round = data.round;
-          roundEl.classList.add("fade");
-          await new Promise(r => setTimeout(r, 500));
-          roundEl.innerText = `Round: ${round} / ${maxRounds}`;
-          roundEl.classList.remove("fade");
-        }
+    /* Game Container */  
+    .game-container {  
+      max-width: 800px;  
+      width: 100%;  
+    }  
 
-        if (data.score) {
-          scoreHome = data.score.home || 0;
-          scoreAway = data.score.away || 0;
-          scoreboardEl.innerText = `Home: ${scoreHome} | Away: ${scoreAway}`;
-        }
+    /* Round Progress */  
+    .round-progress {  
+      margin: 10px 0;  
+      display: flex;  
+      justify-content: center;  
+      gap: 5px;  
+    }  
 
-        if (!data[`${role}Guess`] && round <= maxRounds) {
-          showGuessChoices();
-        } else {
-          guessChoices.style.display = "none";
-        }
+    .round-dot {  
+      width: 12px;  
+      height: 12px;  
+      border-radius: 50%;  
+      background: rgba(255, 255, 255, 0.2);  
+      transition: all 0.3s ease;  
+    }  
 
-        // Only home creates target and calculates round result
-        if (
-          role === "home" &&
-          data.homeGuess && data.awayGuess &&
-          data.round === round &&
-          (!data.lastResult || data.lastResult.round !== round)
-        ) {
-          const target = Math.floor(Math.random() * 10) + 1;
-          const diffHome = Math.abs(data.homeGuess.value - target);
-          const diffAway = Math.abs(data.awayGuess.value - target);
+    .round-dot.active {  
+      background: #00ffc6;  
+      box-shadow: 0 0 8px #00ffc6;  
+      animation: dotPulse 1.5s infinite;  
+    }  
 
-          let winner = null;
-          if (diffHome < diffAway) winner = "home";
-          else if (diffAway < diffHome) winner = "away";
+    @keyframes dotPulse {  
+      0%, 100% { transform: scale(1); }  
+      50% { transform: scale(1.3); }  
+    }  
 
-          await update(roomRef, {
-            lastResult: {
-              round,
-              winner,
-              target,
-              home: data.homeGuess.value,
-              away: data.awayGuess.value
-            },
-            score: {
-              home: scoreHome + (winner === "home" ? 1 : 0),
-              away: scoreAway + (winner === "away" ? 1 : 0)
-            },
-            round: round + 1,
-            homeGuess: null,
-            awayGuess: null
-          });
-        }
+    .round-dot.completed {  
+      background: #ffdd57;  
+    }  
 
-        if (data.lastResult && data.lastResult.round !== lastSeenRound) {
-          lastSeenRound = data.lastResult.round;
-          const result = data.lastResult;
-          let msg = `🎯 Target: ${result.target}\nHome: ${result.home} | Away: ${result.away}`;
-          let title = result.winner ? `${result.winner.toUpperCase()} Wins the Round!` : "It's a Draw!";
+    /* Score Animation */  
+    .score-up {  
+      color: #4ecdc4;  
+      animation: scorePop 0.6s ease;  
+    }  
 
-          await Swal.fire({ title, text: msg, icon: result.winner ? "success" : "info" });
-        }
+    @keyframes scorePop {  
+      0% { transform: scale(1); }  
+      50% { transform: scale(1.3); }  
+      100% { transform: scale(1); }  
+    }  
 
-        if (round > maxRounds) {
-          document.querySelectorAll("#guessChoices button").forEach(btn => btn.disabled = true);
-          setTimeout(() => {
-  endGame();
-}, 2000);
-        }
-      });
-    });
+    /* Turn Indicator Animation */  
+    @keyframes pulseTurn {  
+      0% { transform: scale(1.1); }  
+      50% { transform: scale(1.15); }  
+      100% { transform: scale(1.1); }  
+    }  
 
-    function showGuessChoices() {
-      guessChoices.innerHTML = "<p>Choose a number (1-10):</p>";
-      for (let i = 1; i <= 10; i++) {
-        const btn = document.createElement("button");
-        btn.innerText = i;
-        btn.onclick = () => selectGuess(i);
-        guessChoices.appendChild(btn);
-      }
-      guessChoices.style.display = "block";
+    /* Draw Animation */  
+    .draw-cell {  
+      animation: drawPulse 1s ease-in-out infinite;  
+    }  
+
+    @keyframes drawPulse {  
+      0%, 100% {   
+        background: rgba(255, 255, 255, 0.08);  
+        transform: scale(1);  
+      }  
+      50% {   
+        background: rgba(255, 215, 0, 0.2);  
+        transform: scale(1.02);  
+      }  
+    }  
+
+    /* Next Round Animation */  
+    .round-transition {  
+      animation: roundTransition 1s ease-in-out;  
+    }  
+
+    @keyframes roundTransition {  
+      0% { transform: translateY(-20px); opacity: 0; }  
+      50% { transform: translateY(0); opacity: 1; }  
+      100% { transform: translateY(0); opacity: 1; }  
     }
-
-    async function selectGuess(val) {
-      guessChoices.style.display = "none";
-      await update(ref(db, `rooms/${roomId}`), {
-        [`${role}Guess`]: { uid: myUid, value: val }
-      });
-    }
-let gameEnded = false;
-
-async function endGame() {
-  if (gameEnded) return;
-  gameEnded = true;
-
-  const roomRef = ref(db, `rooms/${roomId}`);
-  const roomSnap = await get(roomRef);
-  if (!roomSnap.exists()) return;
-
-  const roomData = roomSnap.val();
-  const homeUid = roomData.home;
-  const awayUid = roomData.away;
-  const stake = roomData.stake || 10;
-  const roomType = roomData.type || "normal"; // default to normal
-  const isFriendMatch = roomType === "friendmatch";
-
-  let winner = null;
-  if (scoreHome > scoreAway) winner = "home";
-  else if (scoreAway > scoreHome) winner = "away";
-  const isDraw = winner === null;
-
-  // ✅ Step 1: Show final result via SweetAlert
-
-  // ✅ Step 2: Update stats if NOT friendmatch
-  if (!isFriendMatch) {
-    const homeStatsRef = ref(db, `users/${homeUid}/stats`);
-    const awayStatsRef = ref(db, `users/${awayUid}/stats`);
-
-    try {
-      const [homeSnap, awaySnap] = await Promise.all([
-        get(homeStatsRef),
-        get(awayStatsRef)
-      ]);
-
-      const homeStats = homeSnap.exists() ? homeSnap.val() : {
-        played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0
-      };
-      const awayStats = awaySnap.exists() ? awaySnap.val() : {
-        played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0
-      };
-
-      // Update played
-      homeStats.played += 1;
-      awayStats.played += 1;
-
-      if (winner === "home") {
-        homeStats.wins += 1;
-        homeStats.coins += stake * 2;
-        homeStats.totalcoinswon += stake * 2;
-        awayStats.losses += 1;
-      } else if (winner === "away") {
-        awayStats.wins += 1;
-        awayStats.coins += stake * 2;
-        awayStats.totalcoinswon += stake * 2;
-        homeStats.losses += 1;
-      } else {
-        homeStats.draws += 1;
-        awayStats.draws += 1;
-      }
-
-      await Promise.all([
-        update(homeStatsRef, homeStats),
-        update(awayStatsRef, awayStats)
-      ]);
-    } catch (err) {
-      console.error("⚠️ Stats update error:", err);
-    }
-  }
-
-  // ✅ Step 3: Redirect to endgame page
-  const endParams = new URLSearchParams({
-    room: roomId,
-    role,
-    type: roomType,
-    winner: isDraw ? "draw" : winner,
-    scoreHome,
-    scoreAway
-  });
-
-  location.href = `endgame.html?${endParams.toString()}`;
-}
-
-  </script>
-</body>
+  </style>  
+</head>  
+<body>    
+  <div class="game-container">  
+    <div id="role">Loading role...</div>  
+    <div id="round">Game: Tic Tac Toe</div>  
+    <div class="round-progress" id="roundProgress" style="display: none;"></div>  
+    <div class="profile">  
+      <div class="profileBox" id="homeProfileBox">  
+        <img id="homeProfile" src="" alt="Home Profile">  
+        <p id="homeName"></p>  
+      </div>  
+      <div class="profileBox" id="awayProfileBox">  
+        <img id="awayProfile" src="" alt="Away Profile">  
+        <p id="awayName"></p>  
+      </div>  
+    </div>  
+    <div id="scoreboard">Home: 0 | Away: 0</div>  
+    <div id="status">Waiting for players...</div>  
+    <div id="gameBoard"></div>  
+    <div class="action-buttons">  
+      <button id="restartBtn" style="display: none;">Play Again</button>  
+      <button id="leaveBtn">Leave Game</button>  
+    </div>  
+  </div>    
+  <script type="module">  
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";  
+    import { getDatabase, ref, update, get, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";  
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";  
+  
+    const firebaseConfig = {  
+      apiKey: "AIzaSyBAj0xbIZhcmWiSf3nYVgIIgTZ_KJ64mTE",  
+      authDomain: "exam-81b90.firebaseapp.com",  
+      databaseURL: "https://exam-81b90-default-rtdb.firebaseio.com",  
+      projectId: "exam-81b90",  
+      storageBucket: "exam-81b90.appspot.com",  
+      messagingSenderId: "461178422237",  
+      appId: "1:461178422237:web:8433ab42b524b0a17bac34"  
+    };  
+  
+    const app = initializeApp(firebaseConfig);  
+    const db = getDatabase(app);  
+    const auth = getAuth();  
+  
+    const urlParams = new URLSearchParams(location.search);  
+    const roomId = urlParams.get("room");  
+    const role = urlParams.get("role");  
+  
+    const roleEl = document.getElementById("role");  
+    const roundEl = document.getElementById("round");  
+    const scoreboardEl = document.getElementById("scoreboard");  
+    const statusEl = document.getElementById("status");  
+    const gameBoard = document.getElementById("gameBoard");  
+    const roundProgressEl = document.getElementById("roundProgress");  
+    const homeProfile = document.getElementById("homeProfile");  
+    const awayProfile = document.getElementById("awayProfile");  
+    const homeName = document.getElementById("homeName");  
+    const awayName = document.getElementById("awayName");  
+    const homeProfileBox = document.getElementById("homeProfileBox");  
+    const awayProfileBox = document.getElementById("awayProfileBox");  
+    const restartBtn = document.getElementById("restartBtn");  
+    const leaveBtn = document.getElementById("leaveBtn");  
+  
+    let myUid = null;  
+    let scoreHome = 0;  
+    let scoreAway = 0;  
+    let gameEnded = false;  
+    let mySymbol = role === "home" ? "X" : "O";  
+    let currentTurn = "X";  
+    let roomType = "normal";  
+    let winningCells = [];  
+    let isLeaving = false;  
+    let currentRound = 1;  
+    const maxRounds = 5;  
+  
+    // Initialize the game board  
+    function initializeBoard() {  
+      gameBoard.innerHTML = "";  
+      // Remove any existing win lines  
+      const existingLines = document.querySelectorAll('.win-line');  
+      existingLines.forEach(line => line.remove());  
+        
+      for (let i = 0; i < 9; i++) {  
+        const cell = document.createElement("div");  
+        cell.className = "cell";  
+        cell.dataset.index = i;  
+        cell.addEventListener("click", () => makeMove(i));  
+        gameBoard.appendChild(cell);  
+      }  
+    }  
+  
+    // Update round progress display (only for competitive matches)  
+    function updateRoundProgress() {  
+      if (roomType !== "friendmatch") {  
+        roundProgressEl.style.display = "flex";  
+        roundProgressEl.innerHTML = "";  
+        for (let i = 1; i <= maxRounds; i++) {  
+          const dot = document.createElement("div");  
+          dot.className = "round-dot";  
+          if (i === currentRound) {  
+            dot.classList.add("active");  
+          } else if (i < currentRound) {  
+            dot.classList.add("completed");  
+          }  
+          roundProgressEl.appendChild(dot);  
+        }  
+        roundEl.textContent = `Round ${currentRound} of ${maxRounds}`;  
+      } else {  
+        roundProgressEl.style.display = "none";  
+        roundEl.textContent = "Friend Match - Play Again!";  
+      }  
+    }  
+  
+    // Update active player indicator  
+    function updateActivePlayer() {  
+      if (currentTurn === "X") {  
+        homeProfileBox.classList.add("active");  
+        awayProfileBox.classList.remove("active");  
+        homeProfileBox.style.transform = "scale(1.1)";  
+        awayProfileBox.style.transform = "scale(0.95)";  
+      } else {  
+        awayProfileBox.classList.add("active");  
+        homeProfileBox.classList.remove("active");  
+        awayProfileBox.style.transform = "scale(1.1)";  
+        homeProfileBox.style.transform = "scale(0.95)";  
+      }  
+    }  
+  
+    // Animate turn change  
+    function animateTurnChange() {  
+      const activeBox = currentTurn === "X" ? homeProfileBox : awayProfileBox;  
+      activeBox.style.animation = "pulseTurn 0.6s ease";  
+      setTimeout(() => {  
+        activeBox.style.animation = "";  
+      }, 600);  
+    }  
+  
+    // Animate score update  
+    function animateScoreUpdate() {  
+      scoreboardEl.classList.add('score-up');  
+      setTimeout(() => {  
+        scoreboardEl.classList.remove('score-up');  
+      }, 600);  
+    }  
+  
+    // Enhanced round transition - TURN ALWAYS STARTS WITH HOME (X)  
+    async function transitionToNextRound() {  
+      // Add fade out animation  
+      roundEl.classList.add('fade');  
+      gameBoard.style.opacity = '0.5';  
+      statusEl.textContent = "Starting next round...";  
+        
+      await new Promise(resolve => setTimeout(resolve, 800));  
+        
+      // Reset game state - ALWAYS START WITH HOME (X)  
+      gameEnded = false;  
+      winningCells = [];  
+      currentTurn = "X"; // HAGAAG: Turn-ka mar walba home (X) ayaa bilowaya  
+        
+      // Update round display  
+      if (roomType !== "friendmatch") {  
+        roundEl.textContent = `Round ${currentRound} of ${maxRounds}`;  
+      } else {  
+        roundEl.textContent = "Friend Match - Play Again!";  
+      }  
+        
+      // Reset board with animation  
+      initializeBoard();  
+        
+      // Fade back in with animation  
+      roundEl.classList.remove('fade');  
+      roundEl.classList.add('round-transition');  
+      gameBoard.style.opacity = '1';  
+        
+      // Update active player to show HOME (X) is starting  
+      updateActivePlayer();  
+      animateTurnChange();  
+        
+      // Update status - ALWAYS SHOW HOME STARTS  
+      statusEl.textContent = roomType === "friendmatch"   
+        ? "New game started! Home's turn first!"   
+        : `Round ${currentRound} started! Home's turn first!`;  
+        
+      restartBtn.style.display = "none";  
+  
+      // Remove transition class after animation  
+      setTimeout(() => {  
+        roundEl.classList.remove('round-transition');  
+      }, 1000);  
+    }  
+  
+    // Win animation function  
+    async function animateWin(winningCells) {  
+      // Create win line based on winning pattern  
+      const patterns = [  
+        [0,1,2], [3,4,5], [6,7,8], // rows  
+        [0,3,6], [1,4,7], [2,5,8], // columns  
+        [0,4,8], [2,4,6]           // diagonals  
+      ];  
+        
+      const patternIndex = patterns.findIndex(p =>   
+        p.every(cell => winningCells.includes(cell))  
+      );  
+        
+      if (patternIndex !== -1) {  
+        const line = document.createElement('div');  
+        line.className = 'win-line';  
+          
+        const cellSize = gameBoard.offsetWidth / 3;  
+        const gap = 10;  
+        const lineThickness = 6;  
+          
+        if (patternIndex < 3) {  
+          // Horizontal lines  
+          const row = Math.floor(patternIndex);  
+          line.style.width = `${cellSize * 3 - gap}px`;  
+          line.style.height = `${lineThickness}px`;  
+          line.style.top = `${(row * cellSize) + (cellSize / 2) - (lineThickness / 2)}px`;  
+          line.style.left = `${gap / 2}px`;  
+        } else if (patternIndex < 6) {  
+          // Vertical lines  
+          const col = patternIndex - 3;  
+          line.style.width = `${lineThickness}px`;  
+          line.style.height = `${cellSize * 3 - gap}px`;  
+          line.style.left = `${(col * cellSize) + (cellSize / 2) - (lineThickness / 2)}px`;  
+          line.style.top = `${gap / 2}px`;  
+        } else {  
+          // Diagonal lines  
+          line.style.width = `${Math.sqrt(2) * (cellSize * 3 - gap)}px`;  
+          line.style.height = `${lineThickness}px`;  
+          line.style.top = `${(cellSize * 3) / 2 - (lineThickness / 2)}px`;  
+          line.style.left = patternIndex === 6 ?   
+            `${gap / 2}px` : `${cellSize * 3 - gap / 2}px`;  
+          line.style.transformOrigin = patternIndex === 6 ?   
+            'left center' : 'right center';  
+          line.style.transform = patternIndex === 6 ?   
+            'rotate(-45deg)' : 'rotate(45deg)';  
+        }  
+          
+        gameBoard.appendChild(line);  
+      }  
+        
+      // Confetti effect for win  
+      confetti({  
+        particleCount: 150,  
+        spread: 70,  
+        origin: { y: 0.6 },  
+        colors: ['#ff6b6b', '#4ecdc4', '#ffdd57', '#00ffc6']  
+      });  
+        
+      await new Promise(resolve => setTimeout(resolve, 1500));  
+    }  
+  
+    // Draw animation function  
+    async function animateDraw() {  
+      const cells = document.querySelectorAll('.cell');  
+      cells.forEach(cell => {  
+        cell.classList.add('draw-cell');  
+      });  
+        
+      await new Promise(resolve => setTimeout(resolve, 2000));  
+        
+      cells.forEach(cell => {  
+        cell.classList.remove('draw-cell');  
+      });  
+    }  
+  
+    onAuthStateChanged(auth, async (user) => {  
+      if (!user) return location.href = "login.html";  
+      myUid = user.uid;  
+      if (!roomId || !role) return location.href = "home.html";  
+  
+      roleEl.innerText = `Role: ${role} (${mySymbol})`;  
+  
+      const roomRef = ref(db, `rooms/${roomId}`);  
+      const roomSnap = await get(roomRef);  
+      if (!roomSnap.exists()) return location.href = "room.html";  
+      const roomData = roomSnap.val();  
+  
+      // Set room type  
+      roomType = roomData.type || "normal";  
+  
+      // Security: Check if current user is part of the room  
+      if ((role === "home" && roomData.home !== myUid) || (role === "away" && roomData.away !== myUid)) {  
+        await Swal.fire("You are not part of this game", "Redirecting to home...", "warning");  
+        return location.href = "home.html";  
+      }  
+  
+      // Load profiles  
+      const homeSnap = await get(ref(db, `users/${roomData.home}`));  
+      const awaySnap = await get(ref(db, `users/${roomData.away}`));  
+      if (homeSnap.exists()) {  
+        const home = homeSnap.val();  
+        homeProfile.src = home.logo ? `./${home.logo}.png` : "default.png";  
+        homeName.innerText = home.username || "Home";  
+      }  
+      if (awaySnap.exists()) {  
+        const away = awaySnap.val();  
+        awayProfile.src = away.logo ? `./${away.logo}.png` : "default.png";  
+        awayName.innerText = away.username || "Away";  
+      }  
+  
+      // Initialize the game board  
+      initializeBoard();  
+      updateRoundProgress();  
+  
+      // Button event listeners  
+      restartBtn.addEventListener("click", handleNextRound);  
+      leaveBtn.addEventListener("click", handleLeaveGame);  
+  
+      onValue(roomRef, async snap => {  
+        if (!snap.exists()) {  
+          if (!isLeaving) {  
+            await Swal.fire("Room Closed", "The room has been closed by the host", "info");  
+          }  
+          return location.href = "home.html";  
+        }  
+  
+        const data = snap.val();  
+  
+        // Update current round for competitive matches  
+        if (roomType !== "friendmatch" && data.currentRound && data.currentRound !== currentRound) {  
+          currentRound = data.currentRound;  
+          updateRoundProgress();  
+        }  
+  
+        // Check if opponent left  
+        if (data.awayLeft && role === "home") {  
+          await Swal.fire("Opponent Left", "Your opponent has left the game", "info");  
+          await remove(roomRef);  
+          return location.href = "home.html";  
+        }  
+  
+        if (data.homeLeft && role === "away") {  
+          await Swal.fire("Opponent Left", "Your opponent has left the game", "info");  
+            
+          if (roomType !== "friendmatch") {  
+            await updateStatsForEarlyLeave(roomData.home, roomData.away, "away");  
+          }  
+            
+          await remove(roomRef);  
+          return location.href = "home.html";  
+        }  
+  
+        // Update scores  
+        if (data.score) {  
+          const oldScoreHome = scoreHome;  
+          const oldScoreAway = scoreAway;  
+            
+          scoreHome = data.score.home || 0;  
+          scoreAway = data.score.away || 0;  
+          scoreboardEl.innerText = `Home: ${scoreHome} | Away: ${scoreAway}`;  
+            
+          // Animate score change  
+          if (scoreHome !== oldScoreHome || scoreAway !== oldScoreAway) {  
+            animateScoreUpdate();  
+          }  
+        }  
+  
+        // Update game state  
+        if (data.gameState) {  
+          updateBoard(data.gameState.board);  
+          currentTurn = data.gameState.currentTurn;  
+          updateActivePlayer();  
+            
+          if (data.gameState.winner) {  
+            gameEnded = true;
+            if (data.gameState.winner === "draw") {  
+              statusEl.textContent = "Game ended in a draw!";  
+            } else {  
+              statusEl.textContent = `${data.gameState.winner === "home" ? "Home" : "Away"} wins!`;  
+            }  
+              
+            // Show appropriate button based on game type  
+            if (roomType === "friendmatch") {  
+              restartBtn.textContent = "Play Again";  
+              restartBtn.style.display = "block";  
+            } else {  
+              // Competitive match - only home can advance rounds  
+              if (role === "home") {  
+                restartBtn.textContent = currentRound < maxRounds ? "Next Round" : "Finish Game";  
+                restartBtn.style.display = "block";  
+              } else {  
+                restartBtn.style.display = "none";  
+                statusEl.textContent += " - Waiting for Home to continue...";  
+              }  
+            }  
+          } else {  
+            statusEl.textContent = `Current turn: ${currentTurn === "X" ? "Home" : "Away"}`;  
+            restartBtn.style.display = "none";  
+          }  
+        }  
+  
+        // Check if it's my turn  
+        if (currentTurn === mySymbol && !data.gameState?.winner && !gameEnded) {  
+          statusEl.textContent = "Your turn!";  
+          enableBoard();  
+        } else {  
+          disableBoard();  
+        }  
+  
+        // Handle game end  
+        if (data.gameState?.winner && !gameEnded) {  
+          gameEnded = true;  
+          winningCells = data.gameState.winningCells || [];  
+          highlightWinningCells();  
+        }  
+      });  
+    });  
+  
+    async function handleLeaveGame() {  
+      isLeaving = true;  
+      const roomRef = ref(db, `rooms/${roomId}`);  
+      const roomSnap = await get(roomRef);  
+        
+      if (!roomSnap.exists()) {  
+        return location.href = "home.html";  
+      }  
+  
+      const roomData = roomSnap.val();  
+        
+      if (role === "home") {  
+        await remove(roomRef);  
+          
+        if (roomType !== "friendmatch" && !gameEnded) {  
+          await updateStatsForEarlyLeave(roomData.home, roomData.away, "away");  
+        }  
+      } else {  
+        await update(roomRef, { awayLeft: true });  
+          
+        if (roomType !== "friendmatch" && !gameEnded) {  
+          await updateStatsForEarlyLeave(roomData.home, roomData.away, "home");  
+        }  
+      }  
+        
+      location.href = "home.html";  
+    }  
+  
+    async function updateStatsForEarlyLeave(winnerUid, loserUid, winnerRole) {  
+      const stake = 10;  
+        
+      const winnerStatsRef = ref(db, `users/${winnerUid}/stats`);  
+      const loserStatsRef = ref(db, `users/${loserUid}/stats`);  
+  
+      try {  
+        const [winnerSnap, loserSnap] = await Promise.all([  
+          get(winnerStatsRef),  
+          get(loserStatsRef)  
+        ]);  
+  
+        const winnerStats = winnerSnap.exists() ? winnerSnap.val() : {  
+          played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0  
+        };  
+        const loserStats = loserSnap.exists() ? loserSnap.val() : {  
+          played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0  
+        };  
+  
+        winnerStats.played += 1;  
+        winnerStats.wins += 1;  
+        winnerStats.coins += stake * 2;  
+        winnerStats.totalcoinswon += stake * 2;  
+          
+        loserStats.played += 1;  
+        loserStats.losses += 1;  
+  
+        await Promise.all([  
+          update(winnerStatsRef, winnerStats),  
+          update(loserStatsRef, loserStats)  
+        ]);  
+      } catch (err) {  
+        console.error("⚠️ Stats update error:", err);  
+      }  
+    }  
+  
+    function updateBoard(board) {  
+      const cells = document.querySelectorAll(".cell");  
+      cells.forEach((cell, index) => {  
+        cell.textContent = board[index] || "";  
+        if (board[index] === "X") {  
+          cell.classList.add("x");  
+          cell.classList.remove("o");  
+        } else if (board[index] === "O") {  
+          cell.classList.add("o");  
+          cell.classList.remove("x");  
+        } else {  
+          cell.classList.remove("x", "o");  
+        }  
+          
+        cell.classList.remove("winning-cell", "placed");  
+      });  
+    }  
+  
+    function highlightWinningCells() {  
+      winningCells.forEach(index => {  
+        const cell = document.querySelector(`.cell[data-index="${index}"]`);  
+        if (cell) {  
+          cell.classList.add("winning-cell");  
+        }  
+      });  
+    }  
+  
+    function enableBoard() {  
+      const cells = document.querySelectorAll(".cell");  
+      cells.forEach(cell => {  
+        if (!cell.textContent) {  
+          cell.classList.remove("disabled");  
+        }  
+      });  
+    }  
+  
+    function disableBoard() {  
+      const cells = document.querySelectorAll(".cell");  
+      cells.forEach(cell => {  
+        cell.classList.add("disabled");  
+      });  
+    }  
+  
+    async function makeMove(index) {  
+      if (gameEnded) return;  
+        
+      const roomRef = ref(db, `rooms/${roomId}`);  
+      const roomSnap = await get(roomRef);  
+      if (!roomSnap.exists()) return;  
+        
+      const data = roomSnap.val();  
+      const gameState = data.gameState || { board: Array(9).fill(""), currentTurn: "X" };  
+        
+      if (gameState.board[index] || currentTurn !== mySymbol) return;  
+        
+      // Add visual feedback for the move  
+      const cell = document.querySelector(`.cell[data-index="${index}"]`);  
+      cell.classList.add("placed");  
+        
+      gameState.board[index] = mySymbol;  
+        
+      const winnerInfo = checkWinner(gameState.board);  
+      if (winnerInfo.winner) {  
+        gameState.winner = winnerInfo.winner;  
+        gameState.winningCells = winnerInfo.winningCells;  
+          
+        // Add win animation  
+        await animateWin(winnerInfo.winningCells);  
+          
+        const newScoreHome = scoreHome + (winnerInfo.winner === "home" ? 1 : 0);  
+        const newScoreAway = scoreAway + (winnerInfo.winner === "away" ? 1 : 0);  
+          
+        await update(roomRef, {  
+          score: { home: newScoreHome, away: newScoreAway }  
+        });  
+      } else if (gameState.board.every(cell => cell !== "")) {  
+        gameState.winner = "draw";  
+        // Add draw animation  
+        await animateDraw();  
+      } else {  
+        gameState.currentTurn = mySymbol === "X" ? "O" : "X";  
+        // Animate turn change  
+        animateTurnChange();  
+      }  
+        
+      await update(roomRef, { gameState });  
+    }  
+  
+    function checkWinner(board) {  
+      const winPatterns = [  
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  
+        [0, 4, 8], [2, 4, 6]  
+      ];  
+        
+      for (const pattern of winPatterns) {  
+        const [a, b, c] = pattern;  
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {  
+          return {  
+            winner: board[a] === "X" ? "home" : "away",  
+            winningCells: [a, b, c]  
+          };  
+        }  
+      }  
+        
+      return { winner: null, winningCells: [] };  
+    }  
+  
+    async function handleNextRound() {  
+      const roomRef = ref(db, `rooms/${roomId}`);  
+      const roomSnap = await get(roomRef);  
+      if (!roomSnap.exists()) return;  
+  
+      const data = roomSnap.val();  
+        
+      if (roomType === "friendmatch") {  
+        // HAGAAG: Friend match - reset game with HOME (X) starting  
+        await update(roomRef, {  
+          gameState: {   
+            board: Array(9).fill(""),   
+            currentTurn: "X" // HAGAAG: Always start with HOME  
+          }  
+        });  
+        await transitionToNextRound();  
+      } else {  
+        if (currentRound >= maxRounds) {  
+          // Game over - redirect to endgame  
+          const finalWinner = scoreHome > scoreAway ? "home" :   
+                             scoreAway > scoreHome ? "away" : "draw";  
+            
+          if (finalWinner !== "draw") {  
+            await updateMatchStats(data.home, data.away, finalWinner);  
+          }  
+            
+          const endParams = new URLSearchParams({  
+            room: roomId,  
+            role,  
+            type: roomType,  
+            winner: finalWinner,  
+            scoreHome: scoreHome,  
+            scoreAway: scoreAway  
+          });  
+  
+          location.href = `endgame.html?${endParams.toString()}`;  
+          return;  
+        }  
+  
+        // Move to next round - HAGAAG: ALWAYS START WITH HOME (X)  
+        const nextRoundNum = currentRound + 1;  
+          
+        await update(roomRef, {  
+          gameState: {   
+            board: Array(9).fill(""),   
+            currentTurn: "X" // HAGAAG: Always start with HOME  
+          },  
+          currentRound: nextRoundNum  
+        });  
+          
+        currentRound = nextRoundNum;  
+        updateRoundProgress();  
+        await transitionToNextRound();  
+      }  
+    }  
+  
+    async function updateMatchStats(homeUid, awayUid, winner) {  
+      const stake = 10;  
+      const winnerUid = winner === "home" ? homeUid : awayUid;  
+      const loserUid = winner === "home" ? awayUid : homeUid;  
+        
+      const winnerStatsRef = ref(db, `users/${winnerUid}/stats`);  
+      const loserStatsRef = ref(db, `users/${loserUid}/stats`);  
+  
+      try {  
+        const [winnerSnap, loserSnap] = await Promise.all([  
+          get(winnerStatsRef),  
+          get(loserStatsRef)  
+        ]);  
+  
+        const winnerStats = winnerSnap.exists() ? winnerSnap.val() : {  
+          played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0  
+        };  
+        const loserStats = loserSnap.exists() ? loserSnap.val() : {  
+          played: 0, wins: 0, losses: 0, draws: 0, coins: 0, totalcoinswon: 0  
+        };  
+  
+        winnerStats.played += 1;  
+        winnerStats.wins += 1;  
+        winnerStats.coins += stake * 2;  
+        winnerStats.totalcoinswon += stake * 2;  
+          
+        loserStats.played += 1;  
+        loserStats.losses += 1;  
+  
+        await Promise.all([  
+          update(winnerStatsRef, winnerStats),  
+          update(loserStatsRef, loserStats)  
+        ]);  
+      } catch (err) {  
+        console.error("⚠️ Stats update error:", err);  
+      }  
+    }  
+  </script>  
+</body>  
 </html>
